@@ -15,7 +15,8 @@ RUN npm run build
 
 FROM node:22-alpine AS runtime
 WORKDIR /web
-RUN apk upgrade --no-cache
+# apply OS fixes; drop npm/yarn (not needed at runtime, and their bundled deps trigger scanner findings)
+RUN apk upgrade --no-cache && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /opt/yarn-* /usr/local/bin/yarn /usr/local/bin/yarnpkg
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=build --chown=node:node /web/.next/standalone ./
 COPY --from=build --chown=node:node /web/.next/static ./.next/static
