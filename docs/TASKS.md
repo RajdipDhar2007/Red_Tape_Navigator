@@ -10,4 +10,4 @@
 - [x] 7. Frontend (Next.js, i18n en/bn/hi, voice, review UI)
 - [x] 8. Hardening: headers, rate limit, metrics, tracing; evals (20 golden); coverage >= 80%
 - [x] 9. Docker, CI/CD, load test, Playwright E2E
-- [ ] 10. Docs (COMPLIANCE, INTEGRATIONS, RUNBOOK, PILOT_PLAN, DEMO_SCRIPT) + final pass
+- [x] 10. Docs (COMPLIANCE, INTEGRATIONS, RUNBOOK, PILOT_PLAN, DEMO_SCRIPT) + final pass

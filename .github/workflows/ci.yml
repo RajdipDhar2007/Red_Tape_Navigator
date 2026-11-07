@@ -132,3 +132,23 @@ jobs:
         run: |
           test "$(docker run --rm --entrypoint id rtn-api:ci -u)" != "0"
           test "$(docker run --rm --entrypoint id rtn-web:ci -u)" != "0"
+
+  compose-smoke:
+    name: "make dev stack boots (compose) and the demo scenario runs"
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - run: docker compose up -d --build --wait --wait-timeout 300
+      - run: |
+          pip install httpx
+          python scripts/smoke_demo.py http://localhost:8000
+          curl -fsS http://localhost:3000/en | grep -q "Red Tape Navigator"
+          curl -fsS http://localhost:3000/bn | grep -q 'lang="bn"'
+      - name: Worker is up (scheduled jobs)
+        run: docker compose ps worker --format '{{.State}}' | grep -q running
+      - if: failure()
+        run: docker compose logs --no-color --tail=200
+      - if: always()
+        run: docker compose down -v

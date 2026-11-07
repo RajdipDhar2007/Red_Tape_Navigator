@@ -1,5 +1,5 @@
 PY ?= python
-.PHONY: setup dev stop test lint eval migrate seed e2e loadtest keygen audit placeholders help
+.PHONY: setup dev stop test lint eval migrate seed e2e loadtest keygen audit placeholders help smoke
 
 help:
 	@echo "setup dev stop test lint eval migrate seed e2e loadtest audit keygen placeholders"
@@ -49,3 +49,6 @@ placeholders: ## regenerate the placeholder form PDFs
 
 keygen: ## generate a Fernet key for FIELD_ENCRYPTION_KEY
 	$(PY) -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+smoke: ## run the demo scenario against a running stack (make dev) via the API
+	$(PY) scripts/smoke_demo.py http://localhost:8000
