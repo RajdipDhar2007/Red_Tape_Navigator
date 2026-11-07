@@ -124,10 +124,10 @@ jobs:
       - uses: docker/build-push-action@v6
         with: { context: frontend, load: true, tags: "rtn-web:ci", cache-from: type=gha, cache-to: "type=gha,mode=max" }
       - name: Trivy (HIGH/CRITICAL with fixes available)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with: { image-ref: "rtn-api:ci", severity: "HIGH,CRITICAL", ignore-unfixed: true, exit-code: "1" }
       - name: Trivy web
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with: { image-ref: "rtn-web:ci", severity: "HIGH,CRITICAL", ignore-unfixed: true, exit-code: "1" }
       - name: Verify containers run as non-root
         run: |
