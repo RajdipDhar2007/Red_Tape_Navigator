@@ -1,6 +1,0 @@
-pyproject.toml
-red_tape_navigator.egg-info/PKG-INFO
-red_tape_navigator.egg-info/SOURCES.txt
-red_tape_navigator.egg-info/dependency_links.txt
-red_tape_navigator.egg-info/requires.txt
-red_tape_navigator.egg-info/top_level.txt

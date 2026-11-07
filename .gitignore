@@ -24,3 +24,4 @@ out/
 playwright-report/
 test-results/
 data/
+*.egg-info/
