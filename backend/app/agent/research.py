@@ -15,6 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.agent.llm import LLM, SYSTEM_GUARD
 from app.agent.planner import build_plan, licences_for, scope_for
 from app.core import audit
+from app.core.metrics import LOW_CONFIDENCE
+from app.core.tracing import span
 from app.db.models import Claim, ReviewItem, SourceSnapshot
 from app.kb import confidence as conf
 from app.kb.catalog import ACTIVITIES
@@ -141,12 +143,14 @@ async def research(
     live_report = None
     mode = "knowledge_base"
     if live:
-        live_report = await verify_live(db, claims, llm=llm, fetcher=fetcher, session_id=session_id)
+        with span("research.live", sources=len({c.source_url for c in claims})):
+            live_report = await verify_live(db, claims, llm=llm, fetcher=fetcher, session_id=session_id)
         claims = await claims_for_prefixes(db, prefixes)
         mode = "live_verified" if live_report["fetched"] else "knowledge_base_degraded"
     by_key = {c.key: claim_dict(c) for c in claims}
     plan = build_plan(parsed, by_key)
     low = [claim_dict(c) for c in claims if c.needs_verification]
+    LOW_CONFIDENCE.inc(len(low))
     for c in claims:
         if c.needs_verification:
             existing = (await db.execute(select(ReviewItem).where(ReviewItem.claim_id == c.id, ReviewItem.session_id == session_id))).first()

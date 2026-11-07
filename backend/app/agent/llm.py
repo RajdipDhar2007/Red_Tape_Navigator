@@ -11,7 +11,9 @@ from typing import Any, TypeVar
 from pydantic import BaseModel, ValidationError
 
 from app.core.config import get_settings
+from app.core.metrics import LLM_CALLS
 from app.core.resilience import CircuitBreaker, call_with_resilience
+from app.core.tracing import span
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -54,10 +56,17 @@ class LLM:
     async def _create(self, **kw):
         if not self.available:
             raise LLMUnavailable("ANTHROPIC_API_KEY / ANTHROPIC_MODEL not configured")
-        return await call_with_resilience(
-            lambda: self._client.messages.create(model=self.model, max_tokens=2000, **kw),
-            breaker=_breaker, retries=2, timeout=60,
-        )
+        try:
+            with span("llm.call", model=self.model):
+                out = await call_with_resilience(
+                    lambda: self._client.messages.create(model=self.model, max_tokens=2000, **kw),
+                    breaker=_breaker, retries=2, timeout=60,
+                )
+            LLM_CALLS.labels("ok").inc()
+            return out
+        except Exception:
+            LLM_CALLS.labels("error").inc()
+            raise
 
     async def structured(self, system: str, user: str, schema: type[T]) -> T:
         """Force a tool call whose input schema is the Pydantic model, then validate."""

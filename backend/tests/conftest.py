@@ -20,6 +20,9 @@ async def client():
     async with get_engine().begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+    from app.core.middleware import limiter
+
+    limiter.hits.clear()
     app = create_app()
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c

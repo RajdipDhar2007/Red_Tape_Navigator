@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     rate_limit_per_minute: int = 120
     sentry_dsn: str = ""
     integrations_mode: str = "mock"
+    otel_exporter_otlp_endpoint: str = ""
+    trust_proxy: bool = False
+    auth_rate_limit_per_minute: int = 20
+    metrics_token: str = ""
+    log_level: str = "INFO"
 
     @property
     def cors_list(self) -> list[str]:

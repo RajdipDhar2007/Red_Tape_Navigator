@@ -13,7 +13,9 @@ from urllib.parse import urlparse
 import httpx
 import trafilatura
 
+from app.core.metrics import SCRAPES
 from app.core.resilience import CircuitBreaker, call_with_resilience
+from app.core.tracing import span
 from app.scraping.allowlist import assert_allowed, load_sources
 from app.scraping.sanitizer import content_hash, sanitize
 
@@ -84,6 +86,17 @@ async def _render_js(url: str, ua: str) -> str:  # pragma: no cover - needs a br
 
 
 async def fetch_page(url: str, *, render_js: bool = False, client: httpx.AsyncClient | None = None) -> Page:
+    with span("scrape.fetch", host=urlparse(url).hostname or ""):
+        try:
+            page = await _fetch_page(url, render_js=render_js, client=client)
+        except Exception as exc:
+            SCRAPES.labels(type(exc).__name__).inc()
+            raise
+    SCRAPES.labels("ok").inc()
+    return page
+
+
+async def _fetch_page(url: str, *, render_js: bool = False, client: httpx.AsyncClient | None = None) -> Page:
     url = assert_allowed(url)
     cfg = load_sources()
     ua = cfg["user_agent"]
