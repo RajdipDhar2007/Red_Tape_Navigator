@@ -60,6 +60,8 @@ async def set_answer(db: AsyncSession, session_id: str, key: str, raw: str, sour
     ns = await db.get(NavSession, session_id)
     if ns and key in (ns.skipped or []):
         ns.skipped = [k for k in ns.skipped if k != key]
+    if ns and ns.reviewed_at:  # any edit invalidates a previous review: the citizen must re-review
+        ns.reviewed_at = None
     await db.commit()
     await get_cache().delete(_ck(session_id))
     return value

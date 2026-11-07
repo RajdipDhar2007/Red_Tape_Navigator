@@ -6,7 +6,7 @@
 - [x] 3. Scraping guard (allowlist, robots, sanitizer) + research agent + rules KB, citations, confidence, diff
 - [x] 4. Interview engine + validators + encrypted memory
 - [x] 5. Form registry (3 templates) + PDF filler + field report
-- [ ] 6. API routers, review checkpoint, follow-up, integrations adapters, e2e backend demo flow
+- [x] 6. API routers, review checkpoint, follow-up, integrations adapters, e2e backend demo flow
 - [ ] 7. Frontend (Next.js, i18n en/bn/hi, voice, review UI)
 - [ ] 8. Hardening: headers, rate limit, metrics, tracing; evals (20 golden); coverage >= 80%
 - [ ] 9. Docker, CI/CD, load test, Playwright E2E

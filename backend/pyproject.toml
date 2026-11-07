@@ -51,6 +51,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.coverage.run]
 omit = ["app/integrations/real/*", "app/jobs/worker.py"]
+concurrency = ["greenlet", "thread"]
 
 [tool.coverage.report]
 fail_under = 80

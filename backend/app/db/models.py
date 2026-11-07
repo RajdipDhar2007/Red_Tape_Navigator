@@ -142,4 +142,6 @@ class Reminder(Base):
     title: Mapped[str] = mapped_column(String(255))
     due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     channel: Mapped[str] = mapped_column(String(16), default="email")
+    destination: Mapped[str] = mapped_column(String(255), default="")
+    kind: Mapped[str] = mapped_column(String(16), default="renewal")
     sent: Mapped[bool] = mapped_column(Boolean, default=False)

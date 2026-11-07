@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     confidence_threshold: float = 0.6
     rate_limit_per_minute: int = 120
     sentry_dsn: str = ""
+    integrations_mode: str = "mock"
 
     @property
     def cors_list(self) -> list[str]:
