@@ -67,3 +67,43 @@ backend/evals/ golden cases + harness
 Goal text → intake parse (state/city) → research (KB hit or scrape) → claims with citations/confidence →
 ordered checklist → union of form fields → interview (only missing) → fill PDFs + field report →
 review UI (edit, consent) → download + submission checklist → reminders.
+
+## Session state and the human gate
+
+```mermaid
+stateDiagram-v2
+  [*] --> Goal: POST /sessions (needs consent)
+  Goal --> Goal: clarify (only if city/state missing)
+  Goal --> Research: parsed
+  Research --> Checklist: plan with cited claims
+  Checklist --> Interview: start
+  Interview --> Interview: answer / skip / edit
+  Interview --> Review: required fields answered (or skipped)
+  Review --> Interview: edit invalidates review
+  Review --> Submit: POST /review {confirm:true}  (explicit human consent)
+  Submit --> [*]: citizen downloads, signs and submits ON THE PORTAL
+```
+
+Downloads, e-Sign and the submission checklist return `403 review_required` until the human confirms; any later edit
+resets `reviewed_at`. There is no route or adapter method that submits to a government portal.
+
+## Data model (PostgreSQL)
+
+`users`, `refresh_tokens`, `consents`, `audit_log` (hash-chained, immutable), `nav_sessions`, `answers` (sensitive values
+Fernet-encrypted), `claims` (versioned; `source_url`, `fetched_at`, `content_hash` NOT NULL; `embedding vector(256)`;
+partial unique index → one current version per key), `source_snapshots` (change detection), `review_queue`, `reminders`.
+
+## Agent behaviour
+
+* **Deterministic first:** rules parse the goal and build the plan from a catalogue; the LLM only fills gaps (validated
+  against the catalogue) and extracts claims from official pages (accepted only with a verbatim quote).
+* **Confidence:** `base` by claim type, +0.1 when verified live, −0.4 if the quote is not grounded, capped for unverified
+  seed data, decays with age; `< 0.6` → `needs_verification` + review queue + "Verify with the authority" in the UI.
+* **Resilience:** retry with backoff + timeouts + circuit breakers around every LLM call and per-host scraper;
+  degradation is explicit in the UI (research mode label).
+* **Change detection:** each source URL's content hash is snapshotted; a changed hash flags dependent claims and queues
+  review; a weekly job re-fetches all sources.
+
+## Security
+
+See [SECURITY.md](SECURITY.md). Compliance: [COMPLIANCE.md](COMPLIANCE.md).

@@ -43,7 +43,7 @@ export default function ReviewView({ session, onBack, onConfirmed }: { session: 
 
   const form = rv?.forms[active];
   const formId = form?.form_id;
-  const version = rv ? JSON.stringify(rv.forms.map((f) => f.summary)) : "";
+  const version = rv ? JSON.stringify(rv.forms.map((f) => f.fields.map((x) => [x.value, x.status]))) : "";
 
   useEffect(() => {
     if (!formId || lowData) return;

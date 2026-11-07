@@ -88,3 +88,12 @@ def test_tracing_span_and_error_capture():
     with span("unit", a=1) as sp:
         assert sp is not None
     capture_exception(ValueError("x"), path="/p")
+
+
+async def test_redis_cache_degrades_to_miss_when_unreachable():
+    from app.core.cache import RedisCache
+
+    c = RedisCache("redis://127.0.0.1:1/0")  # nothing listens here
+    assert await c.get("k") is None
+    await c.set("k", {"a": 1})  # must not raise
+    await c.delete("k")
