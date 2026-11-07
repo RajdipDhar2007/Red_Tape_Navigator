@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text, event
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, event, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -97,6 +97,10 @@ class Claim(Base):
     """A regulatory claim. Citation columns are NOT NULL: no claim without a source."""
 
     __tablename__ = "claims"
+    # at most one *current* version per key, even under concurrent writers
+    __table_args__ = (
+        Index("uq_claims_current_key", "key", unique=True, sqlite_where=text("current = 1"), postgresql_where=text("current IS TRUE")),
+    )
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
     key: Mapped[str] = mapped_column(String(128), index=True)
     version: Mapped[int] = mapped_column(Integer, default=1)

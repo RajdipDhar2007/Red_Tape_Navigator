@@ -1,3 +1,4 @@
+import asyncio
 from datetime import UTC, datetime
 
 import jwt
@@ -50,7 +51,7 @@ async def register(body: RegisterIn, db: AsyncSession = Depends(get_db)):
     if exists:
         raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
     # self-registration is always a citizen; elevated roles are granted by admins only
-    user = User(email=body.email.lower(), password_hash=hash_password(body.password), language=body.language)
+    user = User(email=body.email.lower(), password_hash=await asyncio.to_thread(hash_password, body.password), language=body.language)
     db.add(user)
     await db.commit()
     await audit.record(db, user.id, "auth.register")
@@ -60,7 +61,7 @@ async def register(body: RegisterIn, db: AsyncSession = Depends(get_db)):
 @router.post("/login", response_model=TokenOut)
 async def login(body: LoginIn, db: AsyncSession = Depends(get_db)):
     user = (await db.execute(select(User).where(User.email == body.email.lower()))).scalar_one_or_none()
-    if not user or user.deleted_at or not verify_password(body.password, user.password_hash):
+    if not user or user.deleted_at or not await asyncio.to_thread(verify_password, body.password, user.password_hash):
         await audit.record(db, "anonymous", "auth.login_failed")
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid credentials")
     await audit.record(db, user.id, "auth.login")

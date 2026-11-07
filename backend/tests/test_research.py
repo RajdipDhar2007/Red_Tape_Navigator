@@ -243,3 +243,42 @@ async def test_search(client):
         hits = await search(db, "FSSAI registration fee", 3)
         assert hits and "fssai" in hits[0][0].key
         assert (await db.execute(Claim.__table__.select())).first()
+
+
+async def test_concurrent_cold_start_creates_no_duplicate_current_claims(client):
+    """Regression: parallel first requests on an empty KB used to seed twice -> MultipleResultsFound."""
+    import asyncio
+
+    from sqlalchemy import func, select
+
+    parsed = {"activity": "bakery", "city": "Kolkata", "state": "West Bengal"}
+
+    async def one():
+        async with maker()() as db:
+            return await research(db, parsed)
+
+    results = await asyncio.gather(*[one() for _ in range(6)])
+    assert all(r["plan"]["steps"] for r in results)
+    async with maker()() as db:
+        dup = (await db.execute(select(Claim.key, func.count()).where(Claim.current.is_(True)).group_by(Claim.key).having(func.count() > 1))).all()
+        assert not dup
+
+
+async def test_concurrent_upserts_of_same_key_keep_one_current(client):
+    import asyncio
+
+    from sqlalchemy import func, select
+
+    def draft(i):
+        t = f"Fee: variant {i}"
+        return ClaimDraft(key="gst:national:fee", category="fee", text=t, source_url="https://www.gst.gov.in/",
+                          fetched_at=datetime.now(UTC), content_hash=content_hash(t), confidence=0.9)
+
+    async def one(i):
+        async with maker()() as db:
+            return await upsert_claim(db, draft(i))
+
+    await asyncio.gather(*[one(i) for i in range(5)])
+    async with maker()() as db:
+        n = (await db.execute(select(func.count()).select_from(Claim).where(Claim.key == "gst:national:fee", Claim.current.is_(True)))).scalar_one()
+        assert n == 1

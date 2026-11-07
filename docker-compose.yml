@@ -3,23 +3,35 @@ services:
     image: pgvector/pgvector:pg16
     environment: { POSTGRES_USER: rtn, POSTGRES_PASSWORD: rtn, POSTGRES_DB: rtn }
     volumes: [pgdata:/var/lib/postgresql/data]
-    healthcheck: { test: ["CMD-SHELL", "pg_isready -U rtn"], interval: 5s, retries: 10 }
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U rtn"], interval: 5s, timeout: 3s, retries: 10 }
   redis:
     image: redis:7-alpine
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, timeout: 3s, retries: 10 }
   api:
     build: ./backend
     env_file: .env
-    depends_on: { db: { condition: service_healthy }, redis: { condition: service_started } }
+    environment:
+      DATABASE_URL: postgresql+asyncpg://rtn:rtn@db:5432/rtn
+      REDIS_URL: redis://redis:6379/0
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_healthy } }
     ports: ["8000:8000"]
   worker:
     build: ./backend
-    command: arq app.jobs.worker.WorkerSettings
+    command: ["arq", "app.jobs.worker.WorkerSettings"]
     env_file: .env
-    depends_on: [api]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://rtn:rtn@db:5432/rtn
+      REDIS_URL: redis://redis:6379/0
+      RUN_MIGRATIONS: "false"
+      SEED_ON_START: "false"
+    depends_on: { api: { condition: service_healthy } }
   web:
-    build: ./frontend
-    environment: { NEXT_PUBLIC_API_URL: http://localhost:8000 }
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_DEMO_MODE: "true"
     ports: ["3000:3000"]
-    depends_on: [api]
+    depends_on: { api: { condition: service_healthy } }
 volumes:
   pgdata:

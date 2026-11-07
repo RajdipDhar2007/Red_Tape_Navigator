@@ -12,7 +12,6 @@ export default function DoneView({ session }: { session: Session }) {
   const ta = useTranslations("app");
   const sid = session.id;
   const [items, setItems] = useState<ChecklistItem[]>([]);
-  const [important, setImportant] = useState("");
   const [esign, setEsign] = useState<Record<string, string>>({});
   const [chosen, setChosen] = useState<string[]>([]);
   const [channel, setChannel] = useState("email");
@@ -21,10 +20,7 @@ export default function DoneView({ session }: { session: Session }) {
   const forms = [...new Set((session.plan.steps ?? []).map((s) => s.form).filter((f): f is string => !!f))];
 
   useEffect(() => {
-    void api<{ items: ChecklistItem[]; important: string }>(`/sessions/${sid}/submission-checklist`).then((r) => {
-      setItems(r.items);
-      setImportant(r.important);
-    });
+    void api<{ items: ChecklistItem[] }>(`/sessions/${sid}/submission-checklist`).then((r) => setItems(r.items));
   }, [sid]);
 
   const download = async (fid: string) => {
@@ -58,7 +54,7 @@ export default function DoneView({ session }: { session: Session }) {
         {t("heading")}
       </h2>
       <p role="note" className="rounded border border-brand-600 bg-brand-50 p-3 font-medium">
-        {important || t("important")}
+        {t("important")}
       </p>
 
       <div className="card space-y-2">

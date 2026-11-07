@@ -1,0 +1,43 @@
+# Deployment TEMPLATE. Manual trigger only. Fill in the registry/target for your cloud (India region: see docs/COMPLIANCE.md).
+# It never runs automatically and needs an approver on the "production" environment.
+name: Deploy (template)
+on:
+  workflow_dispatch:
+    inputs:
+      ref: { description: "Git ref to deploy", required: true, default: main }
+permissions:
+  contents: read
+  packages: write
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/red-tape-navigator
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: production   # configure required reviewers in repo settings
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with: { registry: "${{ env.REGISTRY }}", username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - uses: docker/build-push-action@v6
+        with: { context: backend, push: true, tags: "${{ env.IMAGE_PREFIX }}-api:${{ github.sha }}" }
+      - uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: true
+          tags: "${{ env.IMAGE_PREFIX }}-web:${{ github.sha }}"
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.PUBLIC_API_URL }}
+            NEXT_PUBLIC_DEMO_MODE=false
+  migrate-and-release:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Run database migrations (release job)
+        run: |
+          echo "TODO: run 'alembic upgrade head' as a one-off task with RUN_MIGRATIONS=true against the production DB"
+          echo "TODO: roll out ${IMAGE_PREFIX}-api:${GITHUB_SHA} and ${IMAGE_PREFIX}-web:${GITHUB_SHA} (ECS/Kubernetes/etc.)"
+          echo "Secrets (SECRET_KEY, FIELD_ENCRYPTION_KEY, ANTHROPIC_API_KEY, DATABASE_URL) must come from the cloud secret manager."

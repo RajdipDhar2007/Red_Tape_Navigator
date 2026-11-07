@@ -5,6 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Claim
@@ -64,11 +65,20 @@ async def upsert_claim(db: AsyncSession, d: ClaimDraft) -> tuple[Claim, UpsertSt
     status: UpsertStatus = "new"
     if cur:
         cur.current = False
+        await db.flush()  # retire the old version before inserting the new current one
         row.version = cur.version + 1
         row.changed_from = cur.id
         status = "changed"
     db.add(row)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        # a concurrent writer inserted the current version first: keep theirs
+        await db.rollback()
+        winner = await get_current(db, d.key)
+        if winner is None:  # pragma: no cover - cannot happen unless the row was deleted meanwhile
+            raise
+        return winner, "unchanged"
     return row, status
 
 

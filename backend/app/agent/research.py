@@ -5,6 +5,7 @@ Rules:
 - Scraped text is sanitised and delimited; the LLM may only extract claims whose `quote` appears verbatim in the page.
 - Every stored claim has source_url, fetched_at, content_hash. Low confidence => `needs_verification` + review queue.
 """
+import asyncio
 import re
 from collections.abc import Awaitable, Callable
 
@@ -26,6 +27,7 @@ from app.scraping.fetcher import HumanHandoffRequired, Page, fetch_page
 from app.scraping.sanitizer import content_hash, wrap_untrusted
 
 Fetcher = Callable[[str], Awaitable[Page]]
+_seed_lock = asyncio.Lock()
 DISCLAIMER = "AI-assisted guidance, not legal advice. Verify with the issuing authority."
 
 
@@ -137,9 +139,12 @@ async def research(
     needed = licences_for(activity)
     prefixes = [f"{lid}:{scope_for(lid, parsed.get('city'))}:" for lid in needed if scope_for(lid, parsed.get("city"))]
     claims = await claims_for_prefixes(db, prefixes)
-    if len(claims) < len(prefixes):  # KB cold start: load the curated seed pack
-        await seed_all(db)
-        claims = await claims_for_prefixes(db, prefixes)
+    if len(claims) < len(prefixes):  # KB cold start: load the curated seed pack (once, even under concurrency)
+        async with _seed_lock:
+            claims = await claims_for_prefixes(db, prefixes)
+            if len(claims) < len(prefixes):
+                await seed_all(db)
+                claims = await claims_for_prefixes(db, prefixes)
     live_report = None
     mode = "knowledge_base"
     if live:

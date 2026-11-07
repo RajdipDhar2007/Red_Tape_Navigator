@@ -7,7 +7,8 @@ _INJECTION = re.compile(
     r"you are now|system prompt|new instructions?:|assistant:|<\s*/?\s*(system|assistant|tool)[^>]*>)",
     re.I,
 )
-_CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f‪-‮⁦-⁩]")
+_CTRL_CODES = [*range(0x00, 0x09), 0x0B, 0x0C, *range(0x0E, 0x20), *range(0x202A, 0x202F), *range(0x2066, 0x206A)]
+_CTRL = re.compile("[" + "".join(re.escape(chr(c)) for c in _CTRL_CODES) + "]")
 MAX_CHARS = 60_000
 
 
