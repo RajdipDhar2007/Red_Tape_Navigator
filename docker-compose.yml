@@ -18,6 +18,12 @@ services:
   worker:
     build: ./backend
     command: ["arq", "app.jobs.worker.WorkerSettings"]
+    healthcheck:
+      test: ["CMD", "arq", "--check", "app.jobs.worker.WorkerSettings"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://rtn:rtn@db:5432/rtn

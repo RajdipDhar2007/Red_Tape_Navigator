@@ -36,4 +36,5 @@ class WorkerSettings:
         cron(purge_job, hour={3}, minute={0}),  # daily
         cron(reminders_job, minute={0, 30}),  # every 30 minutes
     ]
+    health_check_interval = 30  # seconds; used by `arq --check` (compose healthcheck)
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url or "redis://localhost:6379/0")
