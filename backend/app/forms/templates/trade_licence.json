@@ -1,0 +1,127 @@
+{
+ "id": "trade_licence",
+ "title": "Municipal Trade Licence Application (PLACEHOLDER)",
+ "authority": "Municipal Corporation (varies by city)",
+ "version": "placeholder-1",
+ "placeholder": true,
+ "pdf": "trade_licence.pdf",
+ "kind": "acroform",
+ "portal_url": null,
+ "warnings": [],
+ "fields": [
+  {
+   "pdf_field": "authority",
+   "label": "Municipal authority",
+   "source": "authority",
+   "required": true
+  },
+  {
+   "pdf_field": "applicant_name",
+   "label": "Name of applicant",
+   "source": "applicant_name",
+   "transform": "title",
+   "max_len": 60,
+   "required": true
+  },
+  {
+   "pdf_field": "father_name",
+   "label": "Father / spouse name",
+   "source": "father_name",
+   "transform": "title",
+   "max_len": 60,
+   "required": true
+  },
+  {
+   "pdf_field": "residence_address",
+   "label": "Residential address",
+   "source": "residence_address",
+   "max_len": 120,
+   "required": true
+  },
+  {
+   "pdf_field": "mobile",
+   "label": "Mobile",
+   "source": "mobile",
+   "required": true
+  },
+  {
+   "pdf_field": "email",
+   "label": "Email",
+   "source": "email",
+   "required": false
+  },
+  {
+   "pdf_field": "business_name",
+   "label": "Name of establishment",
+   "source": "business_name",
+   "max_len": 60,
+   "required": true
+  },
+  {
+   "pdf_field": "trade_type",
+   "label": "Nature of trade",
+   "source": "business_type_label",
+   "confirm": true,
+   "note": "Mapped from your goal; confirm against the municipal trade category list.",
+   "required": true
+  },
+  {
+   "pdf_field": "premises_address",
+   "label": "Address of premises",
+   "source": "premises_address",
+   "max_len": 120,
+   "required": true
+  },
+  {
+   "pdf_field": "premises_pincode",
+   "label": "PIN",
+   "source": "premises_pincode",
+   "required": true
+  },
+  {
+   "pdf_field": "city",
+   "label": "Ward / city",
+   "source": "city",
+   "required": true
+  },
+  {
+   "pdf_field": "premises_rented",
+   "label": "Premises rented",
+   "source": "premises_ownership",
+   "transform": "checkbox_if:rented",
+   "required": true
+  },
+  {
+   "pdf_field": "premises_owned",
+   "label": "Premises owned",
+   "source": "premises_ownership",
+   "transform": "checkbox_if:owned",
+   "required": true
+  },
+  {
+   "pdf_field": "premises_area_sqft",
+   "label": "Area (sq ft)",
+   "source": "premises_area_sqft",
+   "required": true
+  },
+  {
+   "pdf_field": "num_employees",
+   "label": "Number of employees",
+   "source": "num_employees",
+   "required": true
+  },
+  {
+   "pdf_field": "date_of_commencement",
+   "label": "Proposed date of commencement",
+   "source": "date_of_commencement",
+   "transform": "date_ddmmyyyy",
+   "required": true
+  },
+  {
+   "pdf_field": "signature",
+   "label": "Signature of applicant",
+   "note": "To be signed by the applicant in person / via Aadhaar e-Sign. Never auto-filled.",
+   "required": false
+  }
+ ]
+}
