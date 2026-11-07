@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     auth_rate_limit_per_minute: int = 20
     metrics_token: str = ""
     log_level: str = "INFO"
+    grievance_contact: str = ""
 
     @property
     def cors_list(self) -> list[str]:

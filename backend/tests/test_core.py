@@ -63,3 +63,33 @@ async def test_audit_chain_and_immutability(client, auth):
         await db.execute(update(AuditLog).where(AuditLog.seq == row.seq).values(action="tampered"))
         await db.commit()
         assert not await audit.verify_chain(db)
+
+
+def test_encryption_key_rotation(monkeypatch):
+    from cryptography.fernet import Fernet
+
+    from app.core import config, crypto
+
+    old, new = Fernet.generate_key().decode(), Fernet.generate_key().decode()
+
+    def use(keys):
+        monkeypatch.setenv("FIELD_ENCRYPTION_KEY", keys)
+        config.get_settings.cache_clear()
+
+    try:
+        use(old)
+        token = crypto.encrypt("ABCPE1234F")
+        use(f"{new},{old}")  # new primary, old still readable
+        assert crypto.decrypt(token) == "ABCPE1234F"
+        rotated = crypto.rotate(token)
+        assert rotated != token
+        use(new)  # old key removed: only the rotated token still decrypts
+        assert crypto.decrypt(rotated) == "ABCPE1234F"
+        import pytest
+        from cryptography.fernet import InvalidToken
+
+        with pytest.raises(InvalidToken):
+            crypto.decrypt(token)
+    finally:
+        monkeypatch.delenv("FIELD_ENCRYPTION_KEY", raising=False)
+        config.get_settings.cache_clear()

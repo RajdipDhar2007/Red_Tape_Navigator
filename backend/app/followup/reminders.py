@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.consent import has_consent
 from app.db.models import Reminder
 from app.followup.checklist import RENEWAL_MONTHS
 from app.integrations.interfaces import Integrations
@@ -36,6 +37,9 @@ async def dispatch_due(db: AsyncSession, integrations: Integrations, now: dateti
             continue
         m = integrations.messengers.get(r.channel)
         if m is None or not r.destination:
+            continue
+        if not await has_consent(db, r.user_id, "reminders"):  # consent withdrawn: never send
+            r.sent = True  # close it out so it is not retried; nothing is delivered
             continue
         res = await m.send(r.destination, f"{r.title}. AI-assisted guidance, not legal advice. Verify with the issuing authority.")
         if res.ok:

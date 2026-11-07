@@ -41,5 +41,5 @@ async def delete_session(sid: str, user: User = Depends(current_user), db: Async
 @router.get("/policy")
 async def policy():
     s = get_settings()
-    return {"retention_days": s.retention_days, "data_region": s.data_region, "grievance": "Contact the Data Protection Officer listed in docs/COMPLIANCE.md"}
+    return {"retention_days": s.retention_days, "data_region": s.data_region, "grievance_contact": s.grievance_contact or "Not configured: the deployer must set GRIEVANCE_CONTACT (see docs/COMPLIANCE.md)"}
 

@@ -246,6 +246,8 @@ async def test_reminder_dispatch_uses_labelled_mock(client):
         from app.db.models import NavSession
         ns = NavSession(user_id=u.id, goal="g")
         db.add(ns)
+        from app.db.models import Consent
+        db.add(Consent(user_id=u.id, purpose="reminders", policy_version="1.0", granted=True))
         await db.commit()
         db.add_all([
             Reminder(session_id=ns.id, user_id=u.id, title="due", due_at=datetime.now(UTC) - timedelta(hours=1), channel="email", destination="r@example.com"),
@@ -276,3 +278,25 @@ def test_no_code_path_submits_to_government_portal():
     assert not [p for p in routes if re.search(r"submit(?!ted)", p)], "no submit route may exist"
     # the only 'submitted' route records the citizen's own statement and requires review
     assert "/sessions/{sid}/submitted" in routes
+
+
+async def test_withdrawn_reminder_consent_stops_delivery(client, auth):
+    from datetime import UTC, datetime, timedelta
+
+    headers, _ = auth
+    h, s = await start(client, auth)
+    await client.post("/consent", json={"purpose": "reminders", "granted": True}, headers=h)
+    async with maker()() as db:
+        uid = (await db.execute(User.__table__.select())).first().id
+        db.add(Reminder(session_id=s["id"], user_id=uid, title="due", due_at=datetime.now(UTC) - timedelta(hours=1), channel="email", destination="a@example.com"))
+        await db.commit()
+    await client.post("/consent", json={"purpose": "reminders", "granted": False}, headers=h)
+    async with maker()() as db:
+        MockMessenger.OUTBOX.clear()
+        assert await dispatch_due(db, get_integrations()) == 0
+        assert MockMessenger.OUTBOX == []
+
+
+async def test_login_unknown_email_costs_same_and_fails(client):
+    r = await client.post("/auth/login", json={"email": "nobody@example.com", "password": "whatever-long-1"})
+    assert r.status_code == 401 and r.json()["detail"] == "Invalid credentials"

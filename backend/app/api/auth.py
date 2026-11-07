@@ -14,6 +14,7 @@ from app.db.models import RefreshToken, User
 from app.db.session import get_db
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+_DUMMY_HASH = hash_password("timing-equalisation-only")
 
 
 class RegisterIn(BaseModel):
@@ -61,7 +62,10 @@ async def register(body: RegisterIn, db: AsyncSession = Depends(get_db)):
 @router.post("/login", response_model=TokenOut)
 async def login(body: LoginIn, db: AsyncSession = Depends(get_db)):
     user = (await db.execute(select(User).where(User.email == body.email.lower()))).scalar_one_or_none()
-    if not user or user.deleted_at or not await asyncio.to_thread(verify_password, body.password, user.password_hash):
+    # always run one bcrypt verification so response time does not reveal whether the email exists
+    stored = user.password_hash if user and not user.deleted_at else _DUMMY_HASH
+    valid = await asyncio.to_thread(verify_password, body.password, stored)
+    if not user or user.deleted_at or not valid:
         await audit.record(db, "anonymous", "auth.login_failed")
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid credentials")
     await audit.record(db, user.id, "auth.login")
