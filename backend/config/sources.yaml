@@ -1,0 +1,39 @@
+# Allowlist of official domains the research agent may fetch.
+# Suffix match: "gst.gov.in" also allows "www.gst.gov.in". Enforced in code
+# (app/scraping/allowlist.py), not just in prompts. HTTPS only.
+version: 1
+user_agent: "RedTapeNavigatorBot/0.1 (set contact in deployment)"
+rate_limit_per_domain_per_minute: 20
+max_bytes: 2000000
+domains:
+  national:
+    - udyamregistration.gov.in
+    - fssai.gov.in
+    - foscos.fssai.gov.in
+    - gst.gov.in
+    - india.gov.in
+    - msme.gov.in
+    - umang.gov.in
+    - digilocker.gov.in
+    - cpcb.nic.in
+    - mca.gov.in
+  state:
+    - wb.gov.in
+    - wblabour.gov.in
+    - wbfireservices.gov.in
+    - maharashtra.gov.in
+    - delhi.gov.in
+    - karnataka.gov.in
+    - tn.gov.in
+    - telangana.gov.in
+    - gujarat.gov.in
+  municipal:
+    - kmcgov.in
+    - mcgm.gov.in
+    - mcdonline.nic.in
+    - mcdonline.gov.in
+    - bbmp.gov.in
+    - chennaicorporation.gov.in
+    - ghmc.gov.in
+    - pmc.gov.in
+    - ahmedabadcity.gov.in

@@ -113,6 +113,16 @@ class Claim(Base):
     changed_from: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
 
+class SourceSnapshot(Base):
+    """Latest fetched content hash per official URL, used for change detection."""
+
+    __tablename__ = "source_snapshots"
+    url: Mapped[str] = mapped_column(String(1024), primary_key=True)
+    content_hash: Mapped[str] = mapped_column(String(64))
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    excerpt: Mapped[str] = mapped_column(Text, default="")
+
+
 class ReviewItem(Base):
     __tablename__ = "review_queue"
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
