@@ -10,6 +10,8 @@ RUN pip wheel --wheel-dir /wheels .
 # ---- runtime stage: small, non-root ----
 FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+# apply OS security fixes available since the base image was built (e.g. zlib1g)
+RUN apt-get update && apt-get -y --no-install-recommends upgrade && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app --home /app --shell /usr/sbin/nologin app
 WORKDIR /app
 COPY --from=build /wheels /wheels
