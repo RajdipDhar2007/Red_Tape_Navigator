@@ -1,3 +1,6 @@
+# Enable by (1) turning on Code scanning in the repo settings (free for public repos; private repos need GitHub
+# Advanced Security) and (2) setting the repository variable ENABLE_CODEQL=true. Until then bandit + ruff security rules
+# in ci.yml provide SAST.
 name: CodeQL (SAST)
 on:
   push: { branches: [main] }
@@ -10,6 +13,7 @@ permissions:
   security-events: write
 jobs:
   analyze:
+    if: ${{ vars.ENABLE_CODEQL == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
