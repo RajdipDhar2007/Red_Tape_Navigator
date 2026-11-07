@@ -35,6 +35,7 @@ cd ../frontend && npm install && npm run dev   # UI on :3000
 | `make lint` | ruff, mypy, eslint, tsc |
 | `make eval` | golden cases, citation coverage, hallucination gate |
 | `make e2e` | Playwright end-to-end (goal → interview → PDF → review) |
+| `make smoke` | run the demo scenario through the API of a running stack (CI runs it against the real compose stack) |
 | `make migrate` / `make seed` | Alembic migrations / load curated rules pack |
 | `make audit` | pip-audit, bandit, npm audit |
 | `make loadtest` | Locust ([baseline](docs/LOAD_TEST.md)) |
