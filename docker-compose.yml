@@ -1,0 +1,25 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment: { POSTGRES_USER: rtn, POSTGRES_PASSWORD: rtn, POSTGRES_DB: rtn }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U rtn"], interval: 5s, retries: 10 }
+  redis:
+    image: redis:7-alpine
+  api:
+    build: ./backend
+    env_file: .env
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_started } }
+    ports: ["8000:8000"]
+  worker:
+    build: ./backend
+    command: arq app.jobs.worker.WorkerSettings
+    env_file: .env
+    depends_on: [api]
+  web:
+    build: ./frontend
+    environment: { NEXT_PUBLIC_API_URL: http://localhost:8000 }
+    ports: ["3000:3000"]
+    depends_on: [api]
+volumes:
+  pgdata:
