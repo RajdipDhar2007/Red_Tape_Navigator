@@ -13,3 +13,4 @@
 - Without `ANTHROPIC_API_KEY` the system uses a deterministic fallback for intake/research, labelled in UI.
 - Repository is private on GitHub by default; push after each milestone as the owner requested.
 - No real DigiLocker / Aadhaar e-Sign / WhatsApp credentials exist; all integrations default to labelled mocks.
+- Local venv uses Python 3.13 (3.12 install on this machine is broken); code stays 3.12-compatible, Docker/CI use 3.12.

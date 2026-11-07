@@ -1,8 +1,8 @@
 # Task list (commit + push after each)
 
 - [x] 0. Repo created, monorepo skeleton
-- [ ] 1. Plan docs (ARCHITECTURE, ASSUMPTIONS, TASKS) + scaffold (pyproject, Makefile, .env.example, compose)
-- [ ] 2. Backend core: config, DB models, auth (JWT rotation, RBAC), consent, audit log (hash-chained)
+- [x] 1. Plan docs (ARCHITECTURE, ASSUMPTIONS, TASKS) + scaffold (pyproject, Makefile, .env.example, compose)
+- [x] 2. Backend core: config, DB models, auth (JWT rotation, RBAC), consent, audit log (hash-chained)
 - [ ] 3. Scraping guard (allowlist, robots, sanitizer) + research agent + rules KB, citations, confidence, diff
 - [ ] 4. Interview engine + validators + encrypted memory
 - [ ] 5. Form registry (3 templates) + PDF filler + field report
