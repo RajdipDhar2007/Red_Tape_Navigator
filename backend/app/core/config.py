@@ -45,6 +45,17 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     s = Settings()
+    if s.field_encryption_key:  # fail fast with a clear message instead of at the first Aadhaar/PAN answer
+        from cryptography.fernet import Fernet
+
+        for k in (x.strip() for x in s.field_encryption_key.split(",") if x.strip()):
+            try:
+                Fernet(k.encode())
+            except ValueError as exc:
+                raise RuntimeError(
+                    "FIELD_ENCRYPTION_KEY is not a valid Fernet key (32 url-safe base64 bytes). Generate one with `make keygen`. "
+                    "Keep comments on their own line in .env files."
+                ) from exc
     if s.is_prod and (s.secret_key.startswith("dev-only") or not s.field_encryption_key):
         raise RuntimeError("Production requires SECRET_KEY and FIELD_ENCRYPTION_KEY")
     return s

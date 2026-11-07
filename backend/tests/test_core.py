@@ -93,3 +93,18 @@ def test_encryption_key_rotation(monkeypatch):
     finally:
         monkeypatch.delenv("FIELD_ENCRYPTION_KEY", raising=False)
         config.get_settings.cache_clear()
+
+
+def test_invalid_encryption_key_fails_fast(monkeypatch):
+    import pytest
+
+    from app.core import config
+
+    monkeypatch.setenv("FIELD_ENCRYPTION_KEY", "# urlsafe base64 32-byte Fernet key")
+    config.get_settings.cache_clear()
+    try:
+        with pytest.raises(RuntimeError, match="not a valid Fernet key"):
+            config.get_settings()
+    finally:
+        monkeypatch.delenv("FIELD_ENCRYPTION_KEY")
+        config.get_settings.cache_clear()
