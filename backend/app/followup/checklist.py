@@ -10,7 +10,7 @@ def submission_checklist(plan: dict, form_ids_ready: set[str]) -> list[dict]:
     for step in plan.get("steps", []):
         lic = LICENCES[step["licence"]]
         claims = step.get("claims", {})
-        cite = lambda k: claims.get(k)  # noqa: E731
+        cite = claims.get
         actions = []
         if step["depends_on"]:
             names = ", ".join(LICENCES[d]["name"] for d in step["depends_on"])

@@ -15,7 +15,7 @@ def _rupees(v: str, _: str | None) -> str:
     n = str(int(v))
     head, tail = n[:-3], n[-3:]
     if head:
-        parts = []
+        parts: list[str] = []
         while len(head) > 2:
             parts.insert(0, head[-2:])
             head = head[:-2]

@@ -2,7 +2,7 @@ import os
 import tempfile
 
 _tmp = tempfile.mkdtemp()
-os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{_tmp}/test.db".replace("\\", "/")
+os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL") or f"sqlite+aiosqlite:///{_tmp}/test.db".replace("\\", "/")
 os.environ["ANTHROPIC_API_KEY"] = ""
 os.environ["APP_ENV"] = "test"
 
@@ -18,6 +18,8 @@ from app.main import create_app  # noqa: E402
 async def client():
     await reset_engine()
     async with get_engine().begin() as conn:
+        if conn.dialect.name == "postgresql":
+            await conn.exec_driver_sql("CREATE EXTENSION IF NOT EXISTS vector")
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     from app.core.middleware import limiter

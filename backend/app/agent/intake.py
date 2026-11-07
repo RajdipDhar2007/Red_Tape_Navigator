@@ -4,6 +4,7 @@ import re
 from pydantic import BaseModel
 
 from app.agent.llm import LLM
+from app.core.logging import get_logger
 from app.kb.catalog import ACTIVITIES, ACTIVITY_KEYWORDS, CITIES, STATE_ALIASES
 
 QUESTIONS = {
@@ -69,7 +70,7 @@ def parse_goal_rules(goal: str, language: str = "en") -> ParsedGoal:
         state = state or CITIES[city_key]["state"]
     else:
         m = _FREE_CITY.search(goal)
-        if m and m.group(1).lower() not in {a for a in STATE_ALIASES} and not state:
+        if m and m.group(1).lower() not in STATE_ALIASES:  # a captured state name is not a city
             city = m.group(1)
     intent = "start_business" if (_INTENT.search(goal) or activity) else "other"
     q = QUESTIONS.get(language, QUESTIONS["en"])
@@ -109,6 +110,6 @@ async def parse_goal(goal: str, language: str = "en", llm: LLM | None = None) ->
                 q["city_state"] if not parsed.city and not parsed.state
                 else q["city"] if not parsed.city else q["state"] if not parsed.state else None
             )
-        except Exception:  # noqa: BLE001 - degrade to rules result
-            pass
+        except Exception as exc:  # degrade to the rules result, but leave a trace
+            get_logger("intake").warning("llm_intake_failed", error_type=type(exc).__name__)
     return parsed

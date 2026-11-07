@@ -49,7 +49,7 @@ async def erase_user(db: AsyncSession, user: User) -> dict:
     await _delete_session_data(db, ids)
     await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
     user.email = f"deleted-{uuid.uuid4().hex[:12]}@erased.invalid"
-    user.password_hash = "!"
+    user.password_hash = "!"  # noqa: S105 - unusable hash
     user.deleted_at = datetime.now(UTC)
     await db.commit()
     await audit.record(db, user.id, "privacy.erasure", {"sessions": len(ids)})
@@ -60,7 +60,13 @@ async def purge_expired(db: AsyncSession, now: datetime | None = None) -> int:
     """Retention policy: sessions past `expires_at` are deleted automatically (scheduled job)."""
     now = now or datetime.now(UTC)
     rows = (await db.execute(select(NavSession).where(NavSession.expires_at.is_not(None)))).scalars().all()
-    ids = [s.id for s in rows if (s.expires_at if s.expires_at.tzinfo else s.expires_at.replace(tzinfo=UTC)) < now]
+    def _expired(s: NavSession) -> bool:
+        exp = s.expires_at
+        if exp is None:
+            return False
+        return (exp if exp.tzinfo else exp.replace(tzinfo=UTC)) < now
+
+    ids = [s.id for s in rows if _expired(s)]
     await _delete_session_data(db, ids)
     await db.commit()
     if ids:

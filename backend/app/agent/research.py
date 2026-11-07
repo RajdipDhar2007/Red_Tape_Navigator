@@ -84,7 +84,7 @@ async def verify_live(
     db: AsyncSession, claims: list[Claim], *, llm: LLM | None, fetcher: Fetcher = fetch_page, session_id: str | None = None
 ) -> dict:
     """Fetch each distinct source once; detect changes; optionally upgrade claims through grounded extraction."""
-    report = {"fetched": 0, "changed_sources": [], "handoff": [], "errors": []}
+    report: dict = {"fetched": 0, "changed_sources": [], "handoff": [], "errors": []}
     by_url: dict[str, list[Claim]] = {}
     for c in claims:
         by_url.setdefault(c.source_url, []).append(c)

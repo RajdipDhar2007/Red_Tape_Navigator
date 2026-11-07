@@ -2,8 +2,8 @@
 
 Form template field maps reference these keys (`source` in the JSON). Questions are available in en/bn/hi.
 """
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 from app.interview import validators as v
 

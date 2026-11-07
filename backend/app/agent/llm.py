@@ -56,10 +56,12 @@ class LLM:
     async def _create(self, **kw):
         if not self.available:
             raise LLMUnavailable("ANTHROPIC_API_KEY / ANTHROPIC_MODEL not configured")
+        client = self._client
+        assert client is not None
         try:
             with span("llm.call", model=self.model):
                 out = await call_with_resilience(
-                    lambda: self._client.messages.create(model=self.model, max_tokens=2000, **kw),
+                    lambda: client.messages.create(model=self.model, max_tokens=2000, **kw),
                     breaker=_breaker, retries=2, timeout=60,
                 )
             LLM_CALLS.labels("ok").inc()

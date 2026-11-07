@@ -81,9 +81,9 @@ def plan_fields(t: FormTemplate, values: dict[str, dict]) -> tuple[dict[str, str
             continue
         raw, prov, sens, _ = _resolve(f, values)
         if raw is None:
-            status = "missing" if f.required else "unmapped"
-            note = "Required value not provided; field left blank." if f.required else "Optional value not provided; left blank."
-            report.append(FieldReport(f.pdf_field, f.label, status, None, None, f.keys, note))
+            miss = "missing" if f.required else "unmapped"
+            why = "Required value not provided; field left blank." if f.required else "Optional value not provided; left blank."
+            report.append(FieldReport(f.pdf_field, f.label, miss, None, None, f.keys, why))
             continue
         try:
             val = transforms.apply(f.transform, raw)
@@ -97,7 +97,8 @@ def plan_fields(t: FormTemplate, values: dict[str, dict]) -> tuple[dict[str, str
         if f.max_len and len(val) > f.max_len:
             report.append(FieldReport(f.pdf_field, f.label, "doubtful", shown, SOURCE_LABELS.get(prov or "", prov), f.keys, f"Value is longer than the {f.max_len}-character box; left blank to avoid truncation."))
             continue
-        status, note = "filled", None
+        status: str = "filled"
+        note: str | None = None
         if f.confirm:
             status, note = "doubtful", "Derived or uncertain value: please confirm before signing."
         out[f.pdf_field] = val
@@ -112,8 +113,8 @@ def plan_fields(t: FormTemplate, values: dict[str, dict]) -> tuple[dict[str, str
 
 def _fill_acroform(pdf: bytes, fields: dict[str, str]) -> tuple[bytes, list[str]]:
     doc = pymupdf.open(stream=pdf, filetype="pdf")
-    seen = set()
-    for page in doc:
+    seen: set[str] = set()
+    for page in doc:  # type: ignore[attr-defined]
         for w in page.widgets() or []:
             seen.add(w.field_name)
             if w.field_name not in fields:

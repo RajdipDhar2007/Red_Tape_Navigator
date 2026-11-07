@@ -25,3 +25,4 @@ playwright-report/
 test-results/
 data/
 *.egg-info/
+backend/evals/report.json

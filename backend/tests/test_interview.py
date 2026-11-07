@@ -3,7 +3,8 @@ from sqlalchemy import select
 
 from app.db.models import Answer, NavSession, User
 from app.db.session import maker
-from app.interview import engine, memory, validators as v
+from app.interview import engine, memory
+from app.interview import validators as v
 from app.interview.fields import FIELDS
 
 

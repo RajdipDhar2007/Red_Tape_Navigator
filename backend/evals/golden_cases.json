@@ -1,0 +1,557 @@
+[
+ {
+  "id": "bakery-kolkata-en",
+  "goal": "I want to open a small bakery in Kolkata",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_city": "Kolkata",
+  "expect_state": "West Bengal",
+  "expect_authority": "Kolkata Municipal Corporation"
+ },
+ {
+  "id": "bakery-kolkata-bn",
+  "goal": "কলকাতায় একটি বেকারি খুলতে চাই",
+  "language": "bn",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_city": "Kolkata",
+  "expect_state": "West Bengal"
+ },
+ {
+  "id": "restaurant-mumbai",
+  "goal": "Start a restaurant in Mumbai",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_city": "Mumbai",
+  "expect_state": "Maharashtra",
+  "expect_authority": "Brihanmumbai"
+ },
+ {
+  "id": "cafe-bengaluru",
+  "goal": "I plan to open a cafe in Bangalore",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_city": "Bengaluru",
+  "expect_state": "Karnataka"
+ },
+ {
+  "id": "tea-stall-delhi-hi",
+  "goal": "मुझे दिल्ली में चाय की दुकान खोलनी है",
+  "language": "hi",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "forbid_licences": [
+   "fire_noc",
+   "gst"
+  ],
+  "expect_city": "Delhi"
+ },
+ {
+  "id": "cloud-kitchen-hyderabad",
+  "goal": "Set up a cloud kitchen in Hyderabad",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "gst"
+  ],
+  "forbid_licences": [
+   "shops_est"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_state": "Telangana"
+ },
+ {
+  "id": "sweet-shop-ahmedabad",
+  "goal": "Open a sweet shop in Ahmedabad",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_state": "Gujarat"
+ },
+ {
+  "id": "home-food-pune",
+  "goal": "Start a home kitchen tiffin service in Pune",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "gst"
+  ],
+  "forbid_licences": [
+   "trade_licence",
+   "fire_noc"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_state": "Maharashtra"
+ },
+ {
+  "id": "grocery-chennai",
+  "goal": "Open a kirana grocery store in Chennai",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "shops_est",
+   "gst"
+  ],
+  "forbid_licences": [
+   "fire_noc"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_state": "Tamil Nadu"
+ },
+ {
+  "id": "tailoring-kolkata",
+  "goal": "I want to start a tailoring shop in Kolkata",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "trade_licence",
+   "shops_est",
+   "gst"
+  ],
+  "forbid_licences": [
+   "fssai",
+   "fire_noc"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "aadhaar",
+   "pan",
+   "bank_ifsc"
+  ],
+  "forbid_fields": [
+   "food_products"
+  ],
+  "expect_state": "West Bengal"
+ },
+ {
+  "id": "salon-mumbai",
+  "goal": "Open a beauty parlour in Mumbai",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "trade_licence",
+   "shops_est",
+   "gst"
+  ],
+  "forbid_licences": [
+   "fssai"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "aadhaar",
+   "pan",
+   "bank_ifsc"
+  ],
+  "forbid_fields": [
+   "food_products"
+  ]
+ },
+ {
+  "id": "factory-pune",
+  "goal": "Start a small manufacturing unit in Pune",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "trade_licence",
+   "pollution_consent",
+   "gst",
+   "shops_est"
+  ],
+  "forbid_licences": [
+   "fssai"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "aadhaar",
+   "pan",
+   "bank_ifsc"
+  ],
+  "forbid_fields": [
+   "food_products"
+  ]
+ },
+ {
+  "id": "bakery-no-location",
+  "goal": "I want to open a bakery",
+  "language": "en",
+  "expect_clarify": true
+ },
+ {
+  "id": "restaurant-state-only",
+  "goal": "Open a restaurant in Karnataka",
+  "language": "en",
+  "expect_clarify": true,
+  "expect_state": "Karnataka"
+ },
+ {
+  "id": "tailoring-state-only",
+  "goal": "Open a tailoring shop in Maharashtra",
+  "language": "en",
+  "expect_clarify": true
+ },
+ {
+  "id": "bakery-mumbai-hi",
+  "goal": "मुझे मुंबई में बेकरी खोलनी है",
+  "language": "hi",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_city": "Mumbai"
+ },
+ {
+  "id": "restaurant-kolkata-bn",
+  "goal": "কলকাতায় একটি রেস্তোরাঁ খুলতে চাই",
+  "language": "bn",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_city": "Kolkata"
+ },
+ {
+  "id": "bakery-unknown-city",
+  "goal": "Open a bakery in Siliguri, West Bengal",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_municipal_missing": true,
+  "expect_state": "West Bengal",
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ]
+ },
+ {
+  "id": "unsupported-activity",
+  "goal": "I want to export diamonds in Surat",
+  "language": "en",
+  "expect_no_activity": true,
+  "expect_clarify": true
+ },
+ {
+  "id": "cafe-chennai",
+  "goal": "Open a cafe in Chennai",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "fire_noc",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ],
+  "expect_authority": "Greater Chennai"
+ },
+ {
+  "id": "home-food-delhi",
+  "goal": "Start homemade food business in Delhi",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ]
+ },
+ {
+  "id": "tea-stall-kolkata-bn",
+  "goal": "কলকাতায় চায়ের দোকান খুলতে চাই",
+  "language": "bn",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence"
+  ],
+  "forbid_licences": [
+   "fire_noc"
+  ],
+  "expect_city": "Kolkata"
+ },
+ {
+  "id": "grocery-ahmedabad",
+  "goal": "Start a grocery store in Ahmedabad",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "fssai",
+   "trade_licence",
+   "shops_est",
+   "gst"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "food_products",
+   "aadhaar",
+   "pan",
+   "bank_ifsc",
+   "premises_ownership"
+  ]
+ },
+ {
+  "id": "salon-bengaluru",
+  "goal": "Open a salon in Bengaluru",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "trade_licence",
+   "shops_est",
+   "gst"
+  ],
+  "forbid_licences": [
+   "fssai"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "aadhaar",
+   "pan",
+   "bank_ifsc"
+  ]
+ },
+ {
+  "id": "factory-ahmedabad",
+  "goal": "Start a factory in Ahmedabad, Gujarat",
+  "language": "en",
+  "expect_licences": [
+   "udyam",
+   "trade_licence",
+   "pollution_consent",
+   "gst",
+   "shops_est"
+  ],
+  "expect_fields": [
+   "applicant_name",
+   "mobile",
+   "premises_address",
+   "premises_pincode",
+   "aadhaar",
+   "pan",
+   "bank_ifsc"
+  ]
+ },
+ {
+  "id": "unsupported-activity-with-location",
+  "goal": "I want to export diamonds in Surat, Gujarat",
+  "language": "en",
+  "expect_no_activity": true,
+  "expect_city": "Surat",
+  "expect_state": "Gujarat"
+ }
+]

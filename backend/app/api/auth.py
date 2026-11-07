@@ -33,7 +33,7 @@ class RefreshIn(BaseModel):
 class TokenOut(BaseModel):
     access_token: str
     refresh_token: str
-    token_type: str = "bearer"
+    token_type: str = "bearer"  # noqa: S105
 
 
 async def _issue(db: AsyncSession, user: User) -> TokenOut:

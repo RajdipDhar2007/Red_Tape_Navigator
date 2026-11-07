@@ -1,6 +1,7 @@
 import uuid
 from datetime import UTC, datetime
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -109,7 +110,8 @@ class Claim(Base):
     confidence: Mapped[float] = mapped_column(Float)
     needs_verification: Mapped[bool] = mapped_column(Boolean, default=False)
     seed: Mapped[bool] = mapped_column(Boolean, default=False)
-    embedding: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # pgvector vector(256) on PostgreSQL (see migrations), plain JSON on SQLite (dev/tests)
+    embedding: Mapped[list | None] = mapped_column(JSON().with_variant(Vector(256), "postgresql"), nullable=True)
     changed_from: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
 

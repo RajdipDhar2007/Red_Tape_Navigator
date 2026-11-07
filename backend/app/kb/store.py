@@ -83,7 +83,11 @@ async def claims_for_prefixes(db: AsyncSession, prefixes: list[str]) -> list[Cla
 
 async def search(db: AsyncSession, query: str, k: int = 5) -> list[tuple[Claim, float]]:
     q = embed(query)
-    rows = (await db.execute(select(Claim).where(Claim.current.is_(True)))).scalars().all()
+    if db.get_bind().dialect.name == "postgresql":  # pragma: no cover - exercised in CI against pgvector
+        stmt = select(Claim).where(Claim.current.is_(True), Claim.embedding.is_not(None)).order_by(Claim.embedding.cosine_distance(q)).limit(50)
+        rows = (await db.execute(stmt)).scalars().all()
+    else:
+        rows = (await db.execute(select(Claim).where(Claim.current.is_(True)))).scalars().all()
     qtok = set(re.findall(r"\w+", query.lower()))
 
     def lexical(c: Claim) -> float:  # hybrid search: embedding cosine + keyword overlap

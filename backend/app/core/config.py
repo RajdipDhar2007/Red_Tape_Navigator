@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     app_env: str = "dev"
-    secret_key: str = "dev-only-secret-key-change-me-0123456789"
+    secret_key: str = "dev-only-secret-key-change-me-0123456789"  # noqa: S105 - rejected in prod
     field_encryption_key: str = ""
     database_url: str = "sqlite+aiosqlite:///./data/rtn.db"
     redis_url: str = ""

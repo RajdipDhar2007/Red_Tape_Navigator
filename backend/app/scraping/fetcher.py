@@ -69,8 +69,8 @@ async def _robots_ok(client: httpx.AsyncClient, url: str, ua: str) -> bool:
                 _robots[root] = None  # no robots file -> allowed
         except httpx.HTTPError:
             _robots[root] = None
-    rp = _robots[root]
-    return True if rp is None else rp.can_fetch(ua, url)
+    parser = _robots[root]
+    return True if parser is None else parser.can_fetch(ua, url)
 
 
 async def _render_js(url: str, ua: str) -> str:  # pragma: no cover - needs a browser
