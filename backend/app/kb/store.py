@@ -3,8 +3,9 @@ import re
 from datetime import UTC, datetime
 from typing import Literal
 
+from pgvector.sqlalchemy import Vector
 from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import select
+from sqlalchemy import literal, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -94,7 +95,7 @@ async def claims_for_prefixes(db: AsyncSession, prefixes: list[str]) -> list[Cla
 async def search(db: AsyncSession, query: str, k: int = 5) -> list[tuple[Claim, float]]:
     q = embed(query)
     if db.get_bind().dialect.name == "postgresql":  # pragma: no cover - exercised in CI against pgvector
-        stmt = select(Claim).where(Claim.current.is_(True), Claim.embedding.is_not(None)).order_by(Claim.embedding.cosine_distance(q)).limit(50)
+        stmt = select(Claim).where(Claim.current.is_(True), Claim.embedding.is_not(None)).order_by(Claim.embedding.op("<=>")(literal(q, type_=Vector(256)))).limit(50)
         rows = (await db.execute(stmt)).scalars().all()
     else:
         rows = (await db.execute(select(Claim).where(Claim.current.is_(True)))).scalars().all()

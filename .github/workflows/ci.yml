@@ -123,12 +123,11 @@ jobs:
         with: { context: backend, load: true, tags: "rtn-api:ci", cache-from: type=gha, cache-to: "type=gha,mode=max" }
       - uses: docker/build-push-action@v6
         with: { context: frontend, load: true, tags: "rtn-web:ci", cache-from: type=gha, cache-to: "type=gha,mode=max" }
-      - name: Trivy (HIGH/CRITICAL with fixes available)
-        uses: aquasecurity/trivy-action@0.28.0
-        with: { image-ref: "rtn-api:ci", severity: "HIGH,CRITICAL", ignore-unfixed: true, exit-code: "1" }
-      - name: Trivy web
-        uses: aquasecurity/trivy-action@0.28.0
-        with: { image-ref: "rtn-web:ci", severity: "HIGH,CRITICAL", ignore-unfixed: true, exit-code: "1" }
+      - name: Trivy scan (HIGH/CRITICAL with a fix available fails the build)
+        run: |
+          for img in rtn-api:ci rtn-web:ci; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1               image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress "$img"
+          done
       - name: Verify containers run as non-root
         run: |
           test "$(docker run --rm --entrypoint id rtn-api:ci -u)" != "0"
