@@ -149,3 +149,22 @@ async def test_types_with_extra_permits_say_so_and_queue_an_officer(client, auth
     plan = (await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)).json()["plan"]
     assert plan["coverage"] == "specific" and "may also apply" in plan["note"]
     assert "fssai" in [x["licence"] for x in plan["steps"]]
+
+
+async def test_a_licence_added_after_the_kb_was_seeded_is_loaded_on_demand(client, auth):
+    """Regression: an old local database had many claims but none for newer licences, so plans showed empty steps."""
+    from sqlalchemy import delete
+
+    from app.db.models import Claim
+    from app.db.session import maker
+
+    headers, _ = auth
+    await client.post("/consent", json={"purpose": "service", "granted": True}, headers=headers)
+    s = (await client.post("/sessions", json={"goal": "I want to open a wine shop in Kolkata", "language": "en"}, headers=headers)).json()
+    await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)  # seeds everything
+    async with maker()() as db:
+        await db.execute(delete(Claim).where(Claim.key.like("liquor_licence:%")))
+        await db.commit()
+    plan = (await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)).json()["plan"]
+    step = next(x for x in plan["steps"] if x["licence"] == "liquor_licence")
+    assert "Excise Directorate" in step["claims"]["authority"]["text"]

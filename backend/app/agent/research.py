@@ -150,11 +150,14 @@ async def research(
         return {"plan": build_plan(parsed, {}), "claims": [], "low_confidence": [], "mode": "none", "disclaimer": DISCLAIMER}
     needed = licences_for(activity)
     prefixes = [f"{lid}:{scope_for(lid, parsed.get('city'))}:" for lid in needed if scope_for(lid, parsed.get("city"))]
+    def _missing(found: list) -> list[str]:  # a licence with NO claims at all (cold start, or a licence added after the KB was seeded)
+        return [p for p in prefixes if not any(c.key.startswith(p) for c in found)]
+
     claims = await claims_for_prefixes(db, prefixes)
-    if len(claims) < len(prefixes):  # KB cold start: load the curated seed pack (once, even under concurrency)
+    if _missing(claims):  # load the curated seed pack (once, even under concurrency)
         async with _seed_lock:
             claims = await claims_for_prefixes(db, prefixes)
-            if len(claims) < len(prefixes):
+            if _missing(claims):
                 await seed_all(db)
                 claims = await claims_for_prefixes(db, prefixes)
     live_report = None
