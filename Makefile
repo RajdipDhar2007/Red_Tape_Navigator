@@ -1,5 +1,5 @@
 PY ?= python
-.PHONY: setup dev stop test lint eval migrate seed e2e loadtest keygen audit placeholders help smoke
+.PHONY: setup dev stop test lint eval migrate seed e2e loadtest keygen audit placeholders help smoke verify-sources
 
 help:
 	@echo "setup dev stop test lint eval migrate seed e2e loadtest audit keygen placeholders"
@@ -39,6 +39,9 @@ e2e: ## Playwright end-to-end (builds the frontend first)
 
 loadtest: ## see docs/LOAD_TEST.md
 	cd backend && locust -f ../scripts/loadtest/locustfile.py --host http://localhost:8000 --headless -u 20 -r 5 -t 60s
+
+verify-sources: ## check cited rule sources against the live official sites
+	cd backend && python ../scripts/verify_sources.py
 
 audit: ## dependency + SAST scans
 	cd backend && pip-audit --skip-editable && bandit -r app -ll -q

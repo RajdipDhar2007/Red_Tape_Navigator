@@ -48,6 +48,7 @@ cd ../frontend && npm install && npm run dev   # UI on :3000
 | Seed rules pack (licences, fees, timelines for 11 activities × 8 cities) | **Seed data, not law.** Every claim carries a source URL and is flagged "verify with the authority" when confidence is low. Must be verified against live sources before a pilot. |
 | Interview engine, validators (PAN, Aadhaar Verhoeff, PIN, mobile, IFSC, dates), encrypted memory, skip/resume/edit | **Built.** en / bn / hi. |
 | Form filler (AcroForm + flat-PDF overlay), 3 templates, field-by-field provenance report | **Built**, but the PDFs are **clearly marked placeholders**. Adding the real forms: [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md). |
+| Accounts: register / login / **email password reset** / change password, officer console (stats, review queue, audit check), real SMTP email | **Built.** |
 | Review UI, explicit consent gate, downloads, submission checklist, reminders | **Built.** |
 | DigiLocker, Aadhaar e-Sign, UMANG, WhatsApp / SMS / email | **Mocked** and labelled in the UI ("Demo mode: simulated …"). Real adapters are stubs; go-live needs government/provider onboarding. |
 | Captcha / login portals | **Never bypassed.** The checklist hands over to the human. |
@@ -71,6 +72,6 @@ Everything is environment-driven; see [.env.example](.env.example). Secrets neve
 
 ## Documentation
 
-[Deployment](docs/DEPLOYMENT.md) · [Architecture](docs/ARCHITECTURE.md) · [DPDP compliance](docs/COMPLIANCE.md) · [Security / OWASP](docs/SECURITY.md) ·
+[Deployment](docs/DEPLOYMENT.md) · [Go-live checklist](docs/GO_LIVE.md) · [Architecture](docs/ARCHITECTURE.md) · [DPDP compliance](docs/COMPLIANCE.md) · [Security / OWASP](docs/SECURITY.md) ·
 [Integrations & going live](docs/INTEGRATIONS.md) · [Runbook](docs/RUNBOOK.md) · [Pilot plan](docs/PILOT_PLAN.md) ·
 [Demo script](docs/DEMO_SCRIPT.md) · [Load test](docs/LOAD_TEST.md) · [Assumptions](docs/ASSUMPTIONS.md)
