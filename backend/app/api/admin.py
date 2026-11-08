@@ -1,14 +1,14 @@
 """Human escalation (review queue for CSC operators / officers) and admin operations."""
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.llm import LLM
 from app.agent.research import refresh_all
 from app.api.deps import require_roles
 from app.core import audit
-from app.db.models import Claim, ReviewItem, User
+from app.db.models import Claim, Consent, NavSession, ReviewItem, User
 from app.db.session import get_db
 from app.services import privacy
 
@@ -80,3 +80,45 @@ async def set_role(user_id: str, role: str, user: User = Depends(require_roles("
     await db.commit()
     await audit.record(db, user.id, "admin.role_changed", {"target": user_id, "role": role})
     return {"id": target.id, "role": target.role}
+
+
+@router.get("/stats")
+async def stats(user: User = Depends(require_roles(*STAFF)), db: AsyncSession = Depends(get_db)):
+    """Aggregate, non-personal programme metrics for officers and oversight bodies."""
+
+    async def count(stmt):
+        return (await db.execute(stmt)).scalar_one()
+
+    async def grouped(col, *where):
+        rows = (await db.execute(select(col, func.count()).where(*where).group_by(col))).all()
+        return {str(k or "unknown"): n for k, n in rows}
+
+    sessions_total = await count(select(func.count()).select_from(NavSession))
+    reviewed = await count(select(func.count()).select_from(NavSession).where(NavSession.reviewed_at.is_not(None)))
+    by_activity: dict[str, int] = {}
+    by_state: dict[str, int] = {}
+    for (parsed,) in (await db.execute(select(NavSession.parsed))).all():
+        p = parsed or {}
+        by_activity[str(p.get("activity") or "unknown")] = by_activity.get(str(p.get("activity") or "unknown"), 0) + 1
+        by_state[str(p.get("state") or "unknown")] = by_state.get(str(p.get("state") or "unknown"), 0) + 1
+    return {
+        "users": {"total": await count(select(func.count()).select_from(User).where(User.deleted_at.is_(None))),
+                  "by_role": await grouped(User.role, User.deleted_at.is_(None))},
+        "sessions": {"total": sessions_total, "reviewed": reviewed,
+                     "completion_rate": round(reviewed / sessions_total, 3) if sessions_total else 0.0,
+                     "by_stage": await grouped(NavSession.stage), "by_activity": by_activity, "by_state": by_state},
+        "knowledge_base": {
+            "claims": await count(select(func.count()).select_from(Claim).where(Claim.current.is_(True))),
+            "needs_verification": await count(select(func.count()).select_from(Claim).where(Claim.current.is_(True), Claim.needs_verification.is_(True))),
+            "seed_only": await count(select(func.count()).select_from(Claim).where(Claim.current.is_(True), Claim.seed.is_(True))),
+        },
+        "review_queue": await grouped(ReviewItem.status),
+        "consents": {"granted": await count(select(func.count()).select_from(Consent).where(Consent.granted.is_(True))),
+                     "withdrawn": await count(select(func.count()).select_from(Consent).where(Consent.granted.is_(False)))},
+    }
+
+
+@router.get("/users")
+async def list_users(user: User = Depends(require_roles("admin")), db: AsyncSession = Depends(get_db)):
+    rows = (await db.execute(select(User).where(User.deleted_at.is_(None)).order_by(User.created_at))).scalars().all()
+    return [{"id": u.id, "email": u.email, "role": u.role, "created_at": u.created_at.isoformat()} for u in rows]

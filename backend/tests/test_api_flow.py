@@ -300,3 +300,36 @@ async def test_withdrawn_reminder_consent_stops_delivery(client, auth):
 async def test_login_unknown_email_costs_same_and_fails(client):
     r = await client.post("/auth/login", json={"email": "nobody@example.com", "password": "whatever-long-1"})
     assert r.status_code == 401 and r.json()["detail"] == "Invalid credentials"
+
+
+async def test_admin_stats_and_users_are_aggregate_and_role_gated(client, auth):
+    headers, s = await start(client, auth)
+    await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)
+    assert (await client.get("/admin/stats", headers=headers)).status_code == 403  # citizen
+    assert (await client.get("/admin/users", headers=headers)).status_code == 403
+    async with maker()() as db:
+        u = (await db.execute(User.__table__.select())).first()
+        (await db.get(User, u.id)).role = "admin"
+        await db.commit()
+    ah = {"Authorization": f"Bearer {(await client.post('/auth/login', json={'email': 'a@example.com', 'password': 'correct-horse-battery'})).json()['access_token']}"}
+    st = (await client.get("/admin/stats", headers=ah)).json()
+    assert st["users"]["total"] == 1 and st["sessions"]["total"] == 1
+    assert st["knowledge_base"]["claims"] > 0 and "a@example.com" not in str(st)
+    assert [x["email"] for x in (await client.get("/admin/users", headers=ah)).json()] == ["a@example.com"]
+
+
+async def test_create_admin_script(client, monkeypatch):
+    import importlib.util
+    from pathlib import Path
+
+    spec = importlib.util.spec_from_file_location("create_admin", Path(__file__).resolve().parents[2] / "scripts" / "create_admin.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert await mod.main("boss@dept.gov.in", "citizen", "long-enough-password") == 2
+    assert await mod.main("boss@dept.gov.in", "admin", "short") == 2
+    assert await mod.main("Boss@Dept.gov.in", "admin", "long-enough-password") == 0
+    assert await mod.main("boss@dept.gov.in", "reviewer", "another-long-password") == 0  # promote/reset, no duplicate
+    login = await client.post("/auth/login", json={"email": "boss@dept.gov.in", "password": "another-long-password"})
+    assert login.status_code == 200
+    me = await client.get("/auth/me", headers={"Authorization": f"Bearer {login.json()['access_token']}"})
+    assert me.json()["role"] == "reviewer"
