@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     smtp_from: str = ""
     smtp_starttls: bool = True
     reset_token_minutes: int = 30
+    lockout_threshold: int = 5
+    lockout_minutes: int = 15
 
     @property
     def cors_list(self) -> list[str]:

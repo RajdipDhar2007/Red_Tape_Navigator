@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.intake import SERVICE_INTENTS, apply_general_fallback, parse_goal
@@ -17,6 +18,7 @@ from app.db.session import get_db
 from app.followup.checklist import submission_checklist
 from app.followup.reminders import schedule_after_submission
 from app.forms import filler, official
+from app.forms.context import build_context
 from app.forms.registry import get_template
 from app.integrations.factory import get_integrations
 from app.interview import engine, memory
@@ -71,6 +73,17 @@ def _view(ns: NavSession) -> dict:
         "skipped": ns.skipped, "reviewed": ns.reviewed_at is not None, "created_at": ns.created_at.isoformat(),
         "disclaimer": DISCLAIMER,
     }
+
+
+@router.get("")
+async def list_sessions(user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    """The citizen's own applications, newest first (dashboard)."""
+    rows = (await db.execute(select(NavSession).where(NavSession.user_id == user.id).order_by(NavSession.created_at.desc()).limit(50))).scalars().all()
+    return [{
+        "id": r.id, "goal": r.goal, "created_at": r.created_at.isoformat(), "reviewed": r.reviewed_at is not None,
+        "activity": (r.parsed or {}).get("activity"), "intent": (r.parsed or {}).get("intent"),
+        "city": (r.parsed or {}).get("city"), "steps": len((r.plan or {}).get("steps") or []),
+    } for r in rows]
 
 
 @router.post("", status_code=201)
@@ -307,6 +320,32 @@ async def download(sid: str, fid: str, user: User = Depends(current_user), db: A
     name = re.sub(r"[^a-z0-9_]", "", fid)
     return Response(fills[fid].pdf, media_type="application/pdf",
                     headers={"Content-Disposition": f'attachment; filename="{name}.pdf"', "X-Disclaimer": DISCLAIMER})
+
+
+@router.get("/{sid}/forms/{fid}/keyin")
+async def keyin(sid: str, fid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    """Key-in sheet for portals that are filled online: every value the citizen gave, in form order, ready to copy.
+    The citizen types/pastes it into the official portal, solves the captcha / OTP and submits it themselves."""
+    ns = await svc.get_owned(db, user, sid)
+    _require_reviewed(ns)
+    if fid not in svc.form_ids(ns):
+        raise HTTPException(404, "Unknown form")
+    t = get_template(fid)
+    answers = await memory.get_answers(db, ns.id, reveal=True)
+    values = filler.build_values(answers, build_context(ns.parsed or {}))
+    fields, report, _ = filler.plan_fields(t, values)
+    status = {r.pdf_field: r for r in report}
+    rows = []
+    for f in t.fields:
+        if not f.keys:  # signature and other intentionally unmapped fields are never filled
+            continue
+        r = status.get(f.pdf_field)
+        rows.append({"label": f.label, "value": fields.get(f.pdf_field, ""), "status": r.status if r else "missing",
+                     "note": r.note if r else None, "required": f.required})
+    await audit.record(db, user.id, "form.keyin_viewed", {"form": fid}, ns.id)
+    return {"form_id": fid, "title": t.title.replace(" (PLACEHOLDER)", ""), "authority": t.authority, "portal_url": t.portal_url,
+            "rows": rows, "disclaimer": DISCLAIMER,
+            "important": "Open the official portal yourself, enter these values, complete the OTP/captcha and submit. This tool never submits for you."}
 
 
 @router.get("/{sid}/submission-checklist")

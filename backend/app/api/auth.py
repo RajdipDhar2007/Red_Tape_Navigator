@@ -1,5 +1,5 @@
 import asyncio
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import jwt
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
@@ -74,9 +74,25 @@ async def login(body: LoginIn, db: AsyncSession = Depends(get_db)):
     # always run one bcrypt verification so response time does not reveal whether the email exists
     stored = user.password_hash if user and not user.deleted_at else _DUMMY_HASH
     valid = await asyncio.to_thread(verify_password, body.password, stored)
+    s = get_settings()
+    now = datetime.now(UTC)
+    if user and not user.deleted_at:
+        until = user.locked_until if user.locked_until is None or user.locked_until.tzinfo else user.locked_until.replace(tzinfo=UTC)
+        if until and until > now:  # locked: even the right password is refused until the window ends
+            await audit.record(db, user.id, "auth.login_blocked_locked")
+            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, {"code": "account_locked", "message": f"Too many failed attempts. Try again in {max(1, int((until - now).total_seconds() // 60) + 1)} minutes, or reset your password."})
     if not user or user.deleted_at or not valid:
+        if user and not user.deleted_at:
+            user.failed_logins = (user.failed_logins or 0) + 1
+            if user.failed_logins >= s.lockout_threshold:
+                user.locked_until = now + timedelta(minutes=s.lockout_minutes)
+                user.failed_logins = 0
+                await audit.record(db, user.id, "auth.account_locked")
+            await db.commit()
         await audit.record(db, "anonymous", "auth.login_failed")
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid credentials")
+    user.failed_logins, user.locked_until = 0, None
+    await db.commit()
     await audit.record(db, user.id, "auth.login")
     return await _issue(db, user)
 
@@ -179,6 +195,7 @@ async def reset_password(body: ResetIn, db: AsyncSession = Depends(get_db)):
     if user is None or user.deleted_at or not reset_token_matches(data, user.password_hash):
         raise bad
     user.password_hash = await asyncio.to_thread(hash_password, body.password)
+    user.failed_logins, user.locked_until = 0, None
     await db.commit()
     await _revoke_all(db, user.id)  # sign out every existing session
     await audit.record(db, user.id, "auth.password_reset")
