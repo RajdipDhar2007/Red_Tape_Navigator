@@ -39,7 +39,9 @@ Rollback: redeploy the previous image tag; for schema, `alembic downgrade -1` on
 (0001 is). Take a backup first.
 
 Secrets (`SECRET_KEY`, `FIELD_ENCRYPTION_KEY`, `DATABASE_URL`, `ANTHROPIC_API_KEY`, `METRICS_TOKEN`) come from the
-cloud secret manager. `APP_ENV=prod` refuses to start with the dev secret or without `FIELD_ENCRYPTION_KEY`.
+cloud secret manager. `APP_ENV=prod` refuses to start (listing every problem at once) if: `SECRET_KEY` is a dev/short value (<32 chars),
+`FIELD_ENCRYPTION_KEY` is missing, `DATABASE_URL` is SQLite, `CORS_ORIGINS` is empty/localhost/non-https, or
+`DEMO_MODE` is true.
 
 ## Backup and restore (PostgreSQL)
 ```bash

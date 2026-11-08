@@ -56,6 +56,26 @@ def get_settings() -> Settings:
                     "FIELD_ENCRYPTION_KEY is not a valid Fernet key (32 url-safe base64 bytes). Generate one with `make keygen`. "
                     "Keep comments on their own line in .env files."
                 ) from exc
-    if s.is_prod and (s.secret_key.startswith("dev-only") or not s.field_encryption_key):
-        raise RuntimeError("Production requires SECRET_KEY and FIELD_ENCRYPTION_KEY")
+    if s.is_prod:
+        problems = production_problems(s)
+        if problems:
+            raise RuntimeError("Unsafe production configuration: " + "; ".join(problems))
     return s
+
+
+def production_problems(s: Settings) -> list[str]:
+    """Everything that must not be true when APP_ENV=prod. Reported together so one deploy fixes all of it."""
+    problems: list[str] = []
+    if s.secret_key.startswith(("dev-only", "change-me")) or len(s.secret_key) < 32:
+        problems.append("SECRET_KEY must be a real secret of at least 32 characters")
+    if not s.field_encryption_key:
+        problems.append("FIELD_ENCRYPTION_KEY is required (make keygen)")
+    if s.database_url.startswith("sqlite"):
+        problems.append("DATABASE_URL must be PostgreSQL, not SQLite")
+    if not s.cors_list or any("localhost" in o or "127.0.0.1" in o for o in s.cors_list):
+        problems.append("CORS_ORIGINS must list the real https origin(s), not localhost")
+    elif any(not o.startswith("https://") for o in s.cors_list):
+        problems.append("CORS_ORIGINS must use https://")
+    if s.demo_mode:
+        problems.append("DEMO_MODE must be false (it exposes demo accounts and simulated integrations)")
+    return problems

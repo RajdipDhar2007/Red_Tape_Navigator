@@ -41,6 +41,8 @@ _WALL_MARKERS = ("captcha", "recaptcha", "please log in", "login to continue", "
 _breakers: dict[str, CircuitBreaker] = {}
 _last_hit: dict[str, list[float]] = {}
 _robots: dict[str, robotparser.RobotFileParser | None] = {}
+_robots_at: dict[str, float] = {}
+_ROBOTS_TTL_SECONDS = 3600
 
 
 def _breaker(host: str) -> CircuitBreaker:
@@ -58,7 +60,10 @@ async def _throttle(host: str, per_minute: int) -> None:
 async def _robots_ok(client: httpx.AsyncClient, url: str, ua: str) -> bool:
     u = urlparse(url)
     root = f"{u.scheme}://{u.netloc}"
+    if time.monotonic() - _robots_at.get(root, 0.0) > _ROBOTS_TTL_SECONDS:
+        _robots.pop(root, None)  # expired: re-read so a changed robots.txt is honoured
     if root not in _robots:
+        _robots_at[root] = time.monotonic()
         rp = robotparser.RobotFileParser()
         try:
             r = await client.get(f"{root}/robots.txt", timeout=10)
