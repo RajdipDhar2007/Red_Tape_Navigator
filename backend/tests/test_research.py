@@ -63,7 +63,8 @@ async def test_intake_llm_fills_gaps_but_validates():
     llm = LLM(client=FakeClient(), model="test-model")
     p = await parse_goal("I want to start something", llm=llm)
     assert p.activity is None  # invalid activity from the model is rejected
-    assert p.state == "Gujarat" and p.city == "Surat" and p.clarifying_question is None
+    assert p.state == "Gujarat" and p.city == "Surat"
+    assert p.clarifying_question and "kind of business" in p.clarifying_question  # unknown type is asked, not dropped
 
 
 def test_plan_order_and_dependencies():
@@ -282,3 +283,11 @@ async def test_concurrent_upserts_of_same_key_keep_one_current(client):
     async with maker()() as db:
         n = (await db.execute(select(func.count()).select_from(Claim).where(Claim.key == "gst:national:fee", Claim.current.is_(True)))).scalar_one()
         assert n == 1
+
+
+def test_missing_business_type_is_asked_not_silently_dropped():
+    p = parse_goal_rules("I want to open a shop in Kolkata")
+    assert p.activity is None and p.city == "Kolkata"
+    assert p.clarifying_question and "kind of business" in p.clarifying_question
+    assert parse_goal_rules("मैं कोलकाता में कुछ खोलना चाहता हूँ", "hi").clarifying_question
+    assert parse_goal_rules("I want to open a bakery in Kolkata").clarifying_question is None

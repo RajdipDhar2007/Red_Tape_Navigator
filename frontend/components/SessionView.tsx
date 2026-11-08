@@ -46,6 +46,10 @@ export default function SessionView({ id }: { id: string }) {
       await load();
       setPhase("checklist");
     } catch (e) {
+      if (e instanceof ApiError && e.code === "goal_incomplete") {
+        await load(); // the server needs one more detail: show the clarify form instead of an error
+        return;
+      }
       setErr(e instanceof ApiError ? e.message : t("app.error"));
     }
   }, [id, load, t]);

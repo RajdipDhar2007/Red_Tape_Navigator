@@ -45,6 +45,20 @@ def _find(text: str, aliases: list[str]) -> bool:
     return any(a.lower() in low for a in aliases)
 
 
+def next_question(p: ParsedGoal, language: str = "en") -> str | None:
+    """The single most useful missing detail: where (city/state) first, then what kind of business."""
+    q = QUESTIONS.get(language, QUESTIONS["en"])
+    if not p.city and not p.state:
+        return q["city_state"]
+    if not p.city:
+        return q["city"]
+    if not p.state:
+        return q["state"]
+    if not p.activity:
+        return q["activity"]
+    return None
+
+
 def parse_goal_rules(goal: str, language: str = "en") -> ParsedGoal:
     low = goal.lower()
     activity = None
@@ -73,15 +87,9 @@ def parse_goal_rules(goal: str, language: str = "en") -> ParsedGoal:
         if m and m.group(1).lower() not in STATE_ALIASES:  # a captured state name is not a city
             city = m.group(1)
     intent = "start_business" if (_INTENT.search(goal) or activity) else "other"
-    q = QUESTIONS.get(language, QUESTIONS["en"])
-    question = None
-    if not city and not state:
-        question = q["city_state"]
-    elif not city:
-        question = q["city"]
-    elif not state:
-        question = q["state"]
-    return ParsedGoal(intent=intent, activity=activity, state=state, city=city, city_known=known, clarifying_question=question)
+    parsed = ParsedGoal(intent=intent, activity=activity, state=state, city=city, city_known=known)
+    parsed.clarifying_question = next_question(parsed, language)
+    return parsed
 
 
 class _LLMParse(BaseModel):
@@ -105,11 +113,7 @@ async def parse_goal(goal: str, language: str = "en", llm: LLM | None = None) ->
                 parsed.activity = out.activity
             parsed.city = parsed.city or out.city
             parsed.state = parsed.state or out.state
-            q = QUESTIONS.get(language, QUESTIONS["en"])
-            parsed.clarifying_question = (
-                q["city_state"] if not parsed.city and not parsed.state
-                else q["city"] if not parsed.city else q["state"] if not parsed.state else None
-            )
+            parsed.clarifying_question = next_question(parsed, language)
         except Exception as exc:  # degrade to the rules result, but leave a trace
             get_logger("intake").warning("llm_intake_failed", error_type=type(exc).__name__)
     return parsed

@@ -32,7 +32,8 @@ export class ApiError extends Error {
     public status: number,
     public detail: unknown,
   ) {
-    super(typeof detail === "string" ? detail : JSON.stringify(detail));
+    const msg = (detail as { message?: unknown } | null | undefined)?.message;
+    super(typeof detail === "string" ? detail : typeof msg === "string" ? msg : JSON.stringify(detail));
   }
   get code(): string | undefined {
     const d = this.detail as { code?: string } | undefined;

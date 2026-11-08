@@ -551,6 +551,7 @@
   "goal": "I want to export diamonds in Surat, Gujarat",
   "language": "en",
   "expect_no_activity": true,
+    "expect_clarify": true,
   "expect_city": "Surat",
   "expect_state": "Gujarat"
  }
