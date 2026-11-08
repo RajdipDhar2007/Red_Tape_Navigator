@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -42,6 +43,15 @@ class Settings(BaseSettings):
     reset_token_minutes: int = 30
     lockout_threshold: int = 5
     lockout_minutes: int = 15
+
+    @field_validator("database_url", mode="after")
+    @classmethod
+    def _async_driver(cls, v: str) -> str:
+        """Managed hosts (Render, Heroku-style) hand out postgres:// or postgresql:// URLs; SQLAlchemy needs asyncpg."""
+        for plain in ("postgres://", "postgresql://"):
+            if v.startswith(plain):
+                return "postgresql+asyncpg://" + v[len(plain):]
+        return v
 
     @property
     def cors_list(self) -> list[str]:

@@ -127,3 +127,12 @@ def test_prod_requires_smtp_and_https_web_url():
     assert production_problems(Settings(**base)) == []
     assert any("SMTP" in p for p in production_problems(Settings(**{**base, "smtp_host": ""})))
     assert any("WEB_BASE_URL" in p for p in production_problems(Settings(**{**base, "web_base_url": "http://x"})))
+
+
+def test_managed_postgres_urls_get_the_asyncpg_driver():
+    from app.core.config import Settings
+
+    assert Settings(database_url="postgres://u:p@h/db").database_url == "postgresql+asyncpg://u:p@h/db"
+    assert Settings(database_url="postgresql://u:p@h/db").database_url == "postgresql+asyncpg://u:p@h/db"
+    assert Settings(database_url="postgresql+asyncpg://u:p@h/db").database_url == "postgresql+asyncpg://u:p@h/db"
+    assert Settings(database_url="sqlite+aiosqlite:///x.db").database_url.startswith("sqlite")
