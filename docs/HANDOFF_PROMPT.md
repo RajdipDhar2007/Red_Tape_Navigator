@@ -71,7 +71,7 @@ hash-chained audit log, PII-redacting logs, allowlisted outbound fetching, prod 
   escalates to an officer, and regulator notes (bank, insurance, pharmacy, liquor, ration shop, post office, clinic, school, transport...)
   instead of a wrong shop checklist. State-specific licences use `by_city` entries in `backend/app/kb/sourced_licences.py`, each written from that state's own official page.
   To add a business type, add a row to `backend/app/kb/business_types.py`; to add a licence, read the official document first and cite it in `docs/RULES_VERIFICATION.md`.
-  Still to do: read Karnataka's CL-2 documents (its site failed the secure connection), each pilot state's clinical-establishment law, current Telangana/Maharashtra liquor notifications, and state forms for school and coaching registration. 168 seeded rules, each with a
+  Still to do: the 03.07.2026 Karnataka amendment and any later auction round, each pilot state's clinical-establishment law, current Telangana/Maharashtra liquor notifications, and state forms for school and coaching registration. 168 seeded rules, each with a
   source URL, confidence and "verify" flag. Accounts, password reset by SMTP email, change password, account page with data
   export and erase (DPDP), consent log, retention purge.
 - **Digio (Aadhaar e-Sign + DigiLocker):** `backend/app/integrations/real/digio.py`, webhook `POST /webhooks/digio`

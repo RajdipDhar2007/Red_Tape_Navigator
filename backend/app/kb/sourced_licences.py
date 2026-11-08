@@ -95,14 +95,32 @@ LIQUOR = {
             "restricted": True,
         },
         "bengaluru": {
-            "authority": "State Excise Department, Karnataka",
-            "url": "https://stateexcise.karnataka.gov.in/",
-            "fee": "Retail liquor shops are licensed as CL-2. The department's licence-fee page has a CL-2 row with two tiers by population, but the amounts could not be read reliably from here; confirm the current fee with the department",
-            "fee_conf": 0.3,
-            "timeline": "Not found on the pages that could be read",
-            "timeline_conf": 0.2,
-            "documents": ["The document list for a CL-2 licence was not found on the department's site; ask your district excise office"],
-            "why": "Karnataka: retail liquor shops are licensed as CL-2 by the State Excise Department. The department's pages could not be read securely from here, so no document list is shown; please ask your district excise office.",
+            "authority": "State Excise Department, Karnataka (Additional Commissioner (HQ & I) awards; Deputy Commissioner (Revenue) grants the licence)",
+            "url": "https://stateexcise.karnataka.gov.in/uploads/E-auction%20Notification%2001-07-2026_1782917695.pdf",
+            "fee": "Per the Karnataka Gazette notification of 01.07.2026 (Finance Department (Excise), No. FD 52 EFL 2025): registration on the MSTC e-auction portal costs Rs 1,000 plus GST; "
+                   "the application fee is Rs 50,000, non-refundable, for each licence applied for; the earnest money deposit (EMD) is 2% of the base price, paid online with the application; "
+                   "bids rise in steps of Rs 2 lakh or multiples. For the Bengaluru ranges (Greater Bengaluru Authority area) Annexure-5 gives a base price of Rs 1.5 crore, an applicable licence fee "
+                   "of Rs 9,00,000 and an EMD of Rs 3,00,000. The winner pays MSTC a transaction fee of 0.42% plus GST of the winning bid within 7 working days, and at least 50% of the winning bid in the "
+                   "window set by the department (3 to 11 August 2026 in the first round), the rest later (by 31.10.2026 in the first round). The licence fee is waived for the first excise year (2026-27); "
+                   "annual renewal and additional licence fees are payable for the next four years",
+            "fee_conf": 0.7,
+            "timeline": "The licence term is five excise years (2026-27 to 2030-31). The first auction round for the Bengaluru Urban groups was held in late July 2026 (27 to 29 July for groups BUD-2, 3, 4, 6, 7 and 8 "
+                        "in the schedule read). Later rounds were not found; check the department site and MSTC's 'View Forthcoming auctions' page. After the Letter of Acceptance you apply for the licence on the "
+                        "Excise Services website; the department says it is not responsible for delays in opening the shop",
+            "timeline_conf": 0.6,
+            "documents": [
+                "Register as a bidder on MSTC's e-auction portal (www.mstcecommerce.com): PAN is mandatory (the entity's PAN for a firm, LLP, trust, society or company); OTP verification; registration fee Rs 1,000 plus GST",
+                "Undertaking, given on the bidder registration form, that you are not disqualified under Rule 4-B of the Karnataka Excise (Sale of Indian & Foreign Liquors) Rules, 1968",
+                "Eligible bidders: an individual, LLP, partnership firm, trust, society or company registered under Indian law",
+                "For an LLP, firm, trust, society or company: the entity's registration documents (for example certificate of incorporation with MoA and AoA, or registration certificate, partnership deed, Form-A and list of trustees or members) and an authorization letter for the person who bids",
+                "Reservation certificate from the competent Karnataka authority if you claim a reserved category (SC-A 5.25%, SC-B 5.25%, SC-C 4.50%, ST 3% of licences); without it the bid is cancelled and the money forfeited",
+                "Application fee Rs 50,000 and EMD (Rs 3,00,000 for a Bengaluru range) paid online through your virtual account number on the portal; a separate application and EMD for each licence",
+                "After winning: application in Form-1A for the grant of licence on the Excise Services website, under the Karnataka Excise (Sale of Indian & Foreign Liquors) Rules, 1968; you arrange the premises and other requirements under the Karnataka Excise Act, 1965",
+            ],
+            "why": "Bengaluru (Karnataka): new retail liquor licences are not issued on ordinary application. The state allots unused CL-2A licences (retail off-shop sale of Indian or foreign liquor, not to be drunk on the premises) "
+                   "and CL-9A licences (refreshment room / bar with meals) by electronic auction on MSTC's portal, range by range, under the Gazette notification of 01.07.2026. Each winner may place the shop anywhere "
+                   "within the allotted range, subject to the Excise Rules. The first round for Bengaluru took place in July 2026 and a later amendment (3 July 2026) was not read, so confirm whether another round is planned before spending money.",
+            "restricted": True,
         },
         "chennai": {
             "authority": "Prohibition and Excise Department, Government of Tamil Nadu",

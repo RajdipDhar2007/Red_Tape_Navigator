@@ -134,9 +134,14 @@ async def test_liquor_shop_shows_each_states_own_official_rules(client, auth):
     assert "restricted" not in kolkata  # West Bengal has an application route
 
     for city, phrase in (("Delhi", "only to selected Delhi government undertakings"), ("Ahmedabad", "prohibition state"),
-                         ("Chennai", "state marketing corporation (TASMAC)"), ("Mumbai", "ban on grant of new license")):
+                         ("Chennai", "state marketing corporation (TASMAC)"), ("Mumbai", "ban on grant of new license"),
+                         ("Bengaluru", "electronic auction")):
         p = await plan_for(city)
         assert p["restricted"]["licence"] == "liquor_licence" and phrase in p["restricted"]["text"], city
+
+    blr = await plan_for("Bengaluru")
+    fee = next(x for x in blr["steps"] if x["licence"] == "liquor_licence")["claims"]["fee"]["text"]
+    assert "Rs 1.5 crore" in fee and "Rs 50,000" in fee and "Rs 3,00,000" in fee and "0.42%" in fee
 
     hyd = await plan_for("Hyderabad")
     assert "restricted" not in hyd and "Rs 2,00,000" in step(hyd, "liquor_licence")["claims"]["fee"]["text"]
