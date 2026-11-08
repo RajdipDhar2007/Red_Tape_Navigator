@@ -1,0 +1,18 @@
+"""City-specific fee wording must come only from an official table and must not leak to other cities."""
+from app.kb.seed_loader import seed_drafts
+
+
+def fee(key: str):
+    return next(d for d in seed_drafts() if d.key == key)
+
+
+def test_hyderabad_trade_fee_states_the_published_table_and_its_limits():
+    d = fee("trade_licence:hyderabad:fee")
+    assert "Rs 3" in d.text and "Rs 4" in d.text and "Rs 6" in d.text
+    assert "does not say whether" in d.text and d.source_url == "https://www.ghmc.gov.in/Trade.aspx"
+    assert d.confidence < 0.9  # still flagged for a reviewer
+
+
+def test_other_cities_keep_the_generic_fee_text():
+    d = fee("trade_licence:kolkata:fee")
+    assert "varies by trade category" in d.text and "Rs 3" not in d.text

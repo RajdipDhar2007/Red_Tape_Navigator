@@ -18,7 +18,7 @@ tool now reports how many claims are numeric. A human reviewer is needed for the
 |---|---|---|
 | Udyam registration is free | udyamregistration.gov.in home page: "Udyam (MSME) Registration is Free of Cost and paperless" | Confirmed (2026-11-08) |
 | GST registration thresholds | CGST Act s.22 (taxinformation.cbic.gov.in): Rs 20 lakh general, Rs 10 lakh special category states; goods-only suppliers may be raised up to Rs 40 lakh by notification. A CBIC 2019 update listed states that kept Rs 20 lakh for goods, including Telangana | Wording corrected in the pack; current per-state limit still to be confirmed by a reviewer on the GST portal |
-| Hyderabad trade licence | ghmc.gov.in/Trade.aspx: online application with OTP login, fee paid online, certificate "issued instantly" after payment; fee amounts are in a separate "Trade License Fee rates" PDF | Source URL now the exact page; fee amounts NOT copied (read the PDF and add) |
+| Hyderabad trade licence | ghmc.gov.in/Trade.aspx: online application with OTP login, fee paid online, certificate "issued instantly" after payment; fee amounts are in a separate "Trade License Fee rates" PDF | Source URL now the exact page. The fee table PDF was read: per sq ft by road width, Rs 3 (single lane, 20 ft), Rs 4 (double lane, 30 ft), Rs 6 (multiple lanes, wider than 30 ft). It does not say if this is yearly or whether other charges apply, so the pack says exactly that; reviewer to confirm |
 | Ahmedabad shops & establishments | ahmedabadcity.gov.in/StaticPage/shops_establishment: AMC administers it; Form A for 10+ workers, Form D intimation for fewer; forms downloadable; no fee, timeline or online process stated | Authority and URL corrected to AMC |
 
 ## Not confirmed (need a reviewer or the authority; do not guess)
@@ -29,7 +29,7 @@ tool now reports how many claims are numeric. A human reviewer is needed for the
 - **Fire safety NOC** and **pollution control (CTE/CTO)** sources for Maharashtra, Delhi, Karnataka, Tamil Nadu, Telangana and Gujarat:
   searches of government domains found portals for other states only. The department or its single-window portal must supply the exact page.
   (The pack currently cites each state's general government home page for fire NOC and the CPCB home page for pollution; treat these as placeholders.)
-- **Trade licence fees**: Hyderabad (PDF above), Pune (PMC), Ahmedabad (AMC), Mumbai, Delhi, Bengaluru, Chennai, Kolkata: fee schedules not yet read.
+- **Trade licence fees**: Pune (PMC), Ahmedabad (AMC), Mumbai, Delhi, Bengaluru, Chennai, Kolkata: fee schedules not yet read. (Hyderabad: table read, see above.)
 - **Shops & establishments** fees and timelines for every state.
 - Timelines quoted in the pack ("about 7 days", "3-7 working days", etc.) have no cited official source yet.
 

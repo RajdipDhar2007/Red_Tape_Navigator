@@ -43,6 +43,15 @@ LICENCES: dict[str, dict] = {
         "depends_on": ["fssai"],
         "fee": "Fee varies by trade category and area; confirm with the municipal authority",
         "fee_conf": 0.5,
+        # City-specific fee text, only where an official fee table was read. Keep wording to what the source says.
+        "fee_by_city": {
+            "hyderabad": (
+                "GHMC publishes a trade licence fee table (linked from its trade licence page) charged per sq ft by road width: "
+                "Rs 3 for a single lane (20 ft), Rs 4 for a double lane (30 ft), Rs 6 for multiple lanes (wider than 30 ft). "
+                "The table does not say whether this is yearly or whether other charges apply; confirm on the GHMC page before paying"
+            ),
+        },
+        "fee_by_city_conf": 0.6,
         "timeline": "Varies; typically 2-6 weeks including inspection",
         "timeline_conf": 0.5,
         "documents": ["Proof of premises ownership / rent agreement", "Landlord NOC (if rented)", "Property tax receipt", "ID and address proof", "Passport photo"],

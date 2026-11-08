@@ -32,10 +32,13 @@ def seed_drafts() -> list[ClaimDraft]:
             p = f"{lid}:{scope}"
             where = "" if scope == "national" else f" in {CITIES[scope]['label']}"
             name = lic["name"]
+            city_fee = lic.get("fee_by_city", {}).get(scope)
+            fee = city_fee or lic["fee"]
+            fee_conf = lic["fee_by_city_conf"] if city_fee else lic["fee_conf"]
             out += [
                 _draft(f"{p}:requirement", "requirement", f"{name}{where}: {lic['why']}", {"licence": lid, "value": lic["why"]}, url, 0.75, ts),
                 _draft(f"{p}:authority", "authority", f"Issuing authority for {name}{where}: {authority}", {"licence": lid, "value": authority}, url, 0.9 if scope == "national" else 0.8, ts),
-                _draft(f"{p}:fee", "fee", f"Fee for {name}{where}: {lic['fee']}", {"licence": lid, "value": lic["fee"]}, url, lic["fee_conf"], ts),
+                _draft(f"{p}:fee", "fee", f"Fee for {name}{where}: {fee}", {"licence": lid, "value": fee}, url, fee_conf, ts),
                 _draft(f"{p}:timeline", "timeline", f"Expected timeline for {name}{where}: {lic['timeline']}", {"licence": lid, "value": lic["timeline"]}, url, lic["timeline_conf"], ts),
                 _draft(f"{p}:documents", "documents", f"Documents for {name}{where}: " + "; ".join(lic["documents"]), {"licence": lid, "value": lic["documents"]}, url, 0.7, ts),
                 _draft(f"{p}:form_link", "form_link", f"Apply for {name}{where} on the official portal: {url}", {"licence": lid, "value": url}, url, 0.85, ts),
