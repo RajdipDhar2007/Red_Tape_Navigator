@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useState } from "react";
 import { useTranslations } from "next-intl";
-import { api, ApiError, hasToken, post } from "@/lib/api";
+import { api, apiBlob, ApiError, hasToken, post } from "@/lib/api";
 
 type Stats = {
   users: { total: number; by_role: Record<string, number> };
@@ -17,6 +17,24 @@ type Stats = {
   knowledge_base: { claims: number; needs_verification: number; seed_only: number };
   review_queue: Record<string, number>;
   consents: { granted: number; withdrawn: number };
+};
+type Source = {
+  id: string;
+  url: string;
+  sha256: string;
+  status: string;
+  fetched_at: string;
+  compatible: boolean;
+  compat: { reason?: string; missing_required?: string[]; matched?: number; pdf_fields?: number };
+};
+type FormRow = {
+  form_id: string;
+  title: string;
+  authority: string;
+  official_url: string | null;
+  serving: "official" | "placeholder";
+  active: Source | null;
+  candidates: Source[];
 };
 type Item = {
   id: string;
@@ -49,6 +67,77 @@ function Breakdown({ title, data }: { title: string; data: Record<string, number
         ))}
       </ul>
     </section>
+  );
+}
+
+function FormRowView({ f, onDone }: { f: FormRow; onDone: () => void }) {
+  const t = useTranslations("staff");
+  const id = useId();
+  const [url, setUrl] = useState(f.official_url ?? "");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const run = async (fn: () => Promise<unknown>) => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      await fn();
+      onDone();
+    } catch (e) {
+      setMsg(e instanceof ApiError ? e.message : t("error"));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const view = async (sid: string) => {
+    const blob = await apiBlob(`/admin/forms/sources/${sid}/pdf`);
+    window.open(URL.createObjectURL(blob), "_blank", "noopener,noreferrer");
+  };
+
+  return (
+    <li className="card space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <h3 className="font-semibold">{f.title.replace(/\s*\(PLACEHOLDER\)/, "")}</h3>
+        <span className={f.serving === "official" ? "badge bg-green-200" : "badge bg-amber-200"}>
+          {f.serving === "official" ? t("servingOfficial") : t("servingPlaceholder")}
+        </span>
+      </div>
+      <p className="text-sm text-slate-700">{f.authority}</p>
+      {f.active && <p className="text-sm">{t("activeCopy", { hash: f.active.sha256.slice(0, 10), date: new Date(f.active.fetched_at).toLocaleDateString() })}</p>}
+      <label htmlFor={id}>{t("officialUrl")}</label>
+      <div className="flex flex-wrap gap-2">
+        <input id={id} className="input flex-1" type="url" placeholder="https://" value={url} onChange={(e) => setUrl(e.target.value)} />
+        <button type="button" className="btn" disabled={busy || !url} onClick={() => void run(() => post(`/admin/forms/${f.form_id}/fetch`, { url }))}>
+          {t("fetchForm")}
+        </button>
+      </div>
+      {msg && (
+        <p role="alert" className="text-red-800">
+          {msg}
+        </p>
+      )}
+      {f.candidates.map((c) => (
+        <div key={c.id} className="rounded border border-slate-300 p-2">
+          <p className="text-sm">
+            {c.url} · {c.sha256.slice(0, 10)}
+          </p>
+          <p className={c.compatible ? "text-sm text-green-800" : "text-sm text-red-800"}>
+            {c.compatible ? t("compatible") : t("incompatible")}: {c.compat.reason}
+          </p>
+          <div className="mt-1 flex flex-wrap gap-2">
+            <button type="button" className="btn-secondary" onClick={() => void view(c.id)}>
+              {t("viewPdf")}
+            </button>
+            <button type="button" className="btn" disabled={busy || !c.compatible} onClick={() => void run(() => post(`/admin/forms/sources/${c.id}/activate`))}>
+              {t("activate")}
+            </button>
+            <button type="button" className="btn-secondary" disabled={busy} onClick={() => void run(() => post(`/admin/forms/sources/${c.id}/reject`))}>
+              {t("rejected")}
+            </button>
+          </div>
+        </div>
+      ))}
+    </li>
   );
 }
 
@@ -114,17 +203,20 @@ export default function StaffConsole() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [queue, setQueue] = useState<Item[]>([]);
   const [chain, setChain] = useState<boolean | null>(null);
+  const [forms, setForms] = useState<FormRow[]>([]);
 
   const load = useCallback(async () => {
     if (!hasToken()) return setState("denied");
     try {
       const me = await api<{ role: string }>("/auth/me");
       if (me.role === "citizen") return setState("denied");
-      const [s, q, a] = await Promise.all([
+      const [s, q, a, fm] = await Promise.all([
         api<Stats>("/admin/stats"),
         api<Item[]>("/admin/review-queue"),
         api<{ chain_valid: boolean }>("/admin/audit/verify"),
+        api<FormRow[]>("/admin/forms"),
       ]);
+      setForms(fm);
       setStats(s);
       setQueue(q);
       setChain(a.chain_valid);
@@ -159,6 +251,17 @@ export default function StaffConsole() {
         <Breakdown title={t("byActivity")} data={stats.sessions.by_activity} />
         <Breakdown title={t("byState")} data={stats.sessions.by_state} />
       </div>
+      <section aria-labelledby="forms-h" className="space-y-3">
+        <h2 id="forms-h" className="text-xl font-semibold">
+          {t("forms")}
+        </h2>
+        <p>{t("formsIntro")}</p>
+        <ul className="space-y-3">
+          {forms.map((f) => (
+            <FormRowView key={f.form_id} f={f} onDone={() => void load()} />
+          ))}
+        </ul>
+      </section>
       <section aria-labelledby="queue-h" className="space-y-3">
         <h2 id="queue-h" className="text-xl font-semibold">
           {t("queue")}

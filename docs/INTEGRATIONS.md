@@ -57,6 +57,25 @@ replicate it.
   new adapter, not as a scraper.
 * For production use of a portal's data at scale, get the department's written permission.
 
+## Fetching the official PDF (built)
+
+The platform downloads the current PDF from the issuing authority instead of shipping a copy in the repository:
+
+1. Make sure the form's field map exists (`backend/app/forms/templates/<form_id>.json`, see the next section). Optionally set
+   `"official_url": "https://<allowlisted official site>/<path>.pdf"` in that JSON.
+2. In the officer console (**Official forms**) or via `POST /admin/forms/<form_id>/fetch {"url": "..."}` (admin role), fetch it.
+   The download goes through the same guard rails as research: HTTPS, domain allowlist (checked on every redirect),
+   `robots.txt`, per-domain rate limit, 8 MB cap, PDF signature check, captcha/login pages are never bypassed.
+3. The platform reports whether the PDF **fits our field map** (every required field of the map exists in the PDF; missing and
+   unmapped fields are listed). An officer can view the PDF, then **Approve and use** it. An incompatible PDF cannot be approved.
+4. From then on citizens' review, preview and download use the approved copy, the placeholder banner disappears for that form,
+   and the review screen shows where it came from (site, date, fingerprint).
+5. The weekly worker job re-fetches every form with a known URL. A changed file becomes a new *candidate* plus an officer review
+   item; **citizens keep getting the previously approved copy until an officer approves the new one.**
+
+Limits: only fillable (AcroForm) PDFs can be checked automatically; scanned or flat PDFs, and forms that are filled online
+(FoSCoS, Udyam), need their field map built by hand. The platform never guesses an official URL: it must be supplied.
+
 ## How to add a real form (replace a placeholder)
 
 1. Put the official fillable PDF in `backend/app/forms/templates/<form_id>.pdf` (replace the placeholder).

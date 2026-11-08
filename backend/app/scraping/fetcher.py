@@ -129,7 +129,7 @@ async def _fetch_page(url: str, *, render_js: bool = False, client: httpx.AsyncC
             raise ValueError("too many redirects")
 
         html = await call_with_resilience(
-            go, breaker=_breaker(host), retries=2, timeout=35, retry_on=(httpx.HTTPError, ValueError)
+            go, breaker=_breaker(host), retries=2, timeout=35, retry_on=(httpx.HTTPError,)
         )
     finally:
         if own:
@@ -141,3 +141,63 @@ async def _fetch_page(url: str, *, render_js: bool = False, client: httpx.AsyncC
     return Page(
         url=url, text=clean, fetched_at=datetime.now(UTC), content_hash=content_hash(clean), injection_suspected=flagged
     )
+
+
+@dataclass
+class BinaryFile:
+    url: str
+    content: bytes
+    content_type: str
+    fetched_at: datetime
+    sha256: str
+
+
+class NotAPdf(ValueError):
+    """The URL did not return a PDF (often an HTML error, login or captcha page)."""
+
+
+async def fetch_pdf(url: str, *, max_bytes: int = 8_000_000, client: httpx.AsyncClient | None = None) -> BinaryFile:
+    """Download an official PDF under the same guard rails as page fetching: HTTPS allowlist on every redirect hop,
+    robots.txt, per-domain throttle, circuit breaker, a hard size cap enforced while streaming, and PDF magic-byte check.
+    Captcha / login walls raise HumanHandoffRequired (never bypassed)."""
+    import hashlib
+
+    url = assert_allowed(url)
+    cfg = load_sources()
+    ua = cfg["user_agent"]
+    host = urlparse(url).hostname or ""
+    own = client is None
+    client = client or httpx.AsyncClient(headers={"User-Agent": ua}, follow_redirects=False)
+    try:
+        if not await _robots_ok(client, url, ua):
+            raise RobotsDisallowed(url)
+        await _throttle(host, cfg["rate_limit_per_domain_per_minute"])
+
+        async def go() -> tuple[bytes, str]:
+            cur = url
+            for _ in range(3):
+                async with client.stream("GET", cur, timeout=30) as r:
+                    if r.is_redirect:
+                        cur = assert_allowed(str(httpx.URL(cur).join(r.headers["location"])))
+                        continue
+                    r.raise_for_status()
+                    buf = bytearray()
+                    async for chunk in r.aiter_bytes():
+                        buf += chunk
+                        if len(buf) > max_bytes:
+                            raise ValueError("file too large")
+                    return bytes(buf), r.headers.get("content-type", "")
+            raise ValueError("too many redirects")
+
+        content, ctype = await call_with_resilience(
+            go, breaker=_breaker(host), retries=2, timeout=60, retry_on=(httpx.HTTPError,)
+        )
+    finally:
+        if own:
+            await client.aclose()
+    if not content.startswith(b"%PDF-"):
+        head = content[:4000].decode("utf-8", "ignore").lower()
+        if any(m in head for m in _WALL_MARKERS):
+            raise HumanHandoffRequired(f"Captcha or login required at {url}; download the form manually.")
+        raise NotAPdf(f"{url} did not return a PDF")
+    return BinaryFile(url, content, ctype, datetime.now(UTC), hashlib.sha256(content).hexdigest())

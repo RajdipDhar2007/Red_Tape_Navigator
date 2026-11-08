@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, event, text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, LargeBinary, String, Text, event, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -151,3 +151,21 @@ class Reminder(Base):
     destination: Mapped[str] = mapped_column(String(255), default="")
     kind: Mapped[str] = mapped_column(String(16), default="renewal")
     sent: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class FormSource(Base):
+    """An official PDF fetched from an allowlisted department site. Never used for citizens until a human activates it."""
+
+    __tablename__ = "form_sources"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
+    form_id: Mapped[str] = mapped_column(String(64), index=True)
+    url: Mapped[str] = mapped_column(String(1024))
+    sha256: Mapped[str] = mapped_column(String(64))
+    size: Mapped[int] = mapped_column(Integer)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    status: Mapped[str] = mapped_column(String(16), default="candidate")  # candidate|active|superseded|rejected
+    compatible: Mapped[bool] = mapped_column(Boolean, default=False)
+    compat: Mapped[dict] = mapped_column(JSON, default=dict)
+    pdf: Mapped[bytes] = mapped_column(LargeBinary)
+    decided_by: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

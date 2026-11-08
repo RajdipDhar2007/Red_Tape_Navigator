@@ -19,6 +19,14 @@ async def refresh_rules(ctx) -> dict:
         return await refresh_all(db, llm=LLM())
 
 
+async def forms_job(ctx) -> dict:
+    """Re-fetch official form PDFs; a changed file becomes a candidate + officer review item (never auto-activated)."""
+    from app.forms.official import check_for_changes
+
+    async with maker()() as db:
+        return await check_for_changes(db)
+
+
 async def purge_job(ctx) -> int:
     async with maker()() as db:
         return await purge_expired(db)
@@ -30,9 +38,10 @@ async def reminders_job(ctx) -> int:
 
 
 class WorkerSettings:
-    functions = [refresh_rules, purge_job, reminders_job]
+    functions = [refresh_rules, forms_job, purge_job, reminders_job]
     cron_jobs = [
         cron(refresh_rules, weekday={0}, hour={2}, minute={0}),  # weekly, Monday 02:00
+        cron(forms_job, weekday={0}, hour={2}, minute={30}),  # weekly, after the rules refresh
         cron(purge_job, hour={3}, minute={0}),  # daily
         cron(reminders_job, minute={0, 30}),  # every 30 minutes
     ]

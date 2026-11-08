@@ -16,7 +16,7 @@ from app.db.models import NavSession, User
 from app.db.session import get_db
 from app.followup.checklist import submission_checklist
 from app.followup.reminders import schedule_after_submission
-from app.forms import filler
+from app.forms import filler, official
 from app.forms.registry import get_template
 from app.integrations.factory import get_integrations
 from app.interview import engine, memory
@@ -249,8 +249,10 @@ async def review(sid: str, user: User = Depends(current_user), db: AsyncSession 
             row["answer_key"] = key
             row["editable"] = key is not None
             row["answer_value"] = ans.get(key, {}).get("value") if key else None
+        src = await official.active_source(db, fid)
         forms.append({
             "form_id": fid, "title": r.title, "placeholder": r.placeholder, "summary": r.summary(),
+            "official_source": {"url": src.url, "sha256": src.sha256, "fetched_at": src.fetched_at.isoformat()} if src else None,
             "warnings": r.warnings, "fields": rows, "preview_url": f"/sessions/{sid}/forms/{fid}/preview.png",
         })
     return {

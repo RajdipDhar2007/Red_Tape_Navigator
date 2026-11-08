@@ -64,6 +64,7 @@ class FormTemplate(BaseModel):
     pdf: str
     kind: str = "acroform"
     portal_url: str | None = None
+    official_url: str | None = None  # where the issuing authority publishes the PDF (must be on the allowlist)
     warnings: list[Warning_] = Field(default_factory=list)
     fields: list[FieldMap]
 

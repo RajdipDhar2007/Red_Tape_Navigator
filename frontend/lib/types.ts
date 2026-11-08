@@ -60,6 +60,7 @@ export type ReviewForm = {
   form_id: string;
   title: string;
   placeholder: boolean;
+  official_source?: { url: string; sha256: string; fetched_at: string } | null;
   summary: Record<string, number>;
   warnings: string[];
   fields: ReportRow[];

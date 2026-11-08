@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.db.models import NavSession, User
-from app.forms import filler
+from app.forms import filler, official
 from app.forms.context import build_context
 from app.forms.registry import get_template, required_keys_for
 from app.interview import engine, memory
@@ -43,7 +43,11 @@ def required_keys(ns: NavSession) -> set[str]:
 async def fill_all(db: AsyncSession, ns: NavSession) -> dict[str, filler.FillResult]:
     answers = await memory.get_answers(db, ns.id, reveal=True)
     values = filler.build_values(answers, build_context(ns.parsed or {}))
-    return {fid: filler.fill_form(get_template(fid), values) for fid in form_ids(ns)}
+    out = {}
+    for fid in form_ids(ns):
+        src = await official.active_source(db, fid)
+        out[fid] = filler.fill_form(get_template(fid), values, src.pdf if src else None, official=src is not None)
+    return out
 
 
 def sha256(b: bytes) -> str:

@@ -159,7 +159,7 @@ def _fill_overlay(pdf: bytes, t: FormTemplate, fields: dict[str, str]) -> bytes:
     return out.getvalue()
 
 
-def fill_form(t: FormTemplate, values: dict[str, dict], pdf_bytes: bytes | None = None) -> FillResult:
+def fill_form(t: FormTemplate, values: dict[str, dict], pdf_bytes: bytes | None = None, *, official: bool = False) -> FillResult:
     fields, report, warnings = plan_fields(t, values)
     pdf = pdf_bytes if pdf_bytes is not None else t.pdf_path.read_bytes()
     if t.kind == "acroform":
@@ -170,7 +170,8 @@ def fill_form(t: FormTemplate, values: dict[str, dict], pdf_bytes: bytes | None 
                 report.append(FieldReport(name, name, "unmapped", None, None, [], "PDF field has no mapping in the template; left blank."))
     else:
         filled = _fill_overlay(pdf, t, fields)
-    return FillResult(t.id, t.title, t.placeholder, filled, report, warnings)
+    title = t.title.replace(" (PLACEHOLDER)", "") if official else t.title
+    return FillResult(t.id, title, t.placeholder and not official, filled, report, warnings)
 
 
 def render_preview_png(pdf: bytes, page: int = 0, zoom: float = 1.4) -> bytes:

@@ -8,8 +8,12 @@ from app.agent.llm import LLM
 from app.agent.research import refresh_all
 from app.api.deps import require_roles
 from app.core import audit
-from app.db.models import Claim, Consent, NavSession, ReviewItem, User
+from app.db.models import Claim, Consent, FormSource, NavSession, ReviewItem, User
 from app.db.session import get_db
+from app.forms import official
+from app.forms.registry import load_templates
+from app.scraping.allowlist import DomainNotAllowed
+from app.scraping.fetcher import HumanHandoffRequired, NotAPdf, RobotsDisallowed
 from app.services import privacy
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -122,3 +126,65 @@ async def stats(user: User = Depends(require_roles(*STAFF)), db: AsyncSession = 
 async def list_users(user: User = Depends(require_roles("admin")), db: AsyncSession = Depends(get_db)):
     rows = (await db.execute(select(User).where(User.deleted_at.is_(None)).order_by(User.created_at))).scalars().all()
     return [{"id": u.id, "email": u.email, "role": u.role, "created_at": u.created_at.isoformat()} for u in rows]
+
+
+class FetchFormIn(BaseModel):
+    url: str | None = Field(default=None, max_length=1024)
+
+
+@router.get("/forms")
+async def list_forms(user: User = Depends(require_roles(*STAFF)), db: AsyncSession = Depends(get_db)):
+    """Every form template, whether citizens currently get an approved official copy, and fetched candidates."""
+    out = []
+    for fid, t in load_templates().items():
+        rows = (await db.execute(select(FormSource).where(FormSource.form_id == fid).order_by(FormSource.fetched_at.desc()))).scalars().all()
+        active = next((r for r in rows if r.status == "active"), None)
+        out.append({
+            "form_id": fid, "title": t.title, "authority": t.authority, "official_url": t.official_url,
+            "serving": "official" if active else "placeholder", "active": official.describe(active) if active else None,
+            "candidates": [official.describe(r) for r in rows if r.status == "candidate"],
+        })
+    return out
+
+
+@router.post("/forms/{form_id}/fetch")
+async def fetch_form(form_id: str, body: FetchFormIn, user: User = Depends(require_roles("admin")), db: AsyncSession = Depends(get_db)):
+    if form_id not in load_templates():
+        raise HTTPException(404, "Unknown form")
+    try:
+        src, is_new = await official.fetch_candidate(db, form_id, body.url, actor=user.id)
+    except official.FormSourceError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except DomainNotAllowed as exc:
+        raise HTTPException(422, f"URL is not on the official allowlist: {exc}") from exc
+    except (HumanHandoffRequired, RobotsDisallowed, NotAPdf) as exc:
+        raise HTTPException(422, f"Could not fetch a PDF: {exc}") from exc
+    except Exception as exc:  # noqa: BLE001 - network failures
+        raise HTTPException(502, f"Could not reach the official site ({type(exc).__name__})") from exc
+    return {"new": is_new, **official.describe(src)}
+
+
+@router.get("/forms/sources/{source_id}/pdf")
+async def download_source(source_id: str, user: User = Depends(require_roles(*STAFF)), db: AsyncSession = Depends(get_db)):
+    from fastapi.responses import Response
+
+    src = await db.get(FormSource, source_id)
+    if src is None:
+        raise HTTPException(404, "Not found")
+    return Response(src.pdf, media_type="application/pdf", headers={"Content-Disposition": f'inline; filename="{src.form_id}-{src.sha256[:8]}.pdf"'})
+
+
+@router.post("/forms/sources/{source_id}/{decision}")
+async def decide_source(source_id: str, decision: str, user: User = Depends(require_roles("admin")), db: AsyncSession = Depends(get_db)):
+    if decision not in ("activate", "reject"):
+        raise HTTPException(404, "Not found")
+    try:
+        src = await official.decide(db, source_id, activate=decision == "activate", actor=user.id)
+    except official.FormSourceError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return official.describe(src)
+
+
+@router.post("/forms/refresh")
+async def refresh_forms(user: User = Depends(require_roles("admin")), db: AsyncSession = Depends(get_db)):
+    return await official.check_for_changes(db)

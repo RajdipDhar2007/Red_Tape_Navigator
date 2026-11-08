@@ -128,7 +128,8 @@
     "confirm": "I have reviewed this",
     "incomplete": "Some required fields are still missing.",
     "acknowledge": "I will fill the missing fields by hand",
-    "warnings": "Warnings"
+    "warnings": "Warnings",
+    "officialSource": "Official form fetched from {host} on {date} (fingerprint {hash}), approved by an officer."
   },
   "done": {
     "heading": "Ready to sign and submit",
@@ -179,6 +180,17 @@
     "corrected": "Mark corrected",
     "rejected": "Reject",
     "resolveFailed": "Could not save the decision. Please try again.",
-    "link": "Officer console"
+    "link": "Officer console",
+    "forms": "Official forms",
+    "formsIntro": "Fetch the current PDF from the issuing authority's official site, check it fits our field map, then approve it. Citizens only ever get approved copies; until then they get the labelled placeholder.",
+    "servingOfficial": "Serving official copy",
+    "servingPlaceholder": "Serving placeholder",
+    "activeCopy": "Approved copy {hash} fetched {date}",
+    "officialUrl": "Official PDF address (must be on the government allowlist)",
+    "fetchForm": "Fetch",
+    "compatible": "Fits our field map",
+    "incompatible": "Does not fit",
+    "viewPdf": "View PDF",
+    "activate": "Approve and use"
   }
 }

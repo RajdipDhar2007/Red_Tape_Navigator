@@ -105,6 +105,15 @@ export default function ReviewView({ session, onBack, onConfirmed }: { session: 
           {t("placeholder")}
         </p>
       )}
+      {form.official_source && (
+        <p role="note" className="mb-3 rounded border border-green-500 bg-green-50 p-2 text-green-950">
+          {t("officialSource", {
+            host: new URL(form.official_source.url).hostname,
+            date: new Date(form.official_source.fetched_at).toLocaleDateString(),
+            hash: form.official_source.sha256.slice(0, 10),
+          })}
+        </p>
+      )}
       {form.warnings.length > 0 && (
         <div role="alert" className="mb-3 rounded border border-amber-500 bg-amber-100 p-2 text-amber-950">
           <strong>{t("warnings")}:</strong>
