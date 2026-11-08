@@ -32,6 +32,14 @@ class Settings(BaseSettings):
     metrics_token: str = ""
     log_level: str = "INFO"
     grievance_contact: str = ""
+    web_base_url: str = "http://localhost:3000"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
+    smtp_starttls: bool = True
+    reset_token_minutes: int = 30
 
     @property
     def cors_list(self) -> list[str]:
@@ -76,6 +84,10 @@ def production_problems(s: Settings) -> list[str]:
         problems.append("CORS_ORIGINS must list the real https origin(s), not localhost")
     elif any(not o.startswith("https://") for o in s.cors_list):
         problems.append("CORS_ORIGINS must use https://")
+    if not s.web_base_url.startswith("https://"):
+        problems.append("WEB_BASE_URL must be the public https URL (used in password-reset emails)")
+    if not (s.smtp_host and s.smtp_from):
+        problems.append("SMTP_HOST and SMTP_FROM are required (password-reset and reminder email)")
     if not s.grievance_contact:
         problems.append("GRIEVANCE_CONTACT is required (DPDP grievance officer shown to citizens)")
     if s.demo_mode:

@@ -2,16 +2,25 @@ import asyncio
 from datetime import UTC, datetime
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import current_user
 from app.core import audit
-from app.core.security import create_token, decode_token, hash_password, verify_password
+from app.core.config import get_settings
+from app.core.security import (
+    create_reset_token,
+    create_token,
+    decode_token,
+    hash_password,
+    reset_token_matches,
+    verify_password,
+)
 from app.db.models import RefreshToken, User
 from app.db.session import get_db
+from app.integrations.factory import get_email_sender
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 _DUMMY_HASH = hash_password("timing-equalisation-only")
@@ -102,3 +111,87 @@ async def refresh(body: RefreshIn, db: AsyncSession = Depends(get_db)):
 @router.get("/me")
 async def me(user: User = Depends(current_user)):
     return {"id": user.id, "email": user.email, "role": user.role, "language": user.language}
+
+
+class ForgotIn(BaseModel):
+    email: EmailStr
+
+
+class ResetIn(BaseModel):
+    token: str = Field(min_length=20, max_length=2000)
+    password: str = Field(min_length=10, max_length=128)
+
+
+class ChangePasswordIn(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=10, max_length=128)
+
+
+_RESET_MAIL = {
+    "en": (
+        "Reset your Red Tape Navigator password",
+        "Use this link to choose a new password (valid {m} minutes):\n{url}\n\n"
+        "If you did not ask for this, ignore this email; your password is unchanged.",
+    ),
+    "hi": (
+        "Red Tape Navigator पासवर्ड रीसेट करें",
+        "नया पासवर्ड चुनने के लिए यह लिंक खोलें ({m} मिनट तक मान्य):\n{url}\n\n"
+        "यदि आपने यह अनुरोध नहीं किया, तो इस ईमेल को अनदेखा करें; आपका पासवर्ड नहीं बदला है।",
+    ),
+    "bn": (
+        "Red Tape Navigator পাসওয়ার্ড রিসেট করুন",
+        "নতুন পাসওয়ার্ড বেছে নিতে এই লিঙ্কটি খুলুন ({m} মিনিট বৈধ):\n{url}\n\n"
+        "আপনি অনুরোধ না করে থাকলে এই ইমেল উপেক্ষা করুন; আপনার পাসওয়ার্ড বদলায়নি।",
+    ),
+}
+
+async def _send_reset_email(email: str, language: str, token: str) -> None:
+    s = get_settings()
+    subject, body = _RESET_MAIL.get(language, _RESET_MAIL["en"])
+    url = f"{s.web_base_url.rstrip('/')}/{language if language in _RESET_MAIL else 'en'}/reset?token={token}"
+    await get_email_sender().send(email, body.format(m=s.reset_token_minutes, url=url), subject)
+
+
+async def _revoke_all(db: AsyncSession, user_id: str) -> None:
+    for t in (await db.execute(select(RefreshToken).where(RefreshToken.user_id == user_id))).scalars():
+        t.revoked = True
+    await db.commit()
+
+
+@router.post("/forgot", status_code=202)
+async def forgot_password(body: ForgotIn, background: BackgroundTasks, db: AsyncSession = Depends(get_db)):
+    """Always answers 202 so the endpoint cannot be used to discover which emails are registered."""
+    user = (await db.execute(select(User).where(User.email == body.email.lower()))).scalar_one_or_none()
+    if user and not user.deleted_at:
+        background.add_task(_send_reset_email, user.email, user.language, create_reset_token(user.id, user.password_hash))
+        await audit.record(db, user.id, "auth.reset_requested")
+    return {"status": "ok"}
+
+
+@router.post("/reset")
+async def reset_password(body: ResetIn, db: AsyncSession = Depends(get_db)):
+    bad = HTTPException(status.HTTP_400_BAD_REQUEST, "Reset link is invalid or has expired")
+    try:
+        data = decode_token(body.token, "reset")
+    except jwt.PyJWTError as exc:
+        raise bad from exc
+    user = await db.get(User, data["sub"])
+    if user is None or user.deleted_at or not reset_token_matches(data, user.password_hash):
+        raise bad
+    user.password_hash = await asyncio.to_thread(hash_password, body.password)
+    await db.commit()
+    await _revoke_all(db, user.id)  # sign out every existing session
+    await audit.record(db, user.id, "auth.password_reset")
+    return {"status": "ok"}
+
+
+@router.post("/change-password", response_model=TokenOut)
+async def change_password(body: ChangePasswordIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    if not await asyncio.to_thread(verify_password, body.current_password, user.password_hash):
+        await audit.record(db, user.id, "auth.change_password_failed")
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Current password is incorrect")
+    user.password_hash = await asyncio.to_thread(hash_password, body.new_password)
+    await db.commit()
+    await _revoke_all(db, user.id)
+    await audit.record(db, user.id, "auth.password_changed")
+    return await _issue(db, user)

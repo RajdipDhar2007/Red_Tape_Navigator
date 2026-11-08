@@ -12,5 +12,5 @@ class RealMessenger:
         self.channel = channel
         self.credentials = credentials
 
-    async def send(self, to: str, text: str) -> AdapterResult:
+    async def send(self, to: str, text: str, subject: str = "Red Tape Navigator") -> AdapterResult:
         raise NotImplementedError(f"{self.channel} adapter requires provider onboarding; see docs/INTEGRATIONS.md")

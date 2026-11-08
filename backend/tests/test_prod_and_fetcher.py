@@ -15,6 +15,9 @@ GOOD = dict(
     cors_origins="https://app.example.in",
     demo_mode=False,
     grievance_contact="dpo@example.in",
+    web_base_url="https://app.example.in",
+    smtp_host="smtp.example.in",
+    smtp_from="no-reply@example.in",
 )
 
 
@@ -117,3 +120,10 @@ async def test_robots_cache_expires(monkeypatch):
     monkeypatch.setattr(fetcher, "_ROBOTS_TTL_SECONDS", -1)
     await fetch_page("https://gst.gov.in/p", client=c)
     assert calls["n"] == 2  # expired -> re-read
+
+
+def test_prod_requires_smtp_and_https_web_url():
+    base = {**GOOD, "web_base_url": "https://app.example.in", "smtp_host": "smtp.example.in", "smtp_from": "no-reply@example.in"}
+    assert production_problems(Settings(**base)) == []
+    assert any("SMTP" in p for p in production_problems(Settings(**{**base, "smtp_host": ""})))
+    assert any("WEB_BASE_URL" in p for p in production_problems(Settings(**{**base, "web_base_url": "http://x"})))

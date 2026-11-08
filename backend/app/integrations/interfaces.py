@@ -31,7 +31,7 @@ class UMANG(Protocol):
 class Messenger(Protocol):
     channel: str
 
-    async def send(self, to: str, text: str) -> AdapterResult: ...
+    async def send(self, to: str, text: str, subject: str = "Red Tape Navigator") -> AdapterResult: ...
 
 
 @dataclass

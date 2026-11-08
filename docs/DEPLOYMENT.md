@@ -12,7 +12,8 @@ python -c "import secrets; print(secrets.token_urlsafe(48))"   # -> SECRET_KEY
 make keygen                                                       # -> FIELD_ENCRYPTION_KEY (back it up!)
 ```
 
-Fill in `WEB_DOMAIN`, `API_DOMAIN`, `POSTGRES_PASSWORD`, `GRIEVANCE_CONTACT`. Optional: `ANTHROPIC_API_KEY` +
+Fill in `WEB_DOMAIN`, `API_DOMAIN`, `POSTGRES_PASSWORD`, `GRIEVANCE_CONTACT` and the `SMTP_*` block (any provider: SES,
+SendGrid, NIC mail; used for password-reset and reminder email). Optional: `ANTHROPIC_API_KEY` +
 `ANTHROPIC_MODEL` (live rule verification), `SENTRY_DSN`, `METRICS_TOKEN`.
 
 ## 2. Start

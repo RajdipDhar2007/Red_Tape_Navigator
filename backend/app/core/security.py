@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -32,6 +34,24 @@ def create_token(sub: str, role: str, kind: str) -> tuple[str, str, datetime]:
     if s.oidc_audience:
         payload["aud"] = s.oidc_audience
     return jwt.encode(payload, s.secret_key, algorithm="HS256"), jti, exp
+
+
+def _pw_fingerprint(password_hash: str) -> str:
+    return hashlib.sha256(password_hash.encode()).hexdigest()[:16]
+
+
+def create_reset_token(user_id: str, password_hash: str) -> str:
+    """Single-use by construction: bound to the current password hash, so it dies once the password changes."""
+    s = get_settings()
+    payload = {"sub": user_id, "typ": "reset", "pw": _pw_fingerprint(password_hash), "jti": uuid.uuid4().hex,
+               "exp": _now() + timedelta(minutes=s.reset_token_minutes), "iat": _now()}
+    if s.oidc_audience:
+        payload["aud"] = s.oidc_audience
+    return jwt.encode(payload, s.secret_key, algorithm="HS256")
+
+
+def reset_token_matches(data: dict, password_hash: str) -> bool:
+    return hmac.compare_digest(str(data.get("pw", "")), _pw_fingerprint(password_hash))
 
 
 def decode_token(token: str, kind: str) -> dict:

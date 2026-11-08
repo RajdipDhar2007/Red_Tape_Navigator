@@ -1,3 +1,4 @@
+import logging
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
@@ -8,6 +9,8 @@ from app.db.models import Reminder
 from app.followup.checklist import RENEWAL_MONTHS
 from app.integrations.interfaces import Integrations
 from app.kb.catalog import LICENCES
+
+log = logging.getLogger(__name__)
 
 
 async def schedule_after_submission(
@@ -41,7 +44,11 @@ async def dispatch_due(db: AsyncSession, integrations: Integrations, now: dateti
         if not await has_consent(db, r.user_id, "reminders"):  # consent withdrawn: never send
             r.sent = True  # close it out so it is not retried; nothing is delivered
             continue
-        res = await m.send(r.destination, f"{r.title}. AI-assisted guidance, not legal advice. Verify with the issuing authority.")
+        try:
+            res = await m.send(r.destination, f"{r.title}. AI-assisted guidance, not legal advice. Verify with the issuing authority.")
+        except Exception:  # noqa: BLE001 - e.g. a channel whose provider is not onboarded; keep the batch going
+            log.exception("reminder channel %s failed", r.channel)
+            continue
         if res.ok:
             r.sent = True
             sent += 1
