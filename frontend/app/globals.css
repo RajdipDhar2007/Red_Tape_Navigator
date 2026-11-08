@@ -4,17 +4,49 @@
 
 :root { color-scheme: light; }
 
-body { @apply bg-slate-50 text-slate-900 antialiased; }
+body {
+  @apply bg-slate-50 font-body text-slate-900 antialiased;
+  background-image:
+    radial-gradient(900px 420px at 0% -10%, rgba(245, 138, 31, 0.10), transparent 60%),
+    radial-gradient(900px 420px at 100% 110%, rgba(19, 136, 8, 0.08), transparent 60%);
+  background-attachment: fixed;
+}
+h1, h2, h3, h4 { @apply font-head tracking-tight text-navy-900; }
 
 /* WCAG 2.1 AA: visible focus, minimum target size, motion preferences */
-:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
-button, [role="button"], input, select, textarea { min-height: 44px; }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+:focus-visible { outline: 3px solid #f58a1f; outline-offset: 2px; border-radius: 6px; }
+button, [role="button"], input:not([type="checkbox"]), select, textarea { min-height: 44px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
 
 @layer components {
-  .btn { @apply inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2 font-medium text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50; }
-  .btn-secondary { @apply inline-flex items-center justify-center rounded-lg border border-slate-400 bg-white px-4 py-2 font-medium text-slate-900 hover:bg-slate-100 disabled:opacity-50; }
-  .card { @apply rounded-xl border border-slate-300 bg-white p-4 shadow-sm; }
-  .input { @apply w-full rounded-lg border border-slate-500 bg-white px-3 py-2; }
-  .badge { @apply inline-block rounded-full px-2 py-0.5 text-xs font-semibold; }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-navy-700 px-5 py-2.5 font-semibold text-white shadow-sm
+      transition duration-150 hover:-translate-y-0.5 hover:bg-navy-800 hover:shadow-md active:translate-y-0 active:scale-[.98]
+      disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-sm;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-saffron-400 to-saffron-500 px-6 py-3 font-semibold text-navy-900
+      shadow-md transition duration-150 hover:-translate-y-0.5 hover:from-saffron-500 hover:to-saffron-600 hover:shadow-lift active:translate-y-0 active:scale-[.98]
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-navy-200 bg-white px-5 py-2.5 font-semibold text-navy-800
+      transition duration-150 hover:-translate-y-0.5 hover:border-navy-300 hover:bg-navy-50 active:translate-y-0 active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-ghost { @apply inline-flex items-center gap-1 rounded-lg px-2 py-1 font-medium text-navy-700 underline-offset-4 hover:bg-navy-50 hover:underline; }
+  .card { @apply rounded-2xl border border-slate-200 bg-white p-5 shadow-card; }
+  .card-hover { @apply transition duration-200 hover:-translate-y-1 hover:shadow-lift; }
+  .input {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-inner transition
+      placeholder:text-slate-400 hover:border-navy-300 focus:border-navy-600 focus:outline-none focus:ring-4 focus:ring-navy-100;
+  }
+  label { @apply mb-1 block text-sm font-semibold text-slate-800; }
+  .badge { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
+  .chip {
+    @apply inline-flex items-center rounded-full border border-saffron-200 bg-saffron-50 px-3 py-1.5 text-sm font-medium text-saffron-700
+      transition hover:-translate-y-0.5 hover:bg-saffron-100 hover:shadow-sm;
+  }
+  .section-title { @apply text-2xl font-bold text-navy-900 sm:text-3xl; }
+  .tricolour-bar { background: linear-gradient(90deg, #f58a1f 0 33.33%, #ffffff 33.33% 66.66%, #138808 66.66% 100%); }
 }

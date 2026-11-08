@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, apiBlob, ApiError, post } from "@/lib/api";
 import type { ChecklistItem, Session } from "@/lib/types";
+import KeyInSheet from "./KeyInSheet";
 
 type Esign = { label: string };
 
@@ -57,9 +58,9 @@ export default function DoneView({ session }: { session: Session }) {
         {t("important")}
       </p>
 
-      <div className="card space-y-2">
+      <div className="card space-y-4">
         {forms.map((f) => (
-          <div key={f} className="flex flex-wrap items-center gap-2">
+          <div key={f} className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
             <button className="btn" onClick={() => void download(f)}>
               {t("download")}: {f}
             </button>
@@ -71,6 +72,7 @@ export default function DoneView({ session }: { session: Session }) {
                 {esign[f]} — {t("esignResult")}
               </span>
             )}
+            <KeyInSheet sid={sid} fid={f} />
           </div>
         ))}
       </div>

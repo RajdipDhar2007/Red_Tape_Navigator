@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, ApiError, post } from "@/lib/api";
+import { Link } from "@/i18n/navigation";
 import type { Session } from "@/lib/types";
 import ProgressTracker from "./ProgressTracker";
 import ChecklistView from "./ChecklistView";
@@ -62,9 +63,12 @@ export default function SessionView({ id }: { id: string }) {
   if (!s) return <p aria-live="polite">{t("app.loading")}</p>;
 
   return (
-    <div>
+    <div className="animate-fade-up">
+      <Link href="/" className="btn-ghost mb-2">
+        ← {t("nav.applications")}
+      </Link>
       <ProgressTracker tracker={s.tracker} />
-      <div aria-live="polite" className="mb-4 text-slate-800">
+      <div aria-live="polite" className="mb-5 rounded-xl border-l-4 border-saffron-500 bg-white px-4 py-3 text-lg font-medium text-navy-900 shadow-card">
         <span className="sr-only">{t("tracker.label")}: </span>
         {s.goal}
       </div>

@@ -91,8 +91,3 @@ export async function apiBlob(path: string): Promise<Blob> {
 export const post = <T>(path: string, body?: unknown) =>
   api<T>(path, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) });
 export const put = <T>(path: string, body: unknown) => api<T>(path, { method: "PUT", body: JSON.stringify(body) });
-
-export function randomDemoCredentials(): { email: string; password: string } {
-  const id = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
-  return { email: `demo-${id}@example.com`, password: `Demo-${crypto.randomUUID()}` };
-}
