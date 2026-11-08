@@ -31,6 +31,15 @@ _INTENT = re.compile(r"\b(open|start|begin|set up|setup|launch|register|apply)\b
 _FREE_CITY = re.compile(r"\bin\s+([A-Z][A-Za-z]+(?:\s[A-Z][A-Za-z]+)?)")
 
 
+# Goals that are not "start a business": we recognise them so we never push the citizen into a shop checklist.
+# No verified rules exist for these yet, so they are escalated to an officer (see research()).
+SERVICE_KEYWORDS: dict[str, list[str]] = {
+    "agri_grant": ["grant", "subsidy", "farmer", "farming", "agricultur", "kisan", "crop loan", "किसान", "कृषि", "सब्सिडी", "অনুদান", "কৃষি", "কৃষক"],
+    "building_permit": ["zoning", "building permit", "building plan", "construction permit", "plan sanction", "extension permit", "नक्शा पास", "भवन अनुमति", "বিল্ডিং প্ল্যান", "নকশা অনুমোদন"],
+}
+SERVICE_INTENTS = tuple(SERVICE_KEYWORDS)
+
+
 class ParsedGoal(BaseModel):
     intent: str = "start_business"
     activity: str | None = None
@@ -55,7 +64,7 @@ def next_question(p: ParsedGoal, language: str = "en") -> str | None:
         return q["city"]
     if not p.state:
         return q["state"]
-    if not p.activity:
+    if not p.activity and p.intent not in SERVICE_INTENTS:
         return q["activity"]
     return None
 
@@ -88,6 +97,11 @@ def parse_goal_rules(goal: str, language: str = "en") -> ParsedGoal:
         if m and m.group(1).lower() not in STATE_ALIASES:  # a captured state name is not a city
             city = m.group(1)
     intent = "start_business" if (_INTENT.search(goal) or activity) else "other"
+    if activity is None:
+        for svc, words in SERVICE_KEYWORDS.items():
+            if any(w in low for w in words):
+                intent = svc
+                break
     parsed = ParsedGoal(intent=intent, activity=activity, state=state, city=city, city_known=known)
     parsed.clarifying_question = next_question(parsed, language)
     return parsed
@@ -124,7 +138,7 @@ def apply_general_fallback(parsed: ParsedGoal, answer: str) -> ParsedGoal:
     """After the citizen has answered, an activity we still cannot match is not a dead end: give them the baseline
     checklist (Udyam, trade licence, shop registration, GST) and let an officer confirm activity-specific licences.
     Only applies once the location is known, i.e. the business type is the only thing still missing."""
-    if parsed.activity is None and parsed.city and parsed.state:
+    if parsed.activity is None and parsed.intent not in SERVICE_INTENTS and parsed.city and parsed.state:
         parsed.activity = "general_business"
         parsed.activity_label = " ".join(answer.split())[:80]
         parsed.clarifying_question = None

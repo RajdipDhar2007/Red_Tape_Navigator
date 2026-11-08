@@ -370,3 +370,22 @@ async def test_unrecognised_business_gets_baseline_plan_and_officer_review(clien
     async with maker()() as db:
         items = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == s["id"], ReviewItem.claim_id.is_(None)))).scalars().all()
     assert len(items) == 1 and "ornamental fish breeding" in items[0].reason
+
+
+async def test_non_business_goals_are_escalated_not_forced_into_a_shop_checklist(client, auth):
+    headers, _ = auth
+    await client.post("/consent", json={"purpose": "service", "granted": True}, headers=headers)
+    for goal, intent in [
+        ("I want to apply for an agricultural subsidy in Pune", "agri_grant"),
+        ("I need a building permit for a house extension in Delhi", "building_permit"),
+    ]:
+        s = (await client.post("/sessions", json={"goal": goal, "language": "en"}, headers=headers)).json()
+        assert s["parsed"]["intent"] == intent and s["parsed"]["activity"] is None and not s["parsed"]["clarifying_question"], goal
+        r = await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)
+        assert r.status_code == 200
+        plan = r.json()["plan"]
+        assert plan["steps"] == [] and plan["out_of_scope"] and "officer" in plan["note"]
+        assert r.json()["escalation"]["available"]
+    # location is still asked for first
+    s = (await client.post("/sessions", json={"goal": "I want a farming grant", "language": "en"}, headers=headers)).json()
+    assert "city" in s["parsed"]["clarifying_question"].lower()

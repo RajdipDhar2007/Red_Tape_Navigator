@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agent.intake import apply_general_fallback, parse_goal
+from app.agent.intake import SERVICE_INTENTS, apply_general_fallback, parse_goal
 from app.agent.llm import LLM
 from app.agent.research import DISCLAIMER, research
 from app.api.consent import has_consent
@@ -116,7 +116,7 @@ async def get(sid: str, user: User = Depends(current_user), db: AsyncSession = D
 async def run_research(sid: str, body: ResearchIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     ns = await svc.get_owned(db, user, sid)
     p = ns.parsed or {}
-    if p.get("clarifying_question") or not p.get("activity"):
+    if p.get("clarifying_question") or (not p.get("activity") and p.get("intent") not in SERVICE_INTENTS):
         raise HTTPException(409, {"code": "goal_incomplete", "message": p.get("clarifying_question") or "Tell us what kind of business this is."})
     live = body.live and not get_settings().demo_mode
     res = await research(db, p, session_id=ns.id, llm=LLM(), live=live)

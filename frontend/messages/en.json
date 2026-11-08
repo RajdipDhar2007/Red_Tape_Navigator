@@ -89,7 +89,9 @@
     "modeKnowledge_base": "Curated knowledge base (not live-verified)",
     "modeLive_verified": "Verified against official sites",
     "modeKnowledge_base_degraded": "Official sites unreachable: showing saved knowledge base",
-    "generalNote": "Your business type (“{label}”) is not in our rules pack, so this is the baseline checklist most shops need. Activity-specific licences may also apply; an officer will confirm which."
+    "generalNote": "Your business type (“{label}”) is not in our rules pack, so this is the baseline checklist most shops need. Activity-specific licences may also apply; an officer will confirm which.",
+    "outOfScopeHeading": "We do not have verified rules for this yet",
+    "outOfScope": "An officer has been asked to guide you through it; you do not need to do anything else here. Meanwhile you can search for the scheme or permit on the national portal below, the UMANG app, or your local office."
   },
   "interview": {
     "heading": "A few details",

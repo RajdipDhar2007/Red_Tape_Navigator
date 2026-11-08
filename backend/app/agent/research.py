@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.agent.intake import SERVICE_INTENTS
 from app.agent.llm import LLM, SYSTEM_GUARD
 from app.agent.planner import build_plan, licences_for, scope_for
 from app.core import audit
@@ -134,6 +135,17 @@ async def research(
 ) -> dict:
     """Return the plan with cited claims. Degrades to the seed KB when live research is off or fails."""
     activity = parsed.get("activity")
+    if parsed.get("intent") in SERVICE_INTENTS and activity is None:
+        label = {"agri_grant": "agricultural grant / scheme", "building_permit": "building / zoning permit"}[parsed["intent"]]
+        plan = {"steps": [], "activity": None, "intent": parsed["intent"], "out_of_scope": True,
+                "note": f"We do not yet have verified rules for a {label}. An officer has been asked to guide you; "
+                        "meanwhile search the scheme or permit on https://www.india.gov.in and the UMANG app, or ask your local office."}
+        if session_id and not (await db.execute(select(ReviewItem).where(ReviewItem.session_id == session_id, ReviewItem.claim_id.is_(None)))).first():
+            db.add(ReviewItem(session_id=session_id, claim_id=None, reason=f"Service outside rules pack: {label} ({parsed.get('city') or 'location unknown'})"))
+            await db.commit()
+        await audit.record(db, "agent", "research.out_of_scope", {"intent": parsed["intent"]}, session_id)
+        return {"plan": plan, "claims": [], "low_confidence": [], "mode": "none", "disclaimer": DISCLAIMER,
+                "escalation": {"available": True, "message": "Queued for an officer to guide you."}}
     if activity not in ACTIVITIES:
         return {"plan": build_plan(parsed, {}), "claims": [], "low_confidence": [], "mode": "none", "disclaimer": DISCLAIMER}
     needed = licences_for(activity)

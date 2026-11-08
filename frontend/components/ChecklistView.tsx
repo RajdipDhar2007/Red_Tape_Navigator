@@ -55,9 +55,21 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
           </li>
         ))}
       </ol>
-      <button className="btn mt-4" onClick={onStart}>
-        {t("start")}
-      </button>
+      {session.plan.out_of_scope ? (
+        <div role="note" className="card mt-3 border-amber-400 bg-amber-50">
+          <h3 className="font-semibold">{t("outOfScopeHeading")}</h3>
+          <p className="mt-1">{t("outOfScope")}</p>
+          <p className="mt-2">
+            <a className="underline" href="https://www.india.gov.in" target="_blank" rel="noopener noreferrer">
+              india.gov.in
+            </a>
+          </p>
+        </div>
+      ) : (
+        <button className="btn mt-4" onClick={onStart}>
+          {t("start")}
+        </button>
+      )}
     </section>
   );
 }
