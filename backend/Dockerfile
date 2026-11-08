@@ -24,6 +24,7 @@ COPY config ./config
 COPY migrations ./migrations
 COPY alembic.ini ./
 COPY scripts/entrypoint.sh /entrypoint.sh
+COPY scripts/create_admin.py ./scripts/create_admin.py
 RUN chmod 0555 /entrypoint.sh && mkdir -p /app/data && chown -R app:app /app/data
 USER app
 EXPOSE 8000

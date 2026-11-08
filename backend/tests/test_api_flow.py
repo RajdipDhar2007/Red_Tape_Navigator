@@ -322,7 +322,7 @@ async def test_create_admin_script(client, monkeypatch):
     import importlib.util
     from pathlib import Path
 
-    spec = importlib.util.spec_from_file_location("create_admin", Path(__file__).resolve().parents[2] / "scripts" / "create_admin.py")
+    spec = importlib.util.spec_from_file_location("create_admin", Path(__file__).resolve().parents[1] / "scripts" / "create_admin.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert await mod.main("boss@dept.gov.in", "citizen", "long-enough-password") == 2

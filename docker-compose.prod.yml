@@ -3,7 +3,7 @@
 #   cp .env.prod.example .env.prod      # fill in every value (see docs/DEPLOYMENT.md)
 #   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
 #   ADMIN_PASSWORD='...' docker compose --env-file .env.prod -f docker-compose.prod.yml \
-#       exec -e PYTHONPATH=/app -e ADMIN_PASSWORD api python /scripts/create_admin.py officer@dept.gov.in admin
+#       exec -e PYTHONPATH=/app -e ADMIN_PASSWORD api python /app/scripts/create_admin.py officer@dept.gov.in admin
 #
 # The API refuses to start if the configuration is unsafe (see backend/app/core/config.py).
 x-restart: &restart

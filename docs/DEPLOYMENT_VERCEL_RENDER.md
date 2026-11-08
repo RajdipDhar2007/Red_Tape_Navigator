@@ -15,8 +15,8 @@ Citizen browser --> Vercel (Next.js web) --https--> Render (rtn-api) --> Postgre
 3. The container entrypoint runs `alembic upgrade head` and loads the rules pack on start. Migration 0001 runs
    `CREATE EXTENSION vector`, which Render Postgres allows.
 4. Create the first officer (Render shell on `rtn-api`):
-   `ADMIN_PASSWORD='...' PYTHONPATH=/app python /scripts/create_admin.py officer@dept.gov.in admin`
-   (copy `scripts/create_admin.py` into the image or run it from a one-off job).
+   `ADMIN_PASSWORD='...' python /app/scripts/create_admin.py officer@dept.gov.in admin`
+   (the script is part of the image; type the password only into the Render shell, never into chat or a file).
 5. Check `https://<rtn-api>.onrender.com/ready`.
 
 ## 2. Frontend on Vercel

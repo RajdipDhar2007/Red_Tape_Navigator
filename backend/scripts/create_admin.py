@@ -1,6 +1,6 @@
 """Create (or promote) the first admin / staff account. Run once per environment, on a trusted machine.
 
-  ADMIN_PASSWORD='...' python scripts/create_admin.py officer@dept.gov.in [admin|reviewer|csc_operator]
+  ADMIN_PASSWORD='...' python scripts/create_admin.py officer@dept.gov.in [admin|reviewer|csc_operator]   # from backend/, or /app/scripts/ in the image
 
 The password is read from the ADMIN_PASSWORD env var (never a CLI argument, so it stays out of shell history).
 """
@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # backend/ in the repo, /app in the image
 
 from sqlalchemy import select  # noqa: E402
 

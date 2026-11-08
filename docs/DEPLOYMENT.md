@@ -32,7 +32,7 @@ Self-registration only creates citizens. Create staff accounts on the server:
 
 ```bash
 ADMIN_PASSWORD='a-long-unique-passphrase' docker compose --env-file .env.prod -f docker-compose.prod.yml \
-  exec -e PYTHONPATH=/app -e ADMIN_PASSWORD api python /scripts/create_admin.py officer@dept.gov.in admin
+  exec -e PYTHONPATH=/app -e ADMIN_PASSWORD api python /app/scripts/create_admin.py officer@dept.gov.in admin
 ```
 
 Roles: `admin` (everything), `reviewer` (review queue, stats, audit), `csc_operator` (review queue, stats). The officer
