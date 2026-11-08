@@ -15,6 +15,7 @@ from app.core.middleware import HardeningMiddleware
 from app.core.tracing import configure_tracing
 from app.db.models import Base, Claim
 from app.db.session import get_engine, maker
+from app.db.sqlite_upgrade import add_missing_columns
 
 DISCLAIMER = "AI-assisted guidance, not legal advice. Verify with the issuing authority."
 
@@ -28,6 +29,7 @@ async def lifespan(_: FastAPI):
     if s.database_url.startswith("sqlite"):  # dev/test convenience; production uses Alembic (make migrate)
         async with get_engine().begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(add_missing_columns)  # an old local .db file must not break login after an upgrade
     yield
 
 
