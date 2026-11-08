@@ -17,7 +17,8 @@ const DEMO_GOAL: Record<string, string> = {
 
 function AuthForm({ onDone }: { onDone: () => void }) {
   const t = useTranslations("auth");
-  const [mode, setMode] = useState<"login" | "register">("register");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("register");
+  const [sent, setSent] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -42,12 +43,20 @@ function AuthForm({ onDone }: { onDone: () => void }) {
   return (
     <section className="card mx-auto max-w-md" aria-labelledby="auth-h">
       <h2 id="auth-h" className="mb-3 text-xl font-semibold">
-        {t("heading")}
+        {mode === "forgot" ? t("forgotHeading") : t("heading")}
       </h2>
       <form
         className="space-y-3"
         onSubmit={(e) => {
           e.preventDefault();
+          if (mode === "forgot") {
+            setBusy(true);
+            post("/auth/forgot", { email })
+              .then(() => setSent(true))
+              .catch(() => setErr(t("failed")))
+              .finally(() => setBusy(false));
+            return;
+          }
           void go(mode === "login" ? "/auth/login" : "/auth/register", { email, password, language: locale });
         }}
       >
@@ -55,24 +64,34 @@ function AuthForm({ onDone }: { onDone: () => void }) {
           <label htmlFor={ids[0]}>{t("email")}</label>
           <input id={ids[0]} className="input" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
-        <div>
+        <div hidden={mode === "forgot"}>
           <label htmlFor={ids[1]}>{t("password")}</label>
-          <input id={ids[1]} className="input" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={10} required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input id={ids[1]} className="input" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={10} required={mode !== "forgot"} value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
         {err && (
           <p role="alert" className="text-red-800">
             {err}
           </p>
         )}
+        {sent && (
+          <p role="status" className="text-green-800">
+            {t("linkSent")}
+          </p>
+        )}
         <button className="btn w-full" disabled={busy}>
-          {mode === "login" ? t("login") : t("register")}
+          {mode === "forgot" ? t("sendLink") : mode === "login" ? t("login") : t("register")}
         </button>
       </form>
       <div className="mt-3 flex flex-col gap-2">
-        <button type="button" className="text-left text-brand-700 underline" onClick={() => setMode(mode === "login" ? "register" : "login")}>
-          {mode === "login" ? t("toRegister") : t("toLogin")}
+        <button type="button" className="text-left text-brand-700 underline" onClick={() => { setSent(false); setMode(mode === "register" ? "login" : mode === "login" ? "register" : "login"); }}>
+          {mode === "login" ? t("toRegister") : mode === "forgot" ? t("backToLogin") : t("toLogin")}
         </button>
-        {DEMO && (
+        {mode === "login" && (
+          <button type="button" className="text-left text-brand-700 underline" onClick={() => { setErr(null); setMode("forgot"); }}>
+            {t("forgot")}
+          </button>
+        )}
+        {DEMO && mode !== "forgot" && (
           <button type="button" className="btn-secondary" disabled={busy} onClick={() => void go("/auth/register", { ...randomDemoCredentials(), language: locale })}>
             {t("demo")}
           </button>
