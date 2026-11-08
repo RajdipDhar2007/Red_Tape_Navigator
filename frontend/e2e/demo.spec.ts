@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import bn from "../messages/bn.json";
+import en from "../messages/en.json";
 
 // Test data only. 210000000007 passes the Aadhaar Verhoeff checksum; ABCPE1234F is a well-formed PAN.
 const ANSWERS: Record<string, string> = {
@@ -11,11 +13,21 @@ const ANSWERS: Record<string, string> = {
   bank_account_number: "123456789012", bank_ifsc: "SBIN0001234",
 };
 
-async function startDemo(page: Page, locale = "en") {
+// UI strings come from the message files so this test cannot drift from the real labels again.
+const MSG = { en, bn } as const;
+const GOAL = { en: "I want to open a small bakery in Kolkata", bn: "আমি কলকাতায় একটি বেকারি খুলতে চাই" } as const;
+
+/** Sign up a brand-new account through the real UI (no demo account exists any more), accept consent, state the goal. */
+async function startDemo(page: Page, locale: "en" | "bn" = "en") {
+  const m = MSG[locale];
   await page.goto(`/${locale}`);
-  await page.getByRole("button", { name: locale === "bn" ? "ডেমো অ্যাকাউন্ট ব্যবহার করুন" : "Use a demo account" }).click();
-  await page.getByRole("button", { name: locale === "bn" ? "আমি সম্মত, এগিয়ে যান" : "I agree and continue" }).click();
-  await page.getByRole("button", { name: locale === "bn" ? "ডেমো দেখুন: কলকাতায় বেকারি" : "Try the demo: bakery in Kolkata" }).click();
+  const email = `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
+  await page.getByLabel(m.auth.email, { exact: true }).fill(email);
+  await page.getByLabel(m.auth.password, { exact: true }).fill("Correct-horse-battery-9");
+  await page.getByRole("button", { name: m.auth.register, exact: true }).click();
+  await page.getByRole("button", { name: m.consent.accept, exact: true }).click();
+  await page.getByLabel(m.goal.label, { exact: true }).fill(GOAL[locale]);
+  await page.getByRole("button", { name: m.goal.start }).click();
 }
 
 async function currentKeys(page: Page): Promise<string> {
@@ -53,7 +65,6 @@ test("full demo: goal -> research -> interview -> filled PDF review -> download"
   await expect(page.getByText("FSSAI Food Business Registration / Licence").first()).toBeVisible();
   const sources = page.getByText(/^Source:/);
   expect(await sources.count()).toBeGreaterThan(5);
-  await expect(page.getByRole("note").filter({ hasText: "Demo mode" })).toBeVisible();
   await expect(page.getByText("AI-assisted guidance, not legal advice").first()).toBeVisible();
   await page.getByRole("button", { name: "Start the interview" }).click();
 
