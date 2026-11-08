@@ -10,6 +10,7 @@ from app.api import admin, auth, consent, privacy, sessions, webhooks
 from app.core import metrics
 from app.core.config import get_settings
 from app.core.errors import capture_exception, init_error_tracking
+from app.core.localize import LocalizeMiddleware
 from app.core.logging import configure_logging
 from app.core.middleware import HardeningMiddleware
 from app.core.tracing import configure_tracing
@@ -40,6 +41,7 @@ def create_app() -> FastAPI:
         title="Red Tape Navigator", version="0.1.0", lifespan=lifespan,
         docs_url=None if s.is_prod else "/docs", redoc_url=None, openapi_url=None if s.is_prod else "/openapi.json",
     )
+    app.add_middleware(LocalizeMiddleware)
     app.add_middleware(HardeningMiddleware)
     app.add_middleware(
         CORSMiddleware,

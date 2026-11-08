@@ -490,6 +490,6 @@ async def i_submitted(sid: str, body: SubmittedIn, user: User = Depends(current_
     dest = user.email if body.channel == "email" else ans.get("mobile", {}).get("value", "")
     if not dest:
         raise HTTPException(422, "No destination for this channel; provide your mobile number first")
-    rows = await schedule_after_submission(db, session_id=ns.id, user_id=user.id, licences=body.licences, channel=body.channel, destination=dest)
+    rows = await schedule_after_submission(db, session_id=ns.id, user_id=user.id, licences=body.licences, channel=body.channel, destination=dest, language=ns.language)
     await audit.record(db, user.id, "followup.scheduled", {"count": len(rows), "channel": body.channel}, ns.id)
     return {"scheduled": [{"title": r.title, "due_at": r.due_at.isoformat(), "kind": r.kind} for r in rows]}

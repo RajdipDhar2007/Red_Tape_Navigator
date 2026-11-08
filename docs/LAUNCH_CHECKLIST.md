@@ -47,7 +47,8 @@ Only the owner can do the logins and secrets. In order:
 - [x] Privacy policy and terms pages (en/hi/bn) at `/privacy` and `/terms`, linked in the footer; retention, region and grievance contact read live from the API.
 - [x] Accessibility DOM audit of home, account, privacy, terms, reset, staff (lang, titles, one h1, labels, names, landmarks, no horizontal overflow on home): no issues found after hydration. Unique titles added for the legal pages.
 - [ ] Counsel review of privacy/terms/DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true` (WAITING ON OWNER/counsel).
-- [ ] Native-speaker review of Hindi and Bengali copy, especially `legal` and `done.esign*` strings (WAITING ON OWNER).
+- [x] Hindi and Bengali now cover the whole product: interface strings (`frontend/messages/*.json`) AND backend text (licence names, every rule, document list, authority name, form titles and field labels, checklists, notices, reminder titles) via `backend/app/i18n_content/` (about 270 strings per language). The browser sends its language; the server translates responses. Tests fail if an English string is added without a translation.
+- [ ] Native-speaker review of ALL Hindi and Bengali text, especially `backend/app/i18n_content/data_hi.py` / `data_bn.py` (legal and fee wording), `legal` and `done.esign*` strings (WAITING ON OWNER). Not translated: the officer console (English only).
 - [ ] Real phone test (slow network, voice input) and screen-reader pass (WAITING ON OWNER: needs a real device).
 - [ ] Penetration test / security sign-off, backup restore test, secrets rotation drill.
 - [ ] Pilot with 5-10 shop owners (docs/PILOT_PLAN.md).

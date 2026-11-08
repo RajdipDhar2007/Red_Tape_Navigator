@@ -63,6 +63,8 @@ async function raw(path: string, init: RequestInit = {}, retry = true): Promise<
   const at = store()?.getItem(ACCESS);
   if (at) headers.set("Authorization", `Bearer ${at}`);
   if (init.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+  // The server translates plans, rules and checklists into the interface language (Hindi / Bengali).
+  if (typeof document !== "undefined" && !headers.has("Accept-Language")) headers.set("Accept-Language", document.documentElement.lang || "en");
   const r = await fetch(`${API}${path}`, { ...init, headers });
   if (r.status === 401 && retry && (await refresh())) return raw(path, init, false);
   return r;

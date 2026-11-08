@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import bn from "../messages/bn.json";
 import en from "../messages/en.json";
+import hi from "../messages/hi.json";
 
 // Test data only. 210000000007 passes the Aadhaar Verhoeff checksum; ABCPE1234F is a well-formed PAN.
 const ANSWERS: Record<string, string> = {
@@ -14,11 +15,11 @@ const ANSWERS: Record<string, string> = {
 };
 
 // UI strings come from the message files so this test cannot drift from the real labels again.
-const MSG = { en, bn } as const;
-const GOAL = { en: "I want to open a small bakery in Kolkata", bn: "আমি কলকাতায় একটি বেকারি খুলতে চাই" } as const;
+const MSG = { en, bn, hi } as const;
+const GOAL = { en: "I want to open a small bakery in Kolkata", bn: "আমি কলকাতায় একটি বেকারি খুলতে চাই", hi: "मैं कोलकाता में बेकरी खोलना चाहता हूँ" } as const;
 
 /** Sign up a brand-new account through the real UI (no demo account exists any more), accept consent, state the goal. */
-async function startDemo(page: Page, locale: "en" | "bn" = "en") {
+async function startDemo(page: Page, locale: "en" | "bn" | "hi" = "en") {
   const m = MSG[locale];
   await page.goto(`/${locale}`);
   const email = `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
@@ -121,4 +122,13 @@ test("validation error is shown in the user's language and the answer is not acc
   await name.fill("12345");
   await page.getByRole("button", { name: "Send", exact: true }).click();
   await expect(page.getByRole("alert").filter({ hasText: "valid name" })).toBeVisible();
+});
+
+test("Hindi: licence names and rule text are translated, not left in English", async ({ page }) => {
+  await startDemo(page, "hi");
+  await expect(page.getByText("उद्यम (MSME) पंजीकरण").first()).toBeVisible();
+  await expect(page.getByText("निःशुल्क").first()).toBeVisible(); // "Free of charge" in the Udyam fee line
+  await expect(page.getByText("Udyam (MSME) Registration")).toHaveCount(0);
+  await expect(page.getByText("Free of charge")).toHaveCount(0);
+  await expect(page.locator("html")).toHaveAttribute("lang", "hi");
 });

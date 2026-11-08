@@ -86,6 +86,7 @@ hash-chained audit log, PII-redacting logs, allowlisted outbound fetching, prod 
   trade licence page and fee table, Ahmedabad AMC shops & establishments page). Official URLs for FSSAI/FoSCoS, Udyam, GST and
   most state shops-and-establishments and municipal trade pages are in `backend/app/kb/catalog.py` and the allowlist in
   `backend/config/sources.yaml`.
+- **Translations:** Hindi/Bengali for the interface (`frontend/messages`) and for backend text (`backend/app/i18n_content`, applied by `app/core/localize.py` from the `Accept-Language` header; the frontend sets it in `lib/api.ts`). Any new licence/claim/form text needs rows in `data_hi.py` and `data_bn.py` (tests enforce this). Native-speaker review is still pending.
 - **Legal pages:** `/[locale]/privacy` and `/[locale]/terms` in en/hi/bn, linked in the footer, with live retention period,
   hosting region and grievance contact from `GET /privacy/policy`. They show a "draft, pending legal review" banner until
   `NEXT_PUBLIC_LEGAL_REVIEWED=true`.
