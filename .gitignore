@@ -27,3 +27,5 @@ test-results/
 data/
 *.egg-info/
 backend/evals/report.json
+*.db
+*.sqlite3
