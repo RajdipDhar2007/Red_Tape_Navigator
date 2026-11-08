@@ -28,6 +28,20 @@ Status key: DONE / WAITING ON OWNER / BLOCKED ON THIRD PARTY. Updated as work pr
 - [ ] Waiting on owner: set ANTHROPIC_API_KEY/MODEL and run POST /admin/refresh if wanted (costs API usage).
 
 ## 6. Deployment (Render, Vercel, SMTP, first officer, backups, monitoring, load test): WAITING ON OWNER
+Code and config are ready (`render.yaml`, `docs/DEPLOYMENT_VERCEL_RENDER.md`; `create_admin.py` is now inside the image).
+Only the owner can do the logins and secrets. In order:
+1. Generate secrets on your machine (never commit/paste): `python -c "import secrets;print(secrets.token_urlsafe(48))"` for `SECRET_KEY`;
+   `make keygen` for `FIELD_ENCRYPTION_KEY`. Back up the encryption key somewhere safe: losing it destroys stored Aadhaar/PAN answers.
+2. SMTP: create an account with a provider that can verify your sender domain (SES, Brevo, SendGrid or NIC mail) and note host/user/password.
+3. Render: sign in (GitHub login is fine) > New > Blueprint > pick this repo and `render.yaml`. Fill the `sync:false` values on `rtn-api`
+   and `rtn-worker` (same values): `FIELD_ENCRYPTION_KEY`, `CORS_ORIGINS`/`WEB_BASE_URL` (fill after step 4), `GRIEVANCE_CONTACT`, `SMTP_*`,
+   and later `MSG91_*`, `DIGIO_*`. Render has no India region (Singapore); if the department needs in-India storage, use an Indian cloud.
+4. Vercel: sign in with GitHub > Add New Project > this repo > Root Directory `frontend` > env `NEXT_PUBLIC_API_URL=https://<render-api-url>` > Deploy.
+   Then put that Vercel https origin into Render `CORS_ORIGINS` and `WEB_BASE_URL` and redeploy the API.
+5. Check `https://<api>/ready`. Create the first officer in the Render shell of `rtn-api`:
+   `ADMIN_PASSWORD='<12+ chars>' python /app/scripts/create_admin.py officer@yourdomain admin` (type the password only there).
+6. Turn on Render Postgres backups, add an uptime monitor on `/ready` (UptimeRobot/Better Stack, free tier is fine), optional Sentry DSN.
+7. Tell me when it is live: I will run the real-signup, business-session, password-reset email and reminder checks, then the load test in `docs/LOAD_TEST.md`.
 
 ## 7. Launch hardening and pilot: partly done
 - [x] Privacy policy and terms pages (en/hi/bn) at `/privacy` and `/terms`, linked in the footer; retention, region and grievance contact read live from the API.

@@ -50,7 +50,10 @@ cd ../frontend && npm install && npm run dev   # UI on :3000
 | Form filler (AcroForm + flat-PDF overlay), 3 templates, field-by-field provenance report | **Built**, but the PDFs are **clearly marked placeholders**. Adding the real forms: [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md). |
 | Accounts: register / login / **email password reset** / change password, officer console (stats, review queue, audit check), real SMTP email | **Built.** |
 | Review UI, explicit consent gate, downloads, submission checklist, reminders | **Built.** |
-| DigiLocker, Aadhaar e-Sign, UMANG, WhatsApp / SMS / email | **Mocked** and labelled in the UI ("Demo mode: simulated …"). Real adapters are stubs; go-live needs government/provider onboarding. |
+| Aadhaar e-Sign and DigiLocker via **Digio** | **Built, sandbox-untested.** Signed webhook, consent step, signing link, signed-copy download; unit-tested against a mocked Digio. Runs for real only when `DIGIO_*` credentials are set; otherwise the labelled demo mock. DigiLocker data-field mapping is not implemented yet. See [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md). |
+| SMS via **MSG91** | **Built, not yet tried against live MSG91** (needs TRAI DLT approval). Without credentials: labelled mock. |
+| UMANG, WhatsApp | **Mocked** and labelled ("Demo mode: simulated ..."). Need provider onboarding. |
+| Privacy policy, terms (en/hi/bn) | **Built**, shown as "draft, pending legal review" until counsel approves (`NEXT_PUBLIC_LEGAL_REVIEWED`). |
 | Captcha / login portals | **Never bypassed.** The checklist hands over to the human. |
 | Portal submission | **Does not exist.** No code path submits to a government portal (enforced by a test). |
 
@@ -60,7 +63,8 @@ cd ../frontend && npm install && npm run dev   # UI on :3000
 backend/    FastAPI app (app/), Alembic (migrations/), tests, evals (evals/)
 frontend/   Next.js App Router + next-intl (en/bn/hi), Playwright e2e
 infra/      Terraform skeleton (India region), see infra/README.md
-docs/       ARCHITECTURE, COMPLIANCE, SECURITY, INTEGRATIONS, RUNBOOK, PILOT_PLAN, DEMO_SCRIPT, LOAD_TEST, ASSUMPTIONS
+docs/       ARCHITECTURE, COMPLIANCE, SECURITY, INTEGRATIONS, RUNBOOK, PILOT_PLAN, DEMO_SCRIPT, LOAD_TEST, ASSUMPTIONS,
+            LAUNCH_CHECKLIST (status of every go-live item), RULES_VERIFICATION, RULES_REVIEW_EXPORT.csv
 scripts/    placeholder-form generator, key rotation, load test
 ```
 
