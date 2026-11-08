@@ -111,7 +111,7 @@ async def create(body: GoalIn, user: User = Depends(current_user), db: AsyncSess
 async def clarify(sid: str, body: ClarifyIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     ns = await svc.get_owned(db, user, sid)
     parsed = await parse_goal(f"{ns.goal}. {body.answer}", ns.language, LLM())
-    parsed = apply_general_fallback(parsed, body.answer)
+    parsed = apply_general_fallback(parsed, body.answer, ns.goal)
     ns.parsed = parsed.model_dump()
     await db.commit()
     if not parsed.clarifying_question and parsed.activity:

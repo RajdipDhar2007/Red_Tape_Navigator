@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from app.agent.llm import LLM
 from app.core.logging import get_logger
-from app.kb.catalog import ACTIVITIES, ACTIVITY_KEYWORDS, CITIES, STATE_ALIASES
+from app.kb.catalog import ACTIVITIES, ACTIVITY_KEYWORDS, CITIES, REGULATED_SECTORS, STATE_ALIASES
 
 QUESTIONS = {
     "en": {
@@ -48,6 +48,16 @@ class ParsedGoal(BaseModel):
     city_known: bool = False
     clarifying_question: str | None = None
     activity_label: str | None = None  # what the citizen called it, when it is outside the rules pack
+    regulated: dict | None = None  # {sector, regulator, url} when the business is licensed by a sector regulator
+
+
+def regulated_sector(text: str) -> dict | None:
+    """The sector regulator for businesses (bank, insurance, pharmacy...) whose main licence is not a shop/municipal one."""
+    low = text.lower()
+    for sector, info in REGULATED_SECTORS.items():
+        if re.search(info["pattern"], low):
+            return {"sector": sector, "regulator": info["regulator"], "url": info["url"]}
+    return None
 
 
 def _find(text: str, aliases: list[str]) -> bool:
@@ -134,12 +144,13 @@ async def parse_goal(goal: str, language: str = "en", llm: LLM | None = None) ->
     return parsed
 
 
-def apply_general_fallback(parsed: ParsedGoal, answer: str) -> ParsedGoal:
+def apply_general_fallback(parsed: ParsedGoal, answer: str, goal: str = "") -> ParsedGoal:
     """After the citizen has answered, an activity we still cannot match is not a dead end: give them the baseline
     checklist (Udyam, trade licence, shop registration, GST) and let an officer confirm activity-specific licences.
     Only applies once the location is known, i.e. the business type is the only thing still missing."""
     if parsed.activity is None and parsed.intent not in SERVICE_INTENTS and parsed.city and parsed.state:
         parsed.activity = "general_business"
         parsed.activity_label = " ".join(answer.split())[:80]
+        parsed.regulated = regulated_sector(answer) or regulated_sector(goal)
         parsed.clarifying_question = None
     return parsed

@@ -168,13 +168,23 @@ async def research(
     plan = build_plan(parsed, by_key)
     if ACTIVITIES[activity].get("general"):
         label = parsed.get("activity_label") or "unspecified"
-        plan["note"] = (
-            f"Your business type (\"{label}\") is not in our rules pack, so this is the baseline checklist most shops need. "
-            "Activity-specific licences may also apply; an officer will confirm which."
-        )
+        reg = parsed.get("regulated")
+        if reg:
+            plan["note"] = (
+                f"Your business type (\"{label}\") is regulated by {reg['regulator']}. Its main licence is issued by that authority, "
+                "not through the shop-licence route, so this tool cannot list it. The checklist below only covers the premises "
+                "registrations most businesses need; contact the regulator directly for the licence."
+            )
+            plan["regulated"] = reg
+        else:
+            plan["note"] = (
+                f"Your business type (\"{label}\") is not in our rules pack, so this is the baseline checklist most shops need. "
+                "Activity-specific licences may also apply; an officer will confirm which."
+            )
         already = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == session_id, ReviewItem.claim_id.is_(None)))).first()
         if session_id and not already:
-            db.add(ReviewItem(session_id=session_id, claim_id=None, reason=f"Activity outside rules pack: '{label}' - confirm activity-specific licences"))
+            db.add(ReviewItem(session_id=session_id, claim_id=None, reason=(f"Regulated business ({reg['regulator']}): '{label}' - main licence is outside this product" if reg
+                                                                else f"Activity outside rules pack: '{label}' - confirm activity-specific licences")))
     low = [claim_dict(c) for c in claims if c.needs_verification]
     LOW_CONFIDENCE.inc(len(low))
     for c in claims:

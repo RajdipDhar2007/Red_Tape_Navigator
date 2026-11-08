@@ -218,6 +218,26 @@ CITIES: dict[str, dict] = {
     },
 }
 
+# Businesses whose main licence comes from a sector regulator, not from the shop/municipal route this product covers.
+# Only the regulator is named (a stable fact); no fees, timelines or conditions are stated. `pattern` is a regex on lower-case
+# text with word boundaries, so "blood bank" or "food bank" is not mistaken for a bank.
+REGULATED_SECTORS: dict[str, dict] = {
+    "bank": {"regulator": "the Reserve Bank of India (RBI)", "url": "https://www.rbi.org.in/",
+             "pattern": r"(?<!blood )(?<!food )(?<!seed )(?<!eye )(?<!milk )\bbank(?:s|ing)?\b"},
+    "nbfc": {"regulator": "the Reserve Bank of India (RBI)", "url": "https://www.rbi.org.in/",
+             "pattern": r"\bnbfc\b|\bmicro ?finance\b|\bfinance compan(?:y|ies)\b|\bloan compan(?:y|ies)\b|\bgold loan\b"},
+    "insurance": {"regulator": "the Insurance Regulatory and Development Authority of India (IRDAI)", "url": "https://irdai.gov.in/",
+                  "pattern": r"\binsurance\b"},
+    "securities": {"regulator": "the Securities and Exchange Board of India (SEBI)", "url": "https://www.sebi.gov.in/",
+                   "pattern": r"\bstock ?brok\w*|\bshare brok\w*|\bbroking\b|\bmutual funds?\b|\bportfolio manage\w*|\binvestment advis\w*"},
+    "pharmacy": {"regulator": "your State Drugs Control Department (drug licence)", "url": None,
+                 "pattern": r"\bpharmac(?:y|ies)\b|\bchemist\b|\bmedical (?:store|shop)s?\b|\bmedicine shops?\b|\bdrug stores?\b"},
+    "liquor": {"regulator": "your State Excise Department", "url": None,
+               "pattern": r"\bliquor\b|\bwine (?:shop|store)s?\b|\bbeer (?:shop|store)s?\b|\balcohol\b"},
+    "telecom": {"regulator": "the Department of Telecommunications (DoT)", "url": "https://dot.gov.in/",
+                "pattern": r"\binternet service provider\b|\btelecom\b"},
+}
+
 STATES = sorted({c["state"] for c in CITIES.values()})
 STATE_ALIASES = {
     "west bengal": "West Bengal", "বাংলা": "West Bengal", "পশ্চিমবঙ্গ": "West Bengal", "पश्चिम बंगाल": "West Bengal",
