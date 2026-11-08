@@ -176,6 +176,13 @@ async def research(
                 "businesses need; for a courier or parcel business, or to ask about an India Post franchise or agency, contact them directly."
             )
             plan["regulated"] = reg
+        elif reg and reg.get("mode") == "authorised":
+            plan["note"] = (
+                f"Your business type (\"{label}\") is authorised by {reg['regulator']}. Fair price (ration) shops are appointed or authorised "
+                "by the state government rather than opened through the shop-licence route, so this tool cannot list that authorisation. The "
+                f"checklist below only covers the premises registrations most businesses need; ask {reg['regulator']} how appointments are made."
+            )
+            plan["regulated"] = reg
         elif reg:
             plan["note"] = (
                 f"Your business type (\"{label}\") is regulated by {reg['regulator']}. Its main licence is issued by that authority, "

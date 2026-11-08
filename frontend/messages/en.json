@@ -104,7 +104,8 @@
     "regulatedNote": "Your business type (“{label}”) is regulated by {regulator}. Its main licence is issued by that authority, not through the shop-licence route, so this tool cannot list it. The checklist below only covers the premises registrations most businesses need. Please contact {regulator} directly for the licence. An officer will also review your session.",
     "regulatorSite": "Official site",
     "operatedNote": "Your business type (“{label}”) is run by {regulator}. Post offices are operated by that department, so there is no shop-style licence to open one with this tool. The checklist below only covers the premises registrations most businesses need. For a courier or parcel business, or to ask about an India Post franchise or agency, please contact them directly. An officer will also review your session.",
-    "hotelNote": "This checklist covers food service, premises and tax registrations for a hotel. Lodging-specific licences or registrations (which differ by state) are not in our rules pack yet; an officer will confirm which apply."
+    "hotelNote": "This checklist covers food service, premises and tax registrations for a hotel. Lodging-specific licences or registrations (which differ by state) are not in our rules pack yet; an officer will confirm which apply.",
+    "authorisedNote": "Your business type (“{label}”) is authorised by {regulator}. Fair price (ration) shops are appointed or authorised by the state government rather than opened through the shop-licence route, so this tool cannot list that authorisation. The checklist below only covers the premises registrations most businesses need. Please ask {regulator} how appointments are made. An officer will also review your session."
   },
   "interview": {
     "heading": "A few details",

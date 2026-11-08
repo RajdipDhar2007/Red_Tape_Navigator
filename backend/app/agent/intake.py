@@ -51,12 +51,17 @@ class ParsedGoal(BaseModel):
     regulated: dict | None = None  # {sector, regulator, url} when the business is licensed by a sector regulator
 
 
-def regulated_sector(text: str) -> dict | None:
-    """The sector regulator for businesses (bank, insurance, pharmacy...) whose main licence is not a shop/municipal one."""
+def regulated_sector(text: str, shop_like_only: bool = False) -> dict | None:
+    """The sector regulator for businesses (bank, insurance, pharmacy...) whose main licence is not a shop/municipal one.
+    With shop_like_only, only sectors that are sold from a "shop" (pharmacy, liquor, ration, firecrackers, agri inputs) qualify."""
     low = text.lower()
     for sector, info in REGULATED_SECTORS.items():
-        if re.search(info["pattern"], low):
-            return {"sector": sector, "regulator": info["regulator"], "url": info["url"], "mode": info.get("mode", "regulated")}
+        if shop_like_only and not info.get("shop_like"):
+            continue
+        m = re.search(info["pattern"], low)
+        if m:
+            return {"sector": sector, "regulator": info["regulator"], "url": info["url"], "mode": info.get("mode", "regulated"),
+                    "match": m.group(0)}
     return None
 
 
@@ -74,7 +79,7 @@ def next_question(p: ParsedGoal, language: str = "en") -> str | None:
         return q["city"]
     if not p.state:
         return q["state"]
-    if not p.activity and p.intent not in SERVICE_INTENTS:
+    if not p.activity and p.intent not in SERVICE_INTENTS and not p.regulated:
         return q["activity"]
     return None
 
@@ -113,6 +118,13 @@ def parse_goal_rules(goal: str, language: str = "en") -> ParsedGoal:
                 intent = svc
                 break
     parsed = ParsedGoal(intent=intent, activity=activity, state=state, city=city, city_known=known)
+    # A regulated business is recognised BEFORE the generic word "shop" can make it an ordinary retail shop ("wine shop",
+    # "ration shop"). A specific activity (restaurant, bakery...) wins, so "restaurant near the bank" stays a restaurant.
+    if activity in (None, "retail_shop") and intent not in SERVICE_INTENTS:
+        reg = regulated_sector(goal, shop_like_only=activity == "retail_shop")
+        if reg:
+            parsed.regulated, parsed.activity_label, parsed.intent = reg, reg["match"], "start_business"
+            parsed.activity = "general_business" if (city and state) else None  # baseline premises checklist once the place is known
     parsed.clarifying_question = next_question(parsed, language)
     return parsed
 
@@ -127,7 +139,7 @@ class _LLMParse(BaseModel):
 async def parse_goal(goal: str, language: str = "en", llm: LLM | None = None) -> ParsedGoal:
     """Rules first (deterministic, testable); the LLM only fills gaps and is validated against the catalogue."""
     parsed = parse_goal_rules(goal, language)
-    if llm and llm.available and (parsed.activity is None or parsed.state is None or parsed.city is None):
+    if llm and llm.available and not parsed.regulated and (parsed.activity is None or parsed.state is None or parsed.city is None):
         try:
             out = await llm.structured(
                 "Extract fields from the user's goal. Activity must be one of: " + ", ".join(ACTIVITIES) + " or null. "

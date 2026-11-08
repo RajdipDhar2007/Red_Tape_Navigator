@@ -19,7 +19,15 @@ tool now reports how many claims are numeric. A human reviewer is needed for the
 | Udyam registration is free | udyamregistration.gov.in home page: "Udyam (MSME) Registration is Free of Cost and paperless" | Confirmed (2026-11-08) |
 | GST registration thresholds | CGST Act s.22 (taxinformation.cbic.gov.in): Rs 20 lakh general, Rs 10 lakh special category states; goods-only suppliers may be raised up to Rs 40 lakh by notification. A CBIC 2019 update listed states that kept Rs 20 lakh for goods, including Telangana | Wording corrected in the pack; current per-state limit still to be confirmed by a reviewer on the GST portal |
 | Hyderabad trade licence | ghmc.gov.in/Trade.aspx: online application with OTP login, fee paid online, certificate "issued instantly" after payment; fee amounts are in a separate "Trade License Fee rates" PDF | Source URL now the exact page. The fee table PDF was read: per sq ft by road width, Rs 3 (single lane, 20 ft), Rs 4 (double lane, 30 ft), Rs 6 (multiple lanes, wider than 30 ft). It does not say if this is yearly or whether other charges apply, so the pack says exactly that; reviewer to confirm |
+| Gold / jewellery shops (BIS hallmarking) | bis.gov.in/hallmarking-jewellers: jewellers apply online on the NSWS portal (reachable via manakonline.in); "No fee is being charged from jewellers for grant of registration/certification"; certificate granted instantly and valid for life; hallmarked jewellery carries the BIS mark, purity (carat/fineness) and a six-digit HUID. The page lists no documents; per-article hallmarking charges (Rs 45 in the Jan 2024 jeweller guidelines, Rs 35 in the 2021 version) change over time | Added as licence `bis_hallmark` with the fee/timeline wording above; per-article charges and the list of districts where hallmarking is mandatory NOT stated (reviewer to confirm) |
 | Ahmedabad shops & establishments | ahmedabadcity.gov.in/StaticPage/shops_establishment: AMC administers it; Form A for 10+ workers, Form D intimation for fewer; forms downloadable; no fee, timeline or online process stated | Authority and URL corrected to AMC |
+
+## Business types without a licence checklist (handled as notes, not rules)
+Banks, NBFCs/microfinance, insurance, stock brokers/mutual funds, forex dealers, pharmacies, liquor shops, firecracker shops,
+fertiliser/pesticide shops, clinics/hospitals, schools/colleges, taxi/transport, telecom/ISP, post offices and ration (fair price)
+shops are recognised by word match in `REGULATED_SECTORS` (`backend/app/kb/catalog.py`). The product names only the regulator
+(a stable fact), shows the basic premises registrations, and queues an officer. It states no fees, timelines or conditions for them.
+Ration shops are "authorised" by the state, post offices are "operated" by India Post. A reviewer should confirm each regulator name.
 
 ## Not confirmed (need a reviewer or the authority; do not guess)
 

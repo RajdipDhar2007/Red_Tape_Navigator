@@ -19,7 +19,7 @@ export default defineConfig({
     {
       command: backendCmd,
       cwd: "../backend",
-      url: "http://localhost:8000/health",
+      url: "http://localhost:8000/ready", // this app only: another service on :8000 must not be mistaken for it
       reuseExistingServer: reuse,
       timeout: 60_000,
       env: {

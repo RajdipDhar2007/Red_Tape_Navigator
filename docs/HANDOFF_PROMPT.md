@@ -67,7 +67,9 @@ hash-chained audit log, PII-redacting logs, allowlisted outbound fetching, prod 
 
 ## What is DONE (all on `main`, CI green at the time of handoff)
 - **Core product:** everything in the flow above for 8 cities (Kolkata, Mumbai, Delhi, Bengaluru, Chennai, Hyderabad, Pune,
-  Ahmedabad) and 20 activity types including a baseline fallback that escalates to an officer. 168 seeded rules, each with a
+  Ahmedabad) and 21 business types (incl. hotel and gold/jewellery with the BIS hallmarking registration), a baseline fallback that
+  escalates to an officer, and regulator notes (bank, insurance, pharmacy, liquor, ration shop, post office, clinic, school, transport...)
+  instead of a wrong shop checklist. To add more business types, see `docs/RULES_VERIFICATION.md` and `backend/app/kb/catalog.py`. 168 seeded rules, each with a
   source URL, confidence and "verify" flag. Accounts, password reset by SMTP email, change password, account page with data
   export and erase (DPDP), consent log, retention purge.
 - **Digio (Aadhaar e-Sign + DigiLocker):** `backend/app/integrations/real/digio.py`, webhook `POST /webhooks/digio`
@@ -171,6 +173,8 @@ Never do these yourself and never ask the human to paste a secret into chat: the
 - A login error "Could not sign in. Check your details." is the UI's generic text for ANY failed auth call, including a server 500
   (for example an outdated local database). Check the API response before blaming credentials.
 - Windows: for multi-line Python edits, write a script file and run it; quoted heredocs break in some shells.
+- The e2e suite uses ports 3000 and 8000 and reuses a server already on them only if it answers `/ready` (this app). Another
+  project on port 8000 used to make every e2e sign-up fail; stop it first.
 - CI cancels in-progress runs when you push again; the gitleaks step needs full history (`fetch-depth: 0`, already set).
 - Docker is not always running locally; the compose stack is verified by the CI `compose-smoke` job.
 

@@ -27,7 +27,7 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
       <p className="mb-1">{t("intro")}</p>
       {session.parsed.activity === "general_business" && session.parsed.regulated && (
         <p role="note" className="mb-3 rounded border border-amber-500 bg-amber-100 p-3 text-amber-950">
-          {t(session.parsed.regulated.mode === "operated" ? "operatedNote" : "regulatedNote", { label: session.parsed.activity_label ?? "", regulator: session.parsed.regulated.regulator })}
+          {t(session.parsed.regulated.mode === "operated" ? "operatedNote" : session.parsed.regulated.mode === "authorised" ? "authorisedNote" : "regulatedNote", { label: session.parsed.activity_label ?? "", regulator: session.parsed.regulated.regulator })}
           {session.parsed.regulated.url && (
             <>
               {" "}

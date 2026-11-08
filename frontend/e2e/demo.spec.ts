@@ -30,6 +30,9 @@ async function startDemo(page: Page, locale: "en" | "bn" = "en") {
   await page.getByRole("button", { name: m.goal.start }).click();
 }
 
+// Multiple-choice questions (the others are text inputs). Matches backend/app/interview/fields.py options.
+const CHOICE_KEYS = new Set(["gender", "social_category", "organisation_type", "premises_ownership"]);
+
 async function currentKeys(page: Page): Promise<string> {
   return (await page.locator('label[for^="q-"]').evaluateAll((els) => els.map((e) => e.getAttribute("for")))).join(",");
 }
@@ -45,9 +48,9 @@ async function runInterview(page: Page) {
     }
     for (const forId of keys.split(",")) {
       const key = forId.slice(2);
-      const input = page.locator(`#${forId}`);
-      if (await input.count()) await input.fill(ANSWERS[key]);
-      else await page.locator(`label[for="${forId}"]`).locator("..").getByRole("button", { name: ANSWERS[key], exact: true }).click();
+      // Decide by question type, never by "is the input rendered yet": that was a race (the label appears before its input).
+      if (CHOICE_KEYS.has(key)) await page.locator(`label[for="${forId}"]`).locator("..").getByRole("button", { name: ANSWERS[key], exact: true }).click();
+      else await page.locator(`#${forId}`).fill(ANSWERS[key]); // fill() waits for the input to appear
     }
     const send = page.getByRole("button", { name: "Send", exact: true });
     if (await send.isVisible()) await send.click();
