@@ -11,6 +11,7 @@ domains:
     - fssai.gov.in
     - foscos.fssai.gov.in
     - gst.gov.in
+    - cbic-gst.gov.in
     - india.gov.in
     - msme.gov.in
     - umang.gov.in
@@ -19,9 +20,17 @@ domains:
     - mca.gov.in
   state:
     - wb.gov.in
+    - lc.wb.gov.in
+    - silpasathi.wb.gov.in
     - wblabour.gov.in
     - wbfireservices.gov.in
     - maharashtra.gov.in
+    - mahakamgar.maharashtra.gov.in
+    - mahaonline.gov.in
+    - labour.delhi.gov.in
+    - labourcis.nic.in
+    - labour.telangana.gov.in
+    - labour.gujarat.gov.in
     - delhi.gov.in
     - karnataka.gov.in
     - tn.gov.in
@@ -31,9 +40,11 @@ domains:
     - kmcgov.in
     - mcgm.gov.in
     - mcdonline.nic.in
+    - etl.mcdonline.nic.in
     - mcdonline.gov.in
     - bbmp.gov.in
     - chennaicorporation.gov.in
     - ghmc.gov.in
     - pmc.gov.in
+    - services.pmc.gov.in
     - ahmedabadcity.gov.in

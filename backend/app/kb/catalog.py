@@ -27,8 +27,8 @@ LICENCES: dict[str, dict] = {
         "url": "https://foscos.fssai.gov.in/",
         "form": "fssai_form_a",
         "depends_on": ["udyam"],
-        "fee": "Registration: Rs 100 per year (turnover up to Rs 12 lakh); State licence: roughly Rs 2,000-5,000 per year by category",
-        "fee_conf": 0.7,
+        "fee": "FSSAI revised its fee slabs and licence validity in 2026; the fee is calculated on FoSCoS for your business type, so confirm the amount there before paying",
+        "fee_conf": 0.35,
         "timeline": "Registration: about 7 days; State licence: about 30-60 days incl. inspection",
         "timeline_conf": 0.65,
         "documents": ["Photo ID", "Passport photo", "Proof of premises (rent agreement / ownership)", "List of food products", "Food safety management plan (licence tier)"],
@@ -161,21 +161,21 @@ ACTIVITY_KEYWORDS: dict[str, list[str]] = {
 CITIES: dict[str, dict] = {
     "kolkata": {
         "label": "Kolkata", "state": "West Bengal", "aliases": ["kolkata", "calcutta", "কলকাতা", "कोलकाता"],
-        "authority": "Kolkata Municipal Corporation (KMC)", "trade_url": "https://www.kmcgov.in/",
+        "authority": "Kolkata Municipal Corporation (KMC)", "trade_url": "https://www.kmcgov.in/KMCPortal/jsp/KMCTradeLicenseHome.jsp",
         "fire_authority": "West Bengal Fire & Emergency Services", "fire_url": "https://wbfireservices.gov.in/",
-        "labour_authority": "West Bengal Labour Department", "labour_url": "https://wblabour.gov.in/",
+        "labour_authority": "West Bengal Labour Department", "labour_url": "https://lc.wb.gov.in/",
     },
     "mumbai": {
         "label": "Mumbai", "state": "Maharashtra", "aliases": ["mumbai", "bombay", "মুম্বই", "मुंबई"],
-        "authority": "Brihanmumbai Municipal Corporation (MCGM)", "trade_url": "https://www.mcgm.gov.in/",
+        "authority": "Brihanmumbai Municipal Corporation (MCGM)", "trade_url": "https://portal.mcgm.gov.in/",
         "fire_authority": "Maharashtra Fire Services", "fire_url": "https://www.maharashtra.gov.in/",
-        "labour_authority": "Maharashtra Labour Department", "labour_url": "https://www.maharashtra.gov.in/",
+        "labour_authority": "Maharashtra Labour Department (Mahakamgar)", "labour_url": "https://mahakamgar.maharashtra.gov.in/lc-registration-of-shops-and-establishments.htm",
     },
     "delhi": {
         "label": "Delhi", "state": "Delhi", "aliases": ["delhi", "new delhi", "দিল্লি", "दिल्ली"],
         "authority": "Municipal Corporation of Delhi (MCD)", "trade_url": "https://mcdonline.nic.in/",
         "fire_authority": "Delhi Fire Service", "fire_url": "https://delhi.gov.in/",
-        "labour_authority": "Delhi Labour Department", "labour_url": "https://delhi.gov.in/",
+        "labour_authority": "Delhi Labour Department", "labour_url": "https://labour.delhi.gov.in/hi/node/2932",
     },
     "bengaluru": {
         "label": "Bengaluru", "state": "Karnataka", "aliases": ["bengaluru", "bangalore", "বেঙ্গালুরু", "बेंगलुरु", "बैंगलोर"],
@@ -193,19 +193,19 @@ CITIES: dict[str, dict] = {
         "label": "Hyderabad", "state": "Telangana", "aliases": ["hyderabad", "হায়দরাবাদ", "हैदराबाद"],
         "authority": "Greater Hyderabad Municipal Corporation (GHMC)", "trade_url": "https://www.ghmc.gov.in/",
         "fire_authority": "Telangana State Disaster Response & Fire Services", "fire_url": "https://www.telangana.gov.in/",
-        "labour_authority": "Telangana Labour Department", "labour_url": "https://www.telangana.gov.in/",
+        "labour_authority": "Telangana Labour Department", "labour_url": "https://labour.telangana.gov.in/",
     },
     "pune": {
         "label": "Pune", "state": "Maharashtra", "aliases": ["pune", "poona", "পুনে", "पुणे", "पुने"],
         "authority": "Pune Municipal Corporation (PMC)", "trade_url": "https://pmc.gov.in/",
         "fire_authority": "Maharashtra Fire Services", "fire_url": "https://www.maharashtra.gov.in/",
-        "labour_authority": "Maharashtra Labour Department", "labour_url": "https://www.maharashtra.gov.in/",
+        "labour_authority": "Maharashtra Labour Department (Mahakamgar)", "labour_url": "https://mahakamgar.maharashtra.gov.in/lc-registration-of-shops-and-establishments.htm",
     },
     "ahmedabad": {
         "label": "Ahmedabad", "state": "Gujarat", "aliases": ["ahmedabad", "আহমেদাবাদ", "अहमदाबाद"],
         "authority": "Ahmedabad Municipal Corporation (AMC)", "trade_url": "https://ahmedabadcity.gov.in/",
         "fire_authority": "Gujarat Fire Services", "fire_url": "https://www.gujarat.gov.in/",
-        "labour_authority": "Gujarat Labour Department", "labour_url": "https://www.gujarat.gov.in/",
+        "labour_authority": "Gujarat Labour Department", "labour_url": "https://labour.gujarat.gov.in/",
     },
 }
 

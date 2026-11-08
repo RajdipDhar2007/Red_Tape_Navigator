@@ -114,3 +114,17 @@ Limits: only fillable (AcroForm) PDFs can be checked automatically; scanned or f
 | Verified rules pack (human-reviewed) for the pilot scope | Domain expert |
 | Security audit and penetration test; DPIA; grievance officer | Security / legal |
 | India-region hosting and data-flow review (incl. LLM egress) | Platform / legal |
+
+## SMS via MSG91 (implemented)
+
+`app/integrations/real/msg91.py` sends reminders through MSG91's Flow API (`POST /api/v5/flow`, `authkey` header).
+Set `MSG91_AUTHKEY` and `MSG91_TEMPLATE_ID`; the factory then uses it for the `sms` channel in any mode.
+Indian SMS needs a TRAI DLT-approved template, so create one with a single variable and link it to a MSG91 flow.
+Verify against your MSG91 account in test mode before go-live (DLT errors 203/211 mean sender/template not approved).
+Status: request shape is unit-tested against a mock transport; it has NOT been exercised against live MSG91 yet.
+
+## Digio (DigiLocker KYC + e-Sign): not yet implemented
+
+Needs Digio sandbox credentials (client id / secret) and access to Digio's API reference. The current `ESign` interface
+only carries a document hash, but Digio signs an uploaded PDF and returns a signing link, and DigiLocker is a
+redirect-and-consent flow, so both interfaces must change before an adapter can be written.

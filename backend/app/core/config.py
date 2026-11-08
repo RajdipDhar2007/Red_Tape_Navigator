@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     smtp_from: str = ""
     smtp_starttls: bool = True
+    msg91_authkey: str = ""
+    msg91_template_id: str = ""
+    msg91_text_var: str = "var1"
     reset_token_minutes: int = 30
     lockout_threshold: int = 5
     lockout_minutes: int = 15

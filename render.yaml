@@ -49,6 +49,9 @@ services:
       - { key: SMTP_USERNAME, sync: false }
       - { key: SMTP_PASSWORD, sync: false }
       - { key: SMTP_FROM, sync: false }
+      - { key: MSG91_AUTHKEY, sync: false }
+      - { key: MSG91_TEMPLATE_ID, sync: false }
+      - { key: MSG91_TEXT_VAR, value: var1 }
       - { key: METRICS_TOKEN, generateValue: true }
       - { key: ANTHROPIC_API_KEY, sync: false }
       - { key: ANTHROPIC_MODEL, sync: false }
@@ -85,3 +88,6 @@ services:
       - { key: SMTP_USERNAME, sync: false }
       - { key: SMTP_PASSWORD, sync: false }
       - { key: SMTP_FROM, sync: false }
+      - { key: MSG91_AUTHKEY, sync: false }
+      - { key: MSG91_TEMPLATE_ID, sync: false }
+      - { key: MSG91_TEXT_VAR, value: var1 }

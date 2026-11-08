@@ -136,3 +136,39 @@ def test_managed_postgres_urls_get_the_asyncpg_driver():
     assert Settings(database_url="postgresql://u:p@h/db").database_url == "postgresql+asyncpg://u:p@h/db"
     assert Settings(database_url="postgresql+asyncpg://u:p@h/db").database_url == "postgresql+asyncpg://u:p@h/db"
     assert Settings(database_url="sqlite+aiosqlite:///x.db").database_url.startswith("sqlite")
+
+
+def test_msg91_number_normalisation():
+    from app.integrations.real.msg91 import to_msisdn
+
+    assert to_msisdn("9876543210") == "919876543210"
+    assert to_msisdn("+91 98765 43210") == "919876543210"
+    assert to_msisdn("09876543210") == "919876543210"
+    assert to_msisdn("12345") is None
+    assert to_msisdn("5876543210") is None
+
+
+@pytest.mark.asyncio
+async def test_msg91_request_shape_and_error_handling(monkeypatch):
+    import httpx
+
+    from app.integrations.real.msg91 import Msg91Sms
+
+    seen = {}
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        seen["auth"] = req.headers["authkey"]
+        seen["body"] = __import__("json").loads(req.content)
+        return httpx.Response(200, json={"type": "success", "message": "abc123"})
+
+    real_client = httpx.AsyncClient
+    monkeypatch.setattr("app.integrations.real.msg91.httpx.AsyncClient", lambda **kw: real_client(transport=httpx.MockTransport(handler), **kw))
+    res = await Msg91Sms("KEY", "TPL1").send("9876543210", "Reminder text")
+    assert res.ok and not res.mock and res.data["message_id"] == "abc123"
+    assert seen["auth"] == "KEY"
+    assert seen["body"] == {"template_id": "TPL1", "short_url": "0", "recipients": [{"mobiles": "919876543210", "var1": "Reminder text"}]}
+    bad = await Msg91Sms("KEY", "TPL1").send("123", "x")
+    assert not bad.ok and bad.data["error"] == "invalid_mobile_number"
+
+    monkeypatch.setattr("app.integrations.real.msg91.httpx.AsyncClient", lambda **kw: real_client(transport=httpx.MockTransport(lambda r: httpx.Response(200, json={"type": "error"})), **kw))
+    assert not (await Msg91Sms("KEY", "TPL1").send("9876543210", "x")).ok
