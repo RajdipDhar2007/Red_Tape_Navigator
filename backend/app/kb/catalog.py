@@ -88,7 +88,7 @@ LICENCES: dict[str, dict] = {
         "timeline": "Typically 3-7 working days after application",
         "timeline_conf": 0.7,
         "documents": ["PAN", "Aadhaar", "Proof of business premises", "Bank account proof", "Passport photo"],
-        "why": "Needed above the turnover threshold (Rs 40 lakh for goods, Rs 20 lakh for services; lower in some states) or for inter-state supply / e-commerce.",
+        "why": "Needed above the turnover threshold or for inter-state supply / e-commerce. The CGST Act (s.22) sets Rs 20 lakh (Rs 10 lakh in special category states); suppliers of goods only can have Rs 40 lakh where the state has opted in, and a few states (a CBIC 2019 update listed Telangana) kept Rs 20 lakh. Confirm the current limit for your state on the GST portal.",
         "portal_login": True,
     },
     "pollution_consent": {
@@ -191,7 +191,7 @@ CITIES: dict[str, dict] = {
     },
     "hyderabad": {
         "label": "Hyderabad", "state": "Telangana", "aliases": ["hyderabad", "হায়দরাবাদ", "हैदराबाद"],
-        "authority": "Greater Hyderabad Municipal Corporation (GHMC)", "trade_url": "https://www.ghmc.gov.in/",
+        "authority": "Greater Hyderabad Municipal Corporation (GHMC)", "trade_url": "https://www.ghmc.gov.in/Trade.aspx",
         "fire_authority": "Telangana State Disaster Response & Fire Services", "fire_url": "https://www.telangana.gov.in/",
         "labour_authority": "Telangana Labour Department", "labour_url": "https://labour.telangana.gov.in/",
     },
@@ -205,7 +205,7 @@ CITIES: dict[str, dict] = {
         "label": "Ahmedabad", "state": "Gujarat", "aliases": ["ahmedabad", "আহমেদাবাদ", "अहमदाबाद"],
         "authority": "Ahmedabad Municipal Corporation (AMC)", "trade_url": "https://ahmedabadcity.gov.in/",
         "fire_authority": "Gujarat Fire Services", "fire_url": "https://www.gujarat.gov.in/",
-        "labour_authority": "Gujarat Labour Department", "labour_url": "https://labour.gujarat.gov.in/",
+        "labour_authority": "Ahmedabad Municipal Corporation (Shops & Establishment department)", "labour_url": "https://ahmedabadcity.gov.in/StaticPage/shops_establishment",
     },
 }
 

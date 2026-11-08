@@ -48,9 +48,11 @@ async def main(json_out: str | None) -> int:
     for url, cs in sorted(by_url.items()):
         r = await check(url)
         page_nums = numbers_in(r["text"])
-        entry = {"url": url, "status": r["status"], "claims": len(cs), "claims_with_numbers_found": 0, "claims_unconfirmed": []}
+        entry = {"url": url, "status": r["status"], "claims": len(cs), "claims_with_numbers_found": 0, "claims_unconfirmed": [],
+                 "numeric_claims": 0}
         for c in cs:
             claim_nums = numbers_in(c.text) - {"1", "2", "3"}
+            entry["numeric_claims"] += bool(claim_nums)
             if r["status"] == "ok" and claim_nums and claim_nums <= page_nums:
                 entry["claims_with_numbers_found"] += 1
             else:
@@ -62,8 +64,12 @@ async def main(json_out: str | None) -> int:
     if json_out:
         Path(json_out).write_text(json.dumps(report, indent=2), encoding="utf-8")
     total = sum(e["claims"] for e in report)
+    numeric = sum(e["numeric_claims"] for e in report)
     confirmed = sum(e["claims_with_numbers_found"] for e in report)
-    print(f"\n{len(report)} sources, {bad} unreachable/blocked; {confirmed}/{total} claims have their numbers on the live page.")
+    print(f"\n{len(report)} sources, {bad} unreachable/blocked.")
+    print(f"{total} claims: {numeric} quote a number (those can be checked automatically), {total - numeric} are qualitative "
+          f"(\"confirm with the authority\" wording) and need a human reviewer.")
+    print(f"{confirmed}/{numeric} numeric claims have their numbers on the live page. Nothing is marked verified by this tool.")
     return 1 if bad else 0
 
 

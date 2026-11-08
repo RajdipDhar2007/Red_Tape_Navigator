@@ -20,7 +20,12 @@ Status key: DONE / WAITING ON OWNER / BLOCKED ON THIRD PARTY. Updated as work pr
 
 ## 4. FSSAI forms: BLOCKED ON THIRD PARTY (FSSAI permission reply)
 
-## 5. Rules verification: IN PROGRESS (me), review sign-off WAITING ON OWNER/officer
+## 5. Rules verification: partly done; reviewer sign-off WAITING ON OWNER/officer
+- [x] `make verify-sources` run; metric made meaningful (numeric vs qualitative). Log: docs/RULES_VERIFICATION.md.
+- [x] Checked on official pages: Udyam free, GST s.22 thresholds, GHMC trade page, AMC shops page. Catalogue URLs/wording updated.
+- [x] Reviewer worksheet exported: docs/RULES_REVIEW_EXPORT.csv (168 rules, all UNVERIFIED).
+- [ ] Waiting on a reviewer/department: GST/FSSAI fee slabs, fire NOC and pollution pages outside West Bengal, trade-licence fee schedules, timelines.
+- [ ] Waiting on owner: set ANTHROPIC_API_KEY/MODEL and run POST /admin/refresh if wanted (costs API usage).
 
 ## 6. Deployment (Render, Vercel, SMTP, first officer, backups, monitoring, load test): WAITING ON OWNER
 
