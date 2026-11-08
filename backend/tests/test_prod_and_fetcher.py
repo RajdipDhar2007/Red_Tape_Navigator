@@ -14,6 +14,7 @@ GOOD = dict(
     database_url="postgresql+asyncpg://u:p@db/rtn",
     cors_origins="https://app.example.in",
     demo_mode=False,
+    grievance_contact="dpo@example.in",
 )
 
 
@@ -31,6 +32,7 @@ def test_good_prod_config_has_no_problems():
         ({"cors_origins": "http://localhost:3000"}, "localhost"),
         ({"cors_origins": "http://app.example.in"}, "https"),
         ({"demo_mode": True}, "DEMO_MODE"),
+        ({"grievance_contact": ""}, "GRIEVANCE_CONTACT"),
     ],
 )
 def test_each_unsafe_prod_setting_is_reported(override, fragment):

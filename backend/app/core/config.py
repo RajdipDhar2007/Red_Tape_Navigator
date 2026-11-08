@@ -76,6 +76,8 @@ def production_problems(s: Settings) -> list[str]:
         problems.append("CORS_ORIGINS must list the real https origin(s), not localhost")
     elif any(not o.startswith("https://") for o in s.cors_list):
         problems.append("CORS_ORIGINS must use https://")
+    if not s.grievance_contact:
+        problems.append("GRIEVANCE_CONTACT is required (DPDP grievance officer shown to citizens)")
     if s.demo_mode:
         problems.append("DEMO_MODE must be false (it exposes demo accounts and simulated integrations)")
     return problems

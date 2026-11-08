@@ -71,6 +71,6 @@ Everything is environment-driven; see [.env.example](.env.example). Secrets neve
 
 ## Documentation
 
-[Architecture](docs/ARCHITECTURE.md) · [DPDP compliance](docs/COMPLIANCE.md) · [Security / OWASP](docs/SECURITY.md) ·
+[Deployment](docs/DEPLOYMENT.md) · [Architecture](docs/ARCHITECTURE.md) · [DPDP compliance](docs/COMPLIANCE.md) · [Security / OWASP](docs/SECURITY.md) ·
 [Integrations & going live](docs/INTEGRATIONS.md) · [Runbook](docs/RUNBOOK.md) · [Pilot plan](docs/PILOT_PLAN.md) ·
 [Demo script](docs/DEMO_SCRIPT.md) · [Load test](docs/LOAD_TEST.md) · [Assumptions](docs/ASSUMPTIONS.md)

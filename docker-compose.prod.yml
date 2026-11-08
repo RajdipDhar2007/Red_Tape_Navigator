@@ -1,0 +1,94 @@
+# Production stack: TLS reverse proxy, no demo mode, no published DB/Redis ports, restart policies.
+#
+#   cp .env.prod.example .env.prod      # fill in every value (see docs/DEPLOYMENT.md)
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+#   ADMIN_PASSWORD='...' docker compose --env-file .env.prod -f docker-compose.prod.yml \
+#       exec -e PYTHONPATH=/app -e ADMIN_PASSWORD api python /scripts/create_admin.py officer@dept.gov.in admin
+#
+# The API refuses to start if the configuration is unsafe (see backend/app/core/config.py).
+x-restart: &restart
+  restart: unless-stopped
+
+services:
+  db:
+    <<: *restart
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: rtn
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: rtn
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U rtn"], interval: 5s, timeout: 3s, retries: 10 }
+
+  redis:
+    <<: *restart
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redisdata:/data]
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, timeout: 3s, retries: 10 }
+
+  api:
+    <<: *restart
+    build: ./backend
+    environment: &api-env
+      APP_ENV: prod
+      DEMO_MODE: "false"
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
+      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:?set FIELD_ENCRYPTION_KEY}
+      DATABASE_URL: postgresql+asyncpg://rtn:${POSTGRES_PASSWORD}@db:5432/rtn
+      REDIS_URL: redis://redis:6379/0
+      CORS_ORIGINS: https://${WEB_DOMAIN:?set WEB_DOMAIN}
+      TRUST_PROXY: "true"
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
+      GRIEVANCE_CONTACT: ${GRIEVANCE_CONTACT:?set GRIEVANCE_CONTACT}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      RETENTION_DAYS: ${RETENTION_DAYS:-90}
+      DATA_REGION: ${DATA_REGION:-in-mumbai}
+    volumes: ["./scripts:/scripts:ro"]
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_healthy } }
+
+  worker:
+    <<: *restart
+    build: ./backend
+    command: ["arq", "app.jobs.worker.WorkerSettings"]
+    environment:
+      <<: *api-env
+      RUN_MIGRATIONS: "false"
+      SEED_ON_START: "false"
+    healthcheck:
+      test: ["CMD", "arq", "--check", "app.jobs.worker.WorkerSettings"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+    depends_on: { api: { condition: service_healthy } }
+
+  web:
+    <<: *restart
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: https://${API_DOMAIN:?set API_DOMAIN}
+        NEXT_PUBLIC_DEMO_MODE: "false"
+    depends_on: { api: { condition: service_healthy } }
+
+  proxy:
+    <<: *restart
+    image: caddy:2-alpine
+    ports: ["80:80", "443:443"]
+    environment:
+      WEB_DOMAIN: ${WEB_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [api, web]
+
+volumes:
+  pgdata:
+  redisdata:
+  caddy_data:
+  caddy_config:

@@ -7,6 +7,7 @@ import { api, ApiError, hasToken, post, randomDemoCredentials, setTokens } from 
 import type { Session } from "@/lib/types";
 import VoiceInput from "./VoiceInput";
 
+const DEMO = process.env.NEXT_PUBLIC_DEMO_MODE !== "false";
 type Consent = { purpose: string; granted: boolean }[];
 const DEMO_GOAL: Record<string, string> = {
   en: "I want to open a small bakery in Kolkata",
@@ -71,9 +72,11 @@ function AuthForm({ onDone }: { onDone: () => void }) {
         <button type="button" className="text-left text-brand-700 underline" onClick={() => setMode(mode === "login" ? "register" : "login")}>
           {mode === "login" ? t("toRegister") : t("toLogin")}
         </button>
-        <button type="button" className="btn-secondary" disabled={busy} onClick={() => void go("/auth/register", { ...randomDemoCredentials(), language: locale })}>
-          {t("demo")}
-        </button>
+        {DEMO && (
+          <button type="button" className="btn-secondary" disabled={busy} onClick={() => void go("/auth/register", { ...randomDemoCredentials(), language: locale })}>
+            {t("demo")}
+          </button>
+        )}
       </div>
     </section>
   );
@@ -168,9 +171,11 @@ function GoalForm() {
             {t("start")}
           </button>
           <VoiceInput onText={(x) => setGoal((g) => (g ? `${g} ${x}` : x))} />
-          <button type="button" className="btn-secondary" disabled={busy} onClick={() => void start(DEMO_GOAL[locale] ?? DEMO_GOAL.en)}>
-            {t("demo")}
-          </button>
+          {DEMO && (
+            <button type="button" className="btn-secondary" disabled={busy} onClick={() => void start(DEMO_GOAL[locale] ?? DEMO_GOAL.en)}>
+              {t("demo")}
+            </button>
+          )}
         </div>
         {err && (
           <p role="alert" className="text-red-800">

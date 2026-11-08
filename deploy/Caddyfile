@@ -1,0 +1,16 @@
+# Automatic HTTPS (Let's Encrypt). WEB_DOMAIN / API_DOMAIN come from the compose environment.
+{$WEB_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:3000
+}
+
+{$API_DOMAIN} {
+	encode zstd gzip
+	# /metrics is for the internal monitoring network only
+	@metrics path /metrics
+	respond @metrics 404
+	request_body {
+		max_size 12MB
+	}
+	reverse_proxy api:8000
+}
