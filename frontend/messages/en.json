@@ -104,7 +104,12 @@
     "saved": "Saved",
     "placeholder": "This is a placeholder form for demonstration. It is not an official document and must not be submitted.",
     "showPreview": "Show preview image",
-    "status": { "filled": "Filled", "missing": "Missing", "doubtful": "Please confirm", "unmapped": "Fill by hand" },
+    "status": {
+      "filled": "Filled",
+      "missing": "Missing",
+      "doubtful": "Please confirm",
+      "unmapped": "Fill by hand"
+    },
     "from": "From",
     "consent": "I have reviewed these forms and the information is correct. I understand that I must sign and submit them myself.",
     "confirm": "I have reviewed this",
@@ -133,5 +138,34 @@
     "export": "Download my data",
     "delete": "Delete my account and data",
     "confirm": "This permanently deletes your data. Continue?"
+  },
+  "staff": {
+    "title": "Officer console",
+    "loading": "Loading…",
+    "denied": "This page is for authorised staff only. Please log in with a staff account.",
+    "error": "Could not load the console. Please try again.",
+    "overview": "Programme overview",
+    "citizens": "Citizens served",
+    "sessions": "Navigation sessions",
+    "completion": "Completion rate",
+    "openReviews": "Open reviews",
+    "rules": "Rules in knowledge base",
+    "needsVerification": "Rules needing verification",
+    "consentsGranted": "Consents granted",
+    "auditChain": "Audit log",
+    "intact": "Intact",
+    "broken": "TAMPERED",
+    "byActivity": "Sessions by activity",
+    "byState": "Sessions by state",
+    "queue": "Review queue",
+    "queueEmpty": "Nothing waiting for review.",
+    "confidence": "Confidence",
+    "source": "Official source",
+    "note": "Resolution note (min 3 characters)",
+    "verified": "Mark verified",
+    "corrected": "Mark corrected",
+    "rejected": "Reject",
+    "resolveFailed": "Could not save the decision. Please try again.",
+    "link": "Officer console"
   }
 }
