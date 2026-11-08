@@ -28,7 +28,7 @@ export type Session = {
   goal: string;
   language: string;
   parsed: { activity: string | null; activity_label?: string | null; regulated?: { sector: string; regulator: string; url: string | null; mode?: "regulated" | "operated" | "authorised" } | null; city: string | null; state: string | null; clarifying_question: string | null };
-  plan: { steps?: Step[]; out_of_scope?: boolean; intent?: string };
+  plan: { steps?: Step[]; out_of_scope?: boolean; intent?: string; coverage?: string; restricted?: { licence: string; name: string; text: string } };
   reviewed: boolean;
   tracker: Tracker;
   agent_mode?: string;

@@ -22,10 +22,39 @@ tool now reports how many claims are numeric. A human reviewer is needed for the
 | Gold / jewellery shops (BIS hallmarking) | bis.gov.in/hallmarking-jewellers: jewellers apply online on the NSWS portal (reachable via manakonline.in); "No fee is being charged from jewellers for grant of registration/certification"; certificate granted instantly and valid for life; hallmarked jewellery carries the BIS mark, purity (carat/fineness) and a six-digit HUID. The page lists no documents; per-article hallmarking charges (Rs 45 in the Jan 2024 jeweller guidelines, Rs 35 in the 2021 version) change over time | Added as licence `bis_hallmark` with the fee/timeline wording above; per-article charges and the list of districts where hallmarking is mandatory NOT stated (reviewer to confirm) |
 | Ahmedabad shops & establishments | ahmedabadcity.gov.in/StaticPage/shops_establishment: AMC administers it; Form A for 10+ workers, Form D intimation for fewer; forms downloadable; no fee, timeline or online process stated | Authority and URL corrected to AMC |
 
+## Licences read from official documents (2026-11-08), added with their sources
+
+These are in `backend/app/kb/sourced_licences.py`. Every claim built from them stays flagged "verify" (confidence below 0.9)
+until an officer signs it off. Where a page could not be read or says nothing, the pack says so instead of guessing.
+
+| Licence | Official source read | What the pack states | Not found / caveats |
+|---|---|---|---|
+| Liquor retail, Kolkata (West Bengal) | excise.wb.gov.in, public licence application page | Online application, choose police station, upload applicant and site documents (16 items listed), pay the application fee through GRIPS | Fee amount, timelines and how an LOI is obtained are not on the page |
+| Liquor retail, Mumbai and Pune (Maharashtra) | stateexcise.maharashtra.gov.in FL-II and FL/W-II pages | FL-II: application fee Rs 2,000 (population above 1 lakh) or Rs 1,000, Form FL/A-IB, location and solvency certificate, affidavit of no tax dues, plans; page says "There is ban on grant of new license" | Pages last reviewed 23/09/2014; licence fee on a separate page not read; FL/W-II is only for wine manufacturers |
+| Liquor retail, Delhi | excise.delhi.gov.in licences page | L-6 retail vends are granted only to selected Delhi government undertakings; licence fee Rs 2,50,000; premises conditions | No private route described; L-7 and L-9 are named but not described |
+| Liquor retail, Bengaluru (Karnataka) | stateexcise.karnataka.gov.in (search result only) | Retail shops are licensed as CL-2 | The site failed the secure connection from the research machine, so fee amounts and documents were not read |
+| Liquor retail, Chennai (Tamil Nadu) | cpe.tn.gov.in, Tamil Nadu Liquor Retail Vending (in Shops and Bars) Rules, 2003 | Retail licence is held by the state corporation (TASMAC) | Rules are old; current policy and bar licences not read |
+| Liquor retail, Hyderabad (Telangana) | excise.telangana.gov.in, G.O.Ms.No.86 of 01.08.2023 and its application form | Shops allotted by lottery; 2023-25 application fee Rs 2,00,000 non-refundable; documents list | Notification for the current period was not found |
+| Liquor, Ahmedabad (Gujarat) | Gujarat Prohibition Act, 1949 (indiacode.nic.in) and the department's site | Prohibition state; sale barred unless a licence or permit allows; health permits under section 40A | Current rules and fees for health permits not read |
+| Pet shop registration | awbi.gov.in, Prevention of Cruelty to Animals (Pet Shop) Rules, 2018 (final text, read from the PDF) | Registration with the State Animal Welfare Board; Rs 5,000 non-refundable fee, a separate application per premises; valid five years; renewal Rs 5,000, apply 30 days before expiry; inspection by a State Government veterinarian | A MoEF draft copy says two years; the final text says five years (final text used) |
+| Retail drug (pharmacy) licence | drugs.delhi.gov.in retail checklist (Forms 20, 21, 20F) and the Drugs Rules, 1945 on cdsco.gov.in | Delhi's full document list; for other cities the same list marked "based on Delhi's checklist"; 10 sq m premises (15 sq m for both form pairs); registered pharmacist | Other states' checklists, fee amounts and timelines not read |
+| Clinic / hospital / lab registration | clinicalestablishments.mohfw.gov.in FAQ | Who is covered; the central Act is in force only in listed states and Union Territories (not these pilot states except where adopted); two-step registration where it applies | Each pilot state's own law and authority were not read; fees and validity not stated in the FAQ |
+| Bio-medical waste authorisation | cpcb.nic.in and the Bio-Medical Waste Management Rules, 2016 (search summaries) | Every occupier must get authorisation from the State Pollution Control Board, irrespective of quantity | Form, fee and validity not confirmed |
+| School recognition | CBSE affiliation bye-laws and FAQ (cbse.gov.in), RTE Act section 18 as quoted there | State recognition certificate is required; CBSE affiliation is optional, via SARAS, with the recognition certificate and a State NOC | State forms and fees not read; building and fire approvals differ by state |
+| College / technical institution | aicte-india.org approval-process pages | AICTE approval for technical institutions via the NSWS portal, annual cycles | UGC and university affiliation rules were not read |
+| Coaching centre | PIB release of a Parliament answer on the Ministry of Education guidelines of 16 January 2024 | Guidelines ask states to regulate; some states (Rajasthan, Jharkhand 2025) passed laws | Your state's rules and fees not read |
+
+## Business types (112)
+
+`backend/app/kb/business_types.py` maps about 100 more business types onto licence sets that are already in the pack (retail, food retail,
+food service, office, manufacturing, warehouse, online). It adds no new legal claims. Types known to need extra permits that are NOT in the pack
+(meat and fish shops, banquet halls, garment and food-processing units, travel agencies and more) carry `coverage="specific"`: the app shows a note
+and queues an officer. Matching is by English keywords (longest match wins); `tests/test_catalog_integrity.py` checks every keyword and type.
+
 ## Business types without a licence checklist (handled as notes, not rules)
-Banks, NBFCs/microfinance, insurance, stock brokers/mutual funds, forex dealers, pharmacies, liquor shops, firecracker shops,
-fertiliser/pesticide shops, clinics/hospitals, schools/colleges, taxi/transport, telecom/ISP, post offices and ration (fair price)
-shops are recognised by word match in `REGULATED_SECTORS` (`backend/app/kb/catalog.py`). The product names only the regulator
+Banks, NBFCs/microfinance, insurance, stock brokers/mutual funds, forex dealers, firecracker shops, fertiliser/pesticide shops and pest control,
+taxi/transport, telecom/ISP, real-estate agents, driving schools, security agencies, professional practices (law, accounting, architecture,
+veterinary), post offices and ration (fair price) shops are recognised by word match in `REGULATED_SECTORS` (`backend/app/kb/catalog.py`). The product names only the regulator
 (a stable fact), shows the basic premises registrations, and queues an officer. It states no fees, timelines or conditions for them.
 Ration shops are "authorised" by the state, post offices are "operated" by India Post. A reviewer should confirm each regulator name.
 

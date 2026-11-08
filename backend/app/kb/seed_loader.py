@@ -23,24 +23,29 @@ def seed_drafts() -> list[ClaimDraft]:
     out: list[ClaimDraft] = []
     for lid, lic in LICENCES.items():
         scopes: list[tuple[str, str | None, str | None]]
+        by_city = lic.get("by_city")
         if lid in REQUIRED_OVERRIDES:
             a_key, u_key = REQUIRED_OVERRIDES[lid]
             scopes = [(c, city[a_key], city[u_key]) for c, city in CITIES.items()]
+        elif by_city:  # state-specific licence: each city's entry carries its own authority, URL and details
+            scopes = [(c, e["authority"], e["url"]) for c, e in by_city.items()]
         else:
             scopes = [("national", lic["authority"], lic["url"])]
         for scope, authority, url in scopes:
             p = f"{lid}:{scope}"
             where = "" if scope == "national" else f" in {CITIES[scope]['label']}"
+            entry = (by_city or {}).get(scope, {})
+            lic_view = {**lic, **{k: v for k, v in entry.items() if k in ("fee", "fee_conf", "timeline", "timeline_conf", "documents", "why")}}
             name = lic["name"]
             city_fee = lic.get("fee_by_city", {}).get(scope)
-            fee = city_fee or lic["fee"]
-            fee_conf = lic["fee_by_city_conf"] if city_fee else lic["fee_conf"]
+            fee = city_fee or lic_view["fee"]
+            fee_conf = lic["fee_by_city_conf"] if city_fee else lic_view["fee_conf"]
             out += [
-                _draft(f"{p}:requirement", "requirement", f"{name}{where}: {lic['why']}", {"licence": lid, "value": lic["why"]}, url, 0.75, ts),
+                _draft(f"{p}:requirement", "requirement", f"{name}{where}: {lic_view['why']}", {"licence": lid, "value": lic_view["why"]}, url, 0.75, ts),
                 _draft(f"{p}:authority", "authority", f"Issuing authority for {name}{where}: {authority}", {"licence": lid, "value": authority}, url, 0.9 if scope == "national" else 0.8, ts),
                 _draft(f"{p}:fee", "fee", f"Fee for {name}{where}: {fee}", {"licence": lid, "value": fee}, url, fee_conf, ts),
-                _draft(f"{p}:timeline", "timeline", f"Expected timeline for {name}{where}: {lic['timeline']}", {"licence": lid, "value": lic["timeline"]}, url, lic["timeline_conf"], ts),
-                _draft(f"{p}:documents", "documents", f"Documents for {name}{where}: " + "; ".join(lic["documents"]), {"licence": lid, "value": lic["documents"]}, url, 0.7, ts),
+                _draft(f"{p}:timeline", "timeline", f"Expected timeline for {name}{where}: {lic_view['timeline']}", {"licence": lid, "value": lic_view["timeline"]}, url, lic_view["timeline_conf"], ts),
+                _draft(f"{p}:documents", "documents", f"Documents for {name}{where}: " + "; ".join(lic_view["documents"]), {"licence": lid, "value": lic_view["documents"]}, url, 0.7, ts),
                 _draft(f"{p}:form_link", "form_link", f"Apply for {name}{where} on the official portal: {url}", {"licence": lid, "value": url}, url, 0.85, ts),
             ]
     return out

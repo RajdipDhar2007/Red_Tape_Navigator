@@ -21,7 +21,7 @@ from app.core.metrics import LOW_CONFIDENCE
 from app.core.tracing import span
 from app.db.models import Claim, ReviewItem, SourceSnapshot
 from app.kb import confidence as conf
-from app.kb.catalog import ACTIVITIES
+from app.kb.catalog import ACTIVITIES, LICENCES
 from app.kb.seed_loader import seed_all
 from app.kb.store import ClaimDraft, claims_for_prefixes, upsert_claim
 from app.scraping.fetcher import HumanHandoffRequired, Page, fetch_page
@@ -199,6 +199,23 @@ async def research(
         if session_id and not already:
             db.add(ReviewItem(session_id=session_id, claim_id=None, reason=(f"Regulated/operated business ({reg['regulator']}): '{label}' - main licence is outside this product" if reg
                                                                 else f"Activity outside rules pack: '{label}' - confirm activity-specific licences")))
+    for lid in needed:  # a state-specific licence that the state's official source shows has no ordinary private route
+        by_city = LICENCES[lid].get("by_city") or {}
+        sc = scope_for(lid, parsed.get("city"))
+        if sc in by_city and by_city[sc].get("restricted"):
+            plan["restricted"] = {"licence": lid, "name": LICENCES[lid]["name"], "text": by_city[sc]["why"]}
+            already_r = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == session_id, ReviewItem.claim_id.is_(None)))).first()
+            if session_id and not already_r:
+                db.add(ReviewItem(session_id=session_id, claim_id=None, reason=f"Restricted licence in this state ({LICENCES[lid]['name']}): confirm with the authority"))
+    coverage = ACTIVITIES[activity].get("coverage")
+    if coverage:
+        plan["coverage"] = coverage
+    if coverage == "specific":
+        plan["note"] = ("This checklist covers the registrations we have sourced for this business. Activity-specific permissions (which can differ by state) "
+                        "may also apply and are not in our rules pack yet; an officer will confirm which.")
+        already_c = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == session_id, ReviewItem.claim_id.is_(None)))).first()
+        if session_id and not already_c:
+            db.add(ReviewItem(session_id=session_id, claim_id=None, reason=f"Business type with extra permits outside the pack: {ACTIVITIES[activity]['label']}"))
     if ACTIVITIES[activity].get("coverage") == "lodging":
         plan["note"] = (
             "This checklist covers food service, premises and tax registrations for a hotel. Lodging-specific licences or registrations "

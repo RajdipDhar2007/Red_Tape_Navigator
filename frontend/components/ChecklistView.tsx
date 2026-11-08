@@ -38,6 +38,19 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
           )}
         </p>
       )}
+      {session.plan.restricted && (
+        <div role="note" className="mb-3 rounded border border-amber-500 bg-amber-100 p-3 text-amber-950">
+          <p className="font-semibold">
+            {t("restrictedLead")} {session.plan.restricted.name}
+          </p>
+          <p className="mt-1 text-sm">{session.plan.restricted.text}</p>
+        </div>
+      )}
+      {session.plan.coverage === "specific" && (
+        <p role="note" className="mb-3 rounded bg-amber-100 p-2 text-amber-950">
+          {t("coverageNote")}
+        </p>
+      )}
       {session.parsed.activity === "hotel" && (
         <p role="note" className="mb-3 rounded bg-amber-100 p-2 text-amber-950">
           {t("hotelNote")}

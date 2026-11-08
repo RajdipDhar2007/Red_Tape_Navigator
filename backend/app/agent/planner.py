@@ -32,7 +32,7 @@ def city_scope(city_label: str | None) -> str | None:
 
 def scope_for(lid: str, city_label: str | None) -> str | None:
     """Claim scope for a licence: 'national' or a city key; None when we have no municipal data."""
-    if lid in REQUIRED_OVERRIDES:
+    if lid in REQUIRED_OVERRIDES or LICENCES[lid].get("by_city"):
         return city_scope(city_label)
     return "national"
 

@@ -8,7 +8,8 @@ from app.agent.intake import ParsedGoal, apply_general_fallback, regulated_secto
     ("Bank", "bank"), ("I want to open a bank branch", "bank"), ("co-operative banking society", "bank"),
     ("NBFC", "nbfc"), ("microfinance company", "nbfc"), ("insurance agency", "insurance"),
     ("stock broking firm", "securities"), ("mutual fund distributor", "securities"),
-    ("Pharmacy", "pharmacy"), ("medical store", "pharmacy"), ("liquor shop", "liquor"), ("internet service provider", "telecom"),
+    ("pest control service", "agri_inputs"), ("internet service provider", "telecom"), ("real estate agent", "real_estate"),
+    ("driving school", "driving_school"), ("security agency", "security_agency"), ("law firm", "professional"),
 ])
 def test_regulated_sectors_are_recognised(text, sector):
     assert regulated_sector(text)["sector"] == sector

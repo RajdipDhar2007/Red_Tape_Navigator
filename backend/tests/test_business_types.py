@@ -10,8 +10,8 @@ def parsed(goal: str):
 
 
 @pytest.mark.parametrize("goal,activity", [
-    ("I want to open a gift shop in Kolkata", "retail_shop"), ("start a toy store in Pune", "retail_shop"),
-    ("open a furniture showroom in Delhi", "retail_shop"), ("I want to open a florist in Mumbai", "retail_shop"),
+    ("I want to open a gift shop in Kolkata", "gift_shop"), ("start a toy store in Pune", "toy_shop"),
+    ("open a furniture showroom in Delhi", "furniture_shop"), ("I want to open a florist in Mumbai", "florist"),
     ("open a xerox and photocopy shop in Kolkata", "repair_shop"), ("start a cyber cafe in Chennai", "repair_shop"),
     ("open a supermarket in Hyderabad", "grocery_store"), ("I want to open a gold shop in Kolkata", "jewellery"),
     ("start a jewellery store in Mumbai", "jewellery"), ("open a restaurant near the bank in Kolkata", "restaurant"),
@@ -24,12 +24,9 @@ def test_ordinary_types_map_to_the_right_checklist(goal, activity):
 @pytest.mark.parametrize("goal,sector,mode", [
     ("I want to open a ration shop in Kolkata", "ration", "authorised"),
     ("open a fair price shop in Pune", "ration", "authorised"),
-    ("I want to open a wine shop in Delhi", "liquor", "regulated"),
-    ("start a medical shop in Chennai", "pharmacy", "regulated"),
     ("open a firecracker shop in Hyderabad", "firecrackers", "regulated"),
     ("start a pesticide and fertiliser shop in Ahmedabad", "agri_inputs", "regulated"),
     ("I want to open a bank in Kolkata", "bank", "regulated"), ("open a post office in Pune", "postal", "operated"),
-    ("start a private clinic in Mumbai", "clinic", "regulated"), ("open a school in Delhi", "school", "regulated"),
     ("start a taxi service in Bengaluru", "transport", "regulated"), ("open a money changer in Mumbai", "forex", "regulated"),
 ])
 def test_regulated_types_are_recognised_even_when_the_word_shop_is_present(goal, sector, mode):

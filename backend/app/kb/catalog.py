@@ -4,6 +4,8 @@ IMPORTANT: this is a *seed* pack with source URLs, not a live copy of the law. E
 stored with confidence < 1 and `seed=True`; fees and timelines are indicative and flagged for verification
 until a live refresh confirms the source page. See docs/ASSUMPTIONS.md.
 """
+from app.kb.business_types import EXTRA_ACTIVITIES, EXTRA_KEYWORDS
+from app.kb.sourced_licences import SOURCED_LICENCES
 
 # licence id -> metadata. `form` is a template id in app/forms/templates (None = complete on the portal).
 LICENCES: dict[str, dict] = {
@@ -69,7 +71,7 @@ LICENCES: dict[str, dict] = {
         "timeline": "Varies; inspection required",
         "timeline_conf": 0.45,
         "documents": ["Building plan / layout", "Fire extinguisher installation proof", "Trade licence copy", "Electrical safety certificate"],
-        "why": "Required for food and public-facing premises with cooking equipment.",
+        "why": "Required for many public-facing premises (restaurants, hotels, halls, hospitals, liquor outlets); the fire authority decides by building category.",
         "portal_login": True,
     },
     "shops_est": {
@@ -130,6 +132,8 @@ LICENCES: dict[str, dict] = {
     },
 }
 
+LICENCES.update(SOURCED_LICENCES)  # licences read from official documents (state-specific ones carry by_city)
+
 # activity -> licences needed (order is resolved by dependencies)
 ACTIVITIES: dict[str, dict] = {
     "bakery": {"label": "Bakery", "licences": ["udyam", "fssai", "trade_licence", "fire_noc", "shops_est", "gst"], "food": True},
@@ -153,13 +157,15 @@ ACTIVITIES: dict[str, dict] = {
     "dairy_booth": {"label": "Dairy / milk booth", "licences": ["udyam", "fssai", "trade_licence"], "food": True},
     "repair_shop": {"label": "Repair / service shop", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
     "fitness_centre": {"label": "Gym / fitness centre", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
-    "coaching_centre": {"label": "Coaching / tuition centre", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
+    "coaching_centre": {"label": "Coaching / tuition centre", "licences": ["udyam", "coaching_registration", "trade_licence", "shops_est", "gst"], "food": False},
     "online_seller": {"label": "Online seller / e-commerce", "licences": ["udyam", "gst"], "food": False},
     "handicrafts": {"label": "Handicrafts / home-made goods", "licences": ["udyam", "gst"], "food": False},
     # Fallback for businesses outside the rules pack: the licences almost every shop-type business needs.
     # Activity-specific licences (e.g. drug, liquor, transport) are NOT covered; an officer reviews each such session.
     "general_business": {"label": "Other business (baseline checklist)", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False, "general": True},
 }
+
+ACTIVITIES.update(EXTRA_ACTIVITIES)  # ~110 more business types (see business_types.py)
 
 # keyword synonyms (English, Bengali, Hindi) -> activity
 ACTIVITY_KEYWORDS: dict[str, list[str]] = {
@@ -176,7 +182,7 @@ ACTIVITY_KEYWORDS: dict[str, list[str]] = {
     "tailoring": ["tailor", "tailoring", "boutique", "দর্জি", "दर्जी", "सिलाई"],
     "beauty_parlour": ["beauty parlour", "beauty parlor", "salon", "parlour", "পার্লার", "ब्यूटी पार्लर", "सैलून"],
     "small_manufacturing": ["manufacturing", "factory", "small unit", "workshop", "কারখানা", "फैक्ट्री", "कारखाना"],
-    "retail_shop": ["retail", "shop", "store", "showroom", "clothing", "garment", "stationery", "electronics", "mobile shop", "gift", "toy", "florist", "footwear", "furniture", "hardware", "saree", "textile", "fabric", "cosmetic", "bookshop", "দোকান", "दुकान", "গিফট", "गिफ्ट", "उपहार"],
+    "retail_shop": ["retail", "shop", "store", "showroom", "clothing", "garment", "stationery", "electronics", "mobile shop", "gift", "toy", "footwear", "furniture", "hardware", "saree", "textile", "fabric", "cosmetic", "দোকান", "दुकान", "গিফট", "गिफ्ट", "उपहार"],
     "juice_shop": ["juice", "snack", "fast food", "street food", "জুস", "जूस"],
     "catering": ["catering", "caterer", "ক্যাটারিং", "कैटरिंग"],
     "dairy_booth": ["dairy", "milk booth", "milk shop", "দুধ", "डेयरी", "दूध"],
@@ -186,6 +192,8 @@ ACTIVITY_KEYWORDS: dict[str, list[str]] = {
     "online_seller": ["online store", "online seller", "online business", "e-commerce", "ecommerce", "amazon seller", "অনলাইন", "ऑनलाइन"],
     "handicrafts": ["handicraft", "handmade", "homemade goods", "crafts", "হস্তশিল্প", "हस्तशिल्प"],
 }
+
+ACTIVITY_KEYWORDS.update(EXTRA_KEYWORDS)
 
 CITIES: dict[str, dict] = {
     "kolkata": {
@@ -253,25 +261,25 @@ REGULATED_SECTORS: dict[str, dict] = {
                   "pattern": r"\binsurance\b"},
     "securities": {"regulator": "the Securities and Exchange Board of India (SEBI)", "url": "https://www.sebi.gov.in/",
                    "pattern": r"\bstock ?brok\w*|\bshare brok\w*|\bbroking\b|\bmutual funds?\b|\bportfolio manage\w*|\binvestment advis\w*"},
-    "pharmacy": {"regulator": "your State Drugs Control Department (drug licence)", "url": None, "shop_like": True,
-                 "pattern": r"\bpharmac(?:y|ies)\b|\bchemist\b|\bmedical (?:store|shop)s?\b|\bmedicine shops?\b|\bdrug stores?\b"},
-    "liquor": {"regulator": "your State Excise Department", "url": None, "shop_like": True,
-               "pattern": r"\bliquor\b|\bwine (?:shop|store)s?\b|\bbeer (?:shop|store)s?\b|\balcohol\b"},
     # mode "authorised": the state appoints/authorises the outlet; it is not opened through a licence application.
     "ration": {"regulator": "your State Food and Civil Supplies Department", "url": None, "mode": "authorised", "shop_like": True,
                "pattern": r"\bration (?:shop|store|dealer|depot)s?\b|\bfair price (?:shop|store)s?\b|\bpds (?:shop|dealer|outlet)s?\b"},
     "firecrackers": {"regulator": "the Petroleum and Explosives Safety Organisation (PESO)", "url": "https://peso.gov.in/", "shop_like": True,
                      "pattern": r"\bfire ?crackers?\b|\bfireworks?\b|\bcrackers? (?:shop|store)s?\b"},
     "agri_inputs": {"regulator": "your State Agriculture Department", "url": None, "shop_like": True,
-                    "pattern": r"\bpesticides?\b|\bfertili[sz]ers?\b|\bseed (?:shop|store|dealer)s?\b|\bagro ?(?:shop|centre|center)s?\b"},
-    "clinic": {"regulator": "your State Health Department (clinical establishment registration)", "url": None,
-               "pattern": r"\bclinics?\b|\bhospitals?\b|\bnursing homes?\b|\bdiagnostic\b|\bpathology\b|\bdental\b"},
-    "school": {"regulator": "your State Education Department", "url": None,
-               "pattern": r"\bschools?\b|\bcolleges?\b|\bplay ?school\b"},
+                    "pattern": r"\bpesticides?\b|\bpest control\b|\bfertili[sz]ers?\b|\bseed (?:shop|store|dealer)s?\b|\bagro ?(?:shop|centre|center)s?\b"},
     "forex": {"regulator": "the Reserve Bank of India (RBI)", "url": "https://www.rbi.org.in/",
               "pattern": r"\bmoney chang\w*\b|\bforex\b|\bforeign exchange\b"},
     "transport": {"regulator": "your State Transport Department (vehicle permits)", "url": None,
                   "pattern": r"\btaxi\b|\bcab service\b|\bbus service\b|\btrucking\b|\btransport (?:company|business|service)\b"},
+    "real_estate": {"regulator": "your State Real Estate Regulatory Authority (RERA), where agents register", "url": None,
+                    "pattern": r"\breal estate (?:agent|agency|broker)s?\b|\bproperty (?:dealer|broker)s?\b|\bestate agent\b"},
+    "driving_school": {"regulator": "your State Transport Department (RTO), which licenses driving schools", "url": None,
+                       "pattern": r"\bdriving school\b|\bmotor driving training\b"},
+    "security_agency": {"regulator": "your State Government's Home Department (licence under the Private Security Agencies (Regulation) Act, 2005)", "url": None,
+                        "pattern": r"\bsecurity agenc(?:y|ies)\b|\bsecurity guard (?:service|agency)\b"},
+    "professional": {"regulator": "the relevant professional council (for example the Bar Council, ICAI, the Council of Architecture or your State Veterinary Council)", "url": None,
+                     "pattern": r"\blaw firm\b|\badvocate'?s? office\b|\bchartered accountant\b|\barchitect (?:firm|office)\b|\bveterinary clinic\b|\bvet clinic\b|\banimal hospital\b"},
     "telecom": {"regulator": "the Department of Telecommunications (DoT)", "url": "https://dot.gov.in/",
                 "pattern": r"\binternet service provider\b|\btelecom\b"},
 }
