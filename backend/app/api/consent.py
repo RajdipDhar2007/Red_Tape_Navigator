@@ -13,6 +13,7 @@ router = APIRouter(prefix="/consent", tags=["consent"])
 POLICY_VERSION = "1.0"
 PURPOSES = {
     "service": "To research regulations, ask for missing details and fill government forms on your behalf.",
+    "identity_providers": "To share the form you reviewed with our signing partner (Digio) so you can sign it with Aadhaar, and to fetch documents you approve from DigiLocker. You approve each step on the partner page.",
     "reminders": "To send you renewal and follow-up reminders (email / WhatsApp / SMS).",
 }
 

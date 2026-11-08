@@ -1,22 +1,34 @@
 """Clearly-labelled mock adapters. They never touch real services and never fake a real submission."""
-from app.integrations.interfaces import AdapterResult
+from app.integrations.interfaces import STATUS_COMPLETED, AdapterResult
 
 DEMO = "Demo mode: simulated"
 
 
 class MockDigiLocker:
-    async def list_documents(self, user_ref: str) -> AdapterResult:
-        return AdapterResult(True, {"documents": [{"id": "demo-aadhaar", "type": "Aadhaar (demo)"}, {"id": "demo-pan", "type": "PAN (demo)"}]}, True, f"{DEMO} DigiLocker")
+    mock = True
 
-    async def fetch_document(self, user_ref: str, doc_id: str) -> AdapterResult:
+    async def start_request(self, customer_identifier: str, customer_name: str, reference_id: str) -> AdapterResult:
         # Demo data only: clearly fake identity values.
-        data = {"applicant_name": "Demo Citizen", "residence_address": "1 Demo Street, Demo Locality", "residence_pincode": "700001"}
-        return AdapterResult(True, {"doc_id": doc_id, "fields": data}, True, f"{DEMO} DigiLocker fetch (values are placeholders)")
+        fields = {"applicant_name": "Demo Citizen", "residence_address": "1 Demo Street, Demo Locality", "residence_pincode": "700001"}
+        return AdapterResult(True, {"request_id": f"SIMULATED-{reference_id[:8]}", "status": STATUS_COMPLETED, "fields": fields}, True,
+                             f"{DEMO} DigiLocker fetch (values are placeholders)")
+
+    async def get_status(self, request_id: str) -> AdapterResult:
+        return AdapterResult(True, {"request_id": request_id, "status": STATUS_COMPLETED, "fields": {}}, True, f"{DEMO} DigiLocker")
 
 
 class MockESign:
-    async def request_signature(self, document_sha256: str, signer_ref: str) -> AdapterResult:
-        return AdapterResult(True, {"signature": "SIMULATED-NOT-LEGALLY-VALID", "document_sha256": document_sha256, "legally_valid": False}, True, f"{DEMO} e-Sign")
+    mock = True
+
+    async def create_request(self, pdf: bytes, file_name: str, signer_identifier: str, reason: str, reference_id: str) -> AdapterResult:
+        return AdapterResult(True, {"document_id": f"SIMULATED-{reference_id[:8]}", "status": STATUS_COMPLETED, "signing_url": None,
+                                    "signature": "SIMULATED-NOT-LEGALLY-VALID", "legally_valid": False}, True, f"{DEMO} e-Sign")
+
+    async def get_status(self, document_id: str) -> AdapterResult:
+        return AdapterResult(True, {"document_id": document_id, "status": STATUS_COMPLETED, "legally_valid": False}, True, f"{DEMO} e-Sign")
+
+    async def download_signed(self, document_id: str) -> AdapterResult:
+        return AdapterResult(False, {"error": "simulated_signature_has_no_file"}, True, f"{DEMO} e-Sign: no signed file exists")
 
 
 class MockUMANG:

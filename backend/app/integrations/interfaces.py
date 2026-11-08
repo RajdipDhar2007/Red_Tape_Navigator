@@ -15,13 +15,47 @@ class AdapterResult:
     label: str | None = None  # shown in the UI, e.g. "Demo mode: simulated e-Sign"
 
 
+# Normalised request states shared by every adapter. Provider-specific states are mapped onto these.
+STATUS_PENDING = "pending"      # created, waiting for the citizen
+STATUS_COMPLETED = "completed"  # signed / documents shared
+STATUS_FAILED = "failed"        # provider or authentication error
+STATUS_REJECTED = "rejected"    # citizen or provider rejected
+STATUS_EXPIRED = "expired"
+TERMINAL_STATUSES = {STATUS_COMPLETED, STATUS_FAILED, STATUS_REJECTED, STATUS_EXPIRED}
+
+
 class DigiLocker(Protocol):
-    async def list_documents(self, user_ref: str) -> AdapterResult: ...
-    async def fetch_document(self, user_ref: str, doc_id: str) -> AdapterResult: ...
+    """Consent-based document pull. The citizen approves inside the provider's flow; we only ever see the outcome."""
+
+    mock: bool
+
+    async def start_request(self, customer_identifier: str, customer_name: str, reference_id: str) -> AdapterResult:
+        """data: request_id, status. Fields we are allowed to import (if any) come back under data['fields']."""
+        ...
+
+    async def get_status(self, request_id: str) -> AdapterResult:
+        """data: status (normalised), fields (dict, may be empty)."""
+        ...
 
 
 class ESign(Protocol):
-    async def request_signature(self, document_sha256: str, signer_ref: str) -> AdapterResult: ...
+    """Sign a PDF the citizen has already reviewed. The citizen signs on the provider's page; we never see Aadhaar/OTP."""
+
+    mock: bool
+
+    async def create_request(
+        self, pdf: bytes, file_name: str, signer_identifier: str, reason: str, reference_id: str
+    ) -> AdapterResult:
+        """data: document_id, status, signing_url (None when the provider notifies the signer itself)."""
+        ...
+
+    async def get_status(self, document_id: str) -> AdapterResult:
+        """data: status (normalised)."""
+        ...
+
+    async def download_signed(self, document_id: str) -> AdapterResult:
+        """data: pdf (bytes). Only valid once the status is completed."""
+        ...
 
 
 class UMANG(Protocol):

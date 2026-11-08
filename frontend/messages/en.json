@@ -145,7 +145,7 @@
     "important": "You submit every application yourself on the official portal. This tool never submits anything for you.",
     "download": "Download PDF",
     "checklist": "Your submission checklist",
-    "esign": "Try e-Sign (demo)",
+    "esign": "Sign with Aadhaar e-Sign",
     "esignResult": "Demo mode: simulated e-Sign. Not legally valid.",
     "submittedHeading": "After you have submitted",
     "submittedHelp": "Tell us which applications you submitted and we will remind you to check status and renew.",
@@ -162,7 +162,15 @@
     "copy": "Copy",
     "copied": "Copied",
     "keyinMissing": "Not provided",
-    "keyinError": "Could not load the key-in sheet."
+    "keyinError": "Could not load the key-in sheet.",
+    "esignShare": "To sign, the form you reviewed is sent to our signing partner (Digio). You sign on their page with your Aadhaar OTP; we never see your OTP.",
+    "esignShareBtn": "I agree, continue to sign",
+    "esignOpen": "Open the signing page",
+    "esignMailed": "We also sent the signing link to your email.",
+    "esignWaiting": "Waiting for you to sign...",
+    "esignSigned": "Signed.",
+    "esignDownload": "Download signed copy",
+    "esignFailed": "Signing did not finish. You can start again."
   },
   "privacy": {
     "heading": "Your data",

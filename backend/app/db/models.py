@@ -171,3 +171,27 @@ class FormSource(Base):
     pdf: Mapped[bytes] = mapped_column(LargeBinary)
     decided_by: Mapped[str | None] = mapped_column(String(32), nullable=True)
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class ExternalRequest(Base):
+    """A signing or DigiLocker request handed to an external provider. Holds only ids and status, never documents or identity data."""
+
+    __tablename__ = "external_requests"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(String(32), index=True)
+    session_id: Mapped[str] = mapped_column(ForeignKey("nav_sessions.id"), index=True)
+    provider: Mapped[str] = mapped_column(String(16))  # digio | mock
+    kind: Mapped[str] = mapped_column(String(16))  # esign | digilocker
+    external_id: Mapped[str] = mapped_column(String(64), index=True)  # provider's document / request id
+    status: Mapped[str] = mapped_column(String(16), default="pending")
+    meta: Mapped[dict] = mapped_column(JSON, default=dict)  # form_id, signing_url, error code; no personal data
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
+class WebhookEvent(Base):
+    """Provider webhook ids already processed (delivery is at-least-once, so we de-duplicate)."""
+
+    __tablename__ = "webhook_events"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

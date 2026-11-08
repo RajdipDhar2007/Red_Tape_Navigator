@@ -52,6 +52,13 @@ services:
       - { key: MSG91_AUTHKEY, sync: false }
       - { key: MSG91_TEMPLATE_ID, sync: false }
       - { key: MSG91_TEXT_VAR, value: var1 }
+      # Digio (eSign + DigiLocker). Leave the first two empty to keep the labelled demo mock.
+      - { key: DIGIO_CLIENT_ID, sync: false }
+      - { key: DIGIO_CLIENT_SECRET, sync: false }
+      - { key: DIGIO_ENV, value: sandbox }   # switch to production only after sandbox testing
+      - { key: DIGIO_WEBHOOK_SECRET, sync: false }
+      - { key: DIGIO_WEBHOOK_IPS, value: "35.154.20.28" }   # sandbox; production: 13.126.198.236,52.66.66.81
+      - { key: DIGIO_DIGILOCKER_TEMPLATE, value: DIGILOCKER_AADHAAR_PAN }
       - { key: METRICS_TOKEN, generateValue: true }
       - { key: ANTHROPIC_API_KEY, sync: false }
       - { key: ANTHROPIC_MODEL, sync: false }

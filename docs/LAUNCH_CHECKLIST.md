@@ -11,7 +11,9 @@ Status key: DONE / WAITING ON OWNER / BLOCKED ON THIRD PARTY. Updated as work pr
 ## 2. Digio (DigiLocker + Aadhaar eSign): WAITING ON OWNER, then BLOCKED ON THIRD PARTY
 - [ ] Owner: request sandbox credentials from Digio (see steps in chat / docs/INTEGRATIONS.md).
 - [ ] Digio: creates DigiStudio template `DIGILOCKER_AADHAAR_PAN`, enables eSign, issues UAT client id/secret.
-- [ ] Me (no credentials needed): read remaining Digio docs, redesign interfaces, write adapters, webhook, UI, mocked tests.
+- [x] Me: remaining Digio docs read; interfaces redesigned; adapters, webhook (checksum/IP/duplicates), consent step, UI, 28 mocked-HTTP tests done.
+- [ ] Me, after credentials: run the sandbox checklist in docs/INTEGRATIONS.md, implement DigiLocker field mapping from a real response.
+- [!] Digio website contact form returned an error on 2026-11-08; retry or email Digio directly.
 
 ## 3. MSG91 SMS: WAITING ON OWNER
 - [ ] Sign up, KYC, TRAI DLT sender + template, Flow, auth key. Then live test SMS.

@@ -14,7 +14,7 @@ documents the citizen authorises; messaging only notifies. A test fails the buil
 
 | | |
 |---|---|
-| Interface | `DigiLocker.list_documents`, `fetch_document` |
+| Interface | `DigiLocker.start_request`, `get_status` (consent happens on the provider's page; see the Digio section) |
 | Mock | Returns clearly fake values labelled "Demo mode: simulated DigiLocker"; imports never overwrite what the user typed |
 | What you need to go live | Registration as a requester/partner (via API Setu / DigiLocker partner onboarding), sandbox then production credentials (client id/secret), an OAuth2 consent redirect so the **citizen** authorises each fetch, a signed agreement and a published privacy notice |
 | Implement | `real/digilocker.py`: OAuth2 code flow, fetch issued documents (Aadhaar/PAN XML or PDF), verify signatures where provided, map to answer keys with `source="document"` (the report then shows "document (DigiLocker)") |
@@ -24,7 +24,7 @@ documents the citizen authorises; messaging only notifies. A test fails the buil
 
 | | |
 |---|---|
-| Interface | `ESign.request_signature(document_sha256, signer_ref)` |
+| Interface | `ESign.create_request(pdf, ...)`, `get_status`, `download_signed` (the citizen signs on the provider's page) |
 | Mock | Returns `SIMULATED-NOT-LEGALLY-VALID`, `legally_valid: false`, label "Demo mode: simulated e-Sign". The UI repeats the label |
 | What you need to go live | Typically: an agreement with an e-Sign Service Provider (ESP) approved under the IT Act's e-Sign framework, ASP registration with that ESP, Aadhaar authentication licensing (AUA/Sub-AUA) arranged through the ESP, UIDAI/CCA compliance, a signing-page redirect and callback, and counsel's approval of the user-consent text |
 | Implement | `real/esign.py`: send the hash of the **reviewed** PDF, redirect the citizen to the ESP's OTP page, receive the signed PDF/PKCS#7, store it, audit the event |
@@ -123,24 +123,69 @@ Indian SMS needs a TRAI DLT-approved template, so create one with a single varia
 Verify against your MSG91 account in test mode before go-live (DLT errors 203/211 mean sender/template not approved).
 Status: request shape is unit-tested against a mock transport; it has NOT been exercised against live MSG91 yet.
 
-## Digio (DigiLocker KYC + e-Sign): not yet implemented
+## Digio (DigiLocker KYC + Aadhaar eSign): implemented, sandbox-untested
 
-Needs Digio sandbox credentials (client id / secret) and access to Digio's API reference. The current `ESign` interface
-only carries a document hash, but Digio signs an uploaded PDF and returns a signing link, and DigiLocker is a
-redirect-and-consent flow, so both interfaces must change before an adapter can be written.
+Code: `app/integrations/real/digio.py` (adapters), `app/api/webhooks.py` (`POST /webhooks/digio`), session endpoints in
+`app/api/sessions.py`, table `external_requests` (migration 0004; ids and statuses only, never documents or identity data).
+Digio is used whenever `DIGIO_CLIENT_ID` and `DIGIO_CLIENT_SECRET` are set (like MSG91); otherwise the labelled mock runs.
+With the mock and `DEMO_MODE=false`, the e-Sign and DigiLocker endpoints answer 503 instead of pretending.
+
+**Status: all request shapes are unit-tested against a mocked Digio (`tests/test_digio.py`). Nothing has been run against
+the real Digio sandbox yet, because no credentials exist. Run the sandbox checklist below before any production use.**
+
+### Flow
+
+e-Sign: citizen reviews and confirms the forms -> consents to sharing with the provider (purpose `identity_providers`) ->
+`POST /sessions/{sid}/esign` uploads the reviewed PDF and returns `signing_url` (Digio also emails/SMSes the signer) ->
+the citizen signs on Digio's page with the Aadhaar OTP (we never see it) -> Digio calls the webhook (`doc.signed`) ->
+`GET /sessions/{sid}/esign/{id}` shows `completed` (falls back to polling Digio if the webhook is late) ->
+`GET /sessions/{sid}/esign/{id}/signed.pdf` fetches the signed file from Digio on demand (nothing is stored here).
+
+DigiLocker: `POST /sessions/{sid}/documents/digilocker` creates a DigiStudio request with `notify_customer=true`; Digio
+sends the citizen the consent link; the result arrives by webhook or `GET /sessions/{sid}/documents/digilocker/{id}`.
 
 ### Digio facts confirmed from documentation.digio.in (2026-11-08)
 
-- Base URLs: sandbox `https://ext.digio.in:444`, production `https://api.digio.in`. Each environment has its own client id/secret.
-  Webhook source IPs to whitelist: sandbox `35.154.20.28`; production `13.126.198.236` and `52.66.66.81`.
-- Auth: HTTP Basic (client id : client secret).
-- DigiLocker (Aadhaar/PAN fetch) runs through DigiStudio: `POST {BASE_URL}/client/kyc/v2/request/with_template` with JSON
-  `{customer_identifier (email/mobile, required), customer_name, template_name, reference_id, transaction_id, notify_customer,
-  expire_in_days, generate_access_token, ...}`. The standard template for Aadhaar + PAN is `DIGILOCKER_AADHAAR_PAN`.
-  The citizen then completes consent in Digio's flow (SDK or link); results come by webhook or the status API
-  (`POST {BASE_URL}/client/kyc/v2/{id}/response`, optional query `detail_response`; statuses: requested, approval_pending, approved, rejected, failed, expired, skipped).
-- A workflow template must exist in DigiStudio first (Digio support can create it).
-- eSign (Digi Sign): `POST {BASE_URL}/v2/client/document/upload` (multipart: `file` PDF + `request` JSON with `file_name`,
-  `signers`, `expire_in_days`, `display_on_page`, `notify_signers`, `will_self_sign`, `callback`, `sign_coordinates`, ...);
-  a JSON variant takes the PDF as base64 in `file_data`. HTTP Basic auth.
-- Still unread: webhook payloads, download-media, eSign status/download endpoints, eSign error codes.
+- Base URLs: sandbox `https://ext.digio.in:444`, production `https://api.digio.in`. Each environment has its own client id/secret
+  and its own webhook account and secret. Auth is HTTP Basic (client id : client secret).
+- Webhook source IPs (FAQ): sandbox `35.154.20.28`; production `13.126.198.236` (a second production IP `52.66.66.81` was seen on
+  the environments page). Webhooks are configured in the Enterprise dashboard (sandbox `https://ext-enterprise.digio.in`,
+  production `https://enterprise.digio.in`) under Profile > Webhooks, with a URL and a secret.
+- Webhook authenticity: header `X-Digio-Checksum` = HMAC-SHA256 (hex) of the payload, keyed by the webhook secret.
+  Envelope: `{id, created_at (epoch ms), event, entities[], payload{}}`. Delivery is at-least-once (de-duplicate by `id`).
+  Digio expects HTTP 200 within 10 seconds; failures are retried and eventually pause the account's whole webhook queue, so
+  an authentic delivery is always answered 200. Sandbox delay is about 5 minutes, production about 5 seconds.
+- e-Sign: `POST {BASE}/v2/client/document/upload` (multipart `file` + `request` JSON text; request fields used: `file_name`,
+  `signers[{identifier, reason, sign_type}]`, `expire_in_days`, `display_on_page`, `notify_signers`, `will_self_sign`,
+  `callback` (idempotency key), `include_authentication_url`). Response: `id` (DID...), `agreement_status`
+  (draft|requested|completed|expired|failed), `signing_parties[]` (status, `authentication_url`).
+  Details: `GET {BASE}/v2/client/document/{id}`. Download: `GET {BASE}/v2/client/document/download?document_id=DID...` (PDF).
+  Events: `doc.signed`, `doc.sign.failed` (`error_code`, `error_message`), `doc.sign.rejected`.
+- DigiLocker via DigiStudio: `POST {BASE}/client/kyc/v2/request/with_template` (template `DIGILOCKER_AADHAAR_PAN`, created by
+  Digio support), status `POST {BASE}/client/kyc/v2/{id}/response` (requested, approval_pending, approved, rejected, failed,
+  expired, skipped). Events: `DOCUMENTS_PULLED_SUCCESSFULLY`, `DOCUMENTS_PULLED_PARTIALLY`, `KYC_REQUEST_APPROVED|REJECTED|
+  TERMINATED|EXPIRED`; the DigiLocker payload carries `kyc_request_id`, `reference_id`, `state`, `shared_documents`.
+- Error codes (Digi Sign): documented list with codes such as 1079 (invalid signer), 1108/1155 (expired), 1015 (provider
+  credits exhausted), 1205 (UIDAI/ESP down), plus ESP/UIDAI codes (110-112, 300, 400, 996-998). The adapter maps the common ones
+  to citizen-safe messages and never logs identifiers or response bodies.
+
+### NOT confirmed / not implemented (do not guess)
+
+- The exact shape of the DigiLocker result data (name, address, Aadhaar/PAN fields) in the status response and in
+  download-media. `DigioDigiLocker.get_status` therefore returns `fields: {}`; nothing is auto-imported from Digio yet.
+  Implement the mapping from a real sandbox response, with `source="document"`, and encrypt Aadhaar/PAN values.
+- Whether `signers[]` accepts a `name` field, and the precise error body format (we read `code`/`error_code`, otherwise generic).
+- Whether the same webhook secret and URL can serve both products (it is account-level, so yes in principle).
+
+### Sandbox checklist (once credentials exist)
+
+1. Set `DIGIO_CLIENT_ID`, `DIGIO_CLIENT_SECRET`, `DIGIO_ENV=sandbox`, `DIGIO_WEBHOOK_SECRET`, `DIGIO_WEBHOOK_IPS=35.154.20.28`
+   on `rtn-api` (Render env or `.env.prod`, never in git). In the Digio sandbox dashboard set the webhook URL to
+   `https://<api>/webhooks/digio` with the same secret and enable the Digi Sign and Digi Studio events.
+2. Ask Digio to confirm template `DIGILOCKER_AADHAAR_PAN` exists for your account and that Aadhaar eSign is enabled.
+3. Sign a reviewed form end to end; confirm `signing_url`, the webhook (check `external_requests.status`), and the download.
+4. Start a DigiLocker request; capture the real response of `.../response?detail_response=true` and implement the field mapping.
+5. Only then switch to production credentials/URLs and add `52.66.66.81` to `DIGIO_WEBHOOK_IPS`.
+
+Note: the IP allowlist only works behind a trusted proxy (`TRUST_PROXY=true`, as on Render) and uses the first
+`X-Forwarded-For` hop, which a caller can forge; the HMAC checksum is the real authentication, the IP list is defence in depth.

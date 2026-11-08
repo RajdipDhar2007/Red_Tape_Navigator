@@ -13,7 +13,7 @@ from app.api.consent import has_consent
 from app.api.deps import current_user
 from app.core import audit
 from app.core.config import get_settings
-from app.db.models import NavSession, User
+from app.db.models import ExternalRequest, NavSession, User
 from app.db.session import get_db
 from app.followup.checklist import submission_checklist
 from app.followup.reminders import schedule_after_submission
@@ -21,6 +21,7 @@ from app.forms import filler, official
 from app.forms.context import build_context
 from app.forms.registry import get_template
 from app.integrations.factory import get_integrations
+from app.integrations.interfaces import STATUS_COMPLETED, TERMINAL_STATUSES, AdapterResult
 from app.interview import engine, memory
 from app.interview.fields import FIELDS
 from app.services import session_service as svc
@@ -200,21 +201,73 @@ async def delete_answer(sid: str, key: str, user: User = Depends(current_user), 
     return Response(status_code=204)
 
 
-@router.post("/{sid}/documents/digilocker")
-async def digilocker_import(sid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
-    ns = await svc.get_owned(db, user, sid)
-    integ = get_integrations()
-    if integ.mode == "mock" and not get_settings().demo_mode:
-        raise HTTPException(503, "DigiLocker is not connected")
-    res = await integ.digilocker.fetch_document(user.id, "demo-aadhaar")
+async def _need_provider_consent(db: AsyncSession, user: User, adapter) -> None:
+    """Sharing data with a real provider needs its own DPDP consent; the labelled mock shares nothing."""
+    if not adapter.mock and not await has_consent(db, user.id, "identity_providers"):
+        raise HTTPException(403, {"code": "consent_required", "message": "Please consent to sharing with our signing provider first."})
+
+
+def _request_view(row: ExternalRequest, res: AdapterResult | None = None) -> dict:
+    meta = row.meta or {}
+    out = {"request_id": row.id, "status": row.status, "mock": row.provider == "mock", "form_id": meta.get("form_id"),
+           "signing_url": meta.get("signing_url"), "error_code": meta.get("error_code")}
+    if res is not None:
+        out["label"] = res.label
+    return out
+
+
+async def _own_request(db: AsyncSession, ns: NavSession, rid: str, kind: str) -> ExternalRequest:
+    row = await db.get(ExternalRequest, rid)
+    if not row or row.session_id != ns.id or row.kind != kind:
+        raise HTTPException(404, "Unknown request")
+    return row
+
+
+async def _import_fields(db: AsyncSession, ns: NavSession, fields: dict) -> list[str]:
     existing = await memory.get_answers(db, ns.id)
     saved = []
-    for k, v in res.data["fields"].items():
+    for k, v in fields.items():
         if k not in existing:  # never overwrite what the user already told us
             await memory.set_answer(db, ns.id, k, v, source="document")
             saved.append(k)
-    await audit.record(db, user.id, "integration.digilocker", {"mock": res.mock, "keys": saved}, ns.id)
-    return {"imported": saved, "mock": res.mock, "label": res.label}
+    return saved
+
+
+@router.post("/{sid}/documents/digilocker")
+async def digilocker_import(sid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    dl = get_integrations().digilocker
+    if dl.mock and not get_settings().demo_mode:
+        raise HTTPException(503, "DigiLocker is not connected")
+    await _need_provider_consent(db, user, dl)
+    ans = await memory.get_answers(db, ns.id, reveal=True)
+    name = ans.get("applicant_name", {}).get("value", "")
+    row = ExternalRequest(user_id=user.id, session_id=ns.id, provider="mock" if dl.mock else "digio", kind="digilocker", external_id="", meta={})
+    db.add(row)
+    await db.flush()
+    res = await dl.start_request(user.email, name, row.id)
+    if not res.ok:
+        await db.rollback()
+        raise HTTPException(502, {"code": "provider_error", "message": res.label})
+    row.external_id, row.status = res.data["request_id"], res.data["status"]
+    saved = await _import_fields(db, ns, res.data.get("fields") or {})
+    await db.commit()
+    await audit.record(db, user.id, "integration.digilocker", {"mock": res.mock, "keys": saved, "status": row.status}, ns.id)
+    return {**_request_view(row, res), "imported": saved}
+
+
+@router.get("/{sid}/documents/digilocker/{rid}")
+async def digilocker_status(sid: str, rid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    row = await _own_request(db, ns, rid, "digilocker")
+    saved: list[str] = []
+    if row.status not in TERMINAL_STATUSES and row.provider != "mock":  # webhooks normally update this; poll as a fallback
+        res = await get_integrations().digilocker.get_status(row.external_id)
+        if res.ok:
+            row.status = res.data["status"]
+            saved = await _import_fields(db, ns, res.data.get("fields") or {})
+            await db.commit()
+    return {**_request_view(row), "imported": saved}
 
 
 # ---------- F. Review checkpoint ----------
@@ -365,9 +418,53 @@ async def esign(sid: str, body: EsignIn, user: User = Depends(current_user), db:
     fills = await svc.fill_all(db, ns)
     if body.form_id not in fills:
         raise HTTPException(404, "Unknown form")
-    res = await get_integrations().esign.request_signature(svc.sha256(fills[body.form_id].pdf), user.id)
-    await audit.record(db, user.id, "integration.esign", {"form": body.form_id, "mock": res.mock}, ns.id)
-    return {"mock": res.mock, "label": res.label, **res.data}
+    es = get_integrations().esign
+    if es.mock and not get_settings().demo_mode:
+        raise HTTPException(503, "e-Sign is not connected")
+    await _need_provider_consent(db, user, es)
+    row = ExternalRequest(user_id=user.id, session_id=ns.id, provider="mock" if es.mock else "digio", kind="esign", external_id="",
+                          meta={"form_id": body.form_id})
+    db.add(row)
+    await db.flush()
+    res = await es.create_request(fills[body.form_id].pdf, f"{body.form_id}.pdf", user.email,
+                                  "I have reviewed this form and sign it myself", row.id)
+    if not res.ok:
+        await db.rollback()
+        raise HTTPException(502, {"code": "provider_error", "message": res.label})
+    row.external_id, row.status = res.data["document_id"], res.data["status"]
+    row.meta = {**row.meta, "signing_url": res.data.get("signing_url")}
+    await db.commit()
+    await audit.record(db, user.id, "integration.esign", {"form": body.form_id, "mock": res.mock, "status": row.status}, ns.id)
+    return {**_request_view(row, res), "legally_valid": res.data.get("legally_valid", False)}
+
+
+@router.get("/{sid}/esign/{rid}")
+async def esign_status(sid: str, rid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    row = await _own_request(db, ns, rid, "esign")
+    if row.status not in TERMINAL_STATUSES and row.provider != "mock":  # webhooks normally update this; poll as a fallback
+        res = await get_integrations().esign.get_status(row.external_id)
+        if res.ok:
+            row.status = res.data["status"]
+            await db.commit()
+    return _request_view(row)
+
+
+@router.get("/{sid}/esign/{rid}/signed.pdf")
+async def esign_download(sid: str, rid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    row = await _own_request(db, ns, rid, "esign")
+    if row.provider == "mock":
+        raise HTTPException(404, "A simulated signature has no signed file")
+    if row.status != STATUS_COMPLETED:
+        raise HTTPException(409, {"code": "not_signed", "message": "The document has not been signed yet."})
+    res = await get_integrations().esign.download_signed(row.external_id)
+    if not res.ok:
+        raise HTTPException(502, {"code": "provider_error", "message": res.label})
+    form_id = (row.meta or {}).get("form_id", "signed")
+    await audit.record(db, user.id, "integration.esign.download", {"form": form_id}, ns.id)
+    return Response(res.data["pdf"], media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{form_id}-signed.pdf"', "Cache-Control": "no-store"})
 
 
 @router.post("/{sid}/submitted")

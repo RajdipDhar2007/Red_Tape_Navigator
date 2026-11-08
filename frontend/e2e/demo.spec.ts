@@ -81,7 +81,7 @@ test("full demo: goal -> research -> interview -> filled PDF review -> download"
   await expect(page.getByText("This tool never submits anything for you.").first()).toBeVisible();
   const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: /Download PDF: fssai_form_a/ }).click()]);
   expect(download.suggestedFilename()).toBe("fssai_form_a.pdf");
-  await page.getByRole("button", { name: "Try e-Sign (demo)" }).first().click();
+  await page.getByRole("button", { name: "Sign with Aadhaar e-Sign" }).first().click();
   await expect(page.getByText(/Demo mode: simulated e-Sign/).first()).toBeVisible();
 
   // there is no way to submit to a government portal from this UI

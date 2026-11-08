@@ -43,6 +43,12 @@ class Settings(BaseSettings):
     msg91_authkey: str = ""
     msg91_template_id: str = ""
     msg91_text_var: str = "var1"
+    digio_client_id: str = ""
+    digio_client_secret: str = ""
+    digio_env: str = "sandbox"  # sandbox | production
+    digio_webhook_secret: str = ""
+    digio_webhook_ips: str = ""  # comma list; enforced only when TRUST_PROXY=true (see api/webhooks.py)
+    digio_digilocker_template: str = "DIGILOCKER_AADHAAR_PAN"
     reset_token_minutes: int = 30
     lockout_threshold: int = 5
     lockout_minutes: int = 15
@@ -55,6 +61,14 @@ class Settings(BaseSettings):
             if v.startswith(plain):
                 return "postgresql+asyncpg://" + v[len(plain):]
         return v
+
+    @property
+    def digio_configured(self) -> bool:
+        return bool(self.digio_client_id and self.digio_client_secret)
+
+    @property
+    def digio_ip_list(self) -> list[str]:
+        return [i.strip() for i in self.digio_webhook_ips.split(",") if i.strip()]
 
     @property
     def cors_list(self) -> list[str]:
@@ -105,6 +119,12 @@ def production_problems(s: Settings) -> list[str]:
         problems.append("SMTP_HOST and SMTP_FROM are required (password-reset and reminder email)")
     if not s.grievance_contact:
         problems.append("GRIEVANCE_CONTACT is required (DPDP grievance officer shown to citizens)")
+    if s.digio_configured and not s.digio_webhook_secret:
+        problems.append("DIGIO_WEBHOOK_SECRET is required when Digio credentials are set (webhook checksum)")
+    if s.digio_configured and s.digio_env not in ("sandbox", "production"):
+        problems.append("DIGIO_ENV must be sandbox or production")
+    if s.digio_configured and s.digio_env == "production" and s.digio_webhook_ips and not s.trust_proxy:
+        problems.append("TRUST_PROXY must be true for DIGIO_WEBHOOK_IPS to be enforced behind Render's proxy")
     if s.demo_mode:
         problems.append("DEMO_MODE must be false (it exposes demo accounts and simulated integrations)")
     return problems
