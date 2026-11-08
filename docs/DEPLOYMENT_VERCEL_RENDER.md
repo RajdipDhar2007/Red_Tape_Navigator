@@ -24,7 +24,10 @@ Citizen browser --> Vercel (Next.js web) --https--> Render (rtn-api) --> Postgre
 1. **Add New Project**, import this repo, set **Root Directory** to `frontend`.
 2. Environment variable (Production): `NEXT_PUBLIC_API_URL=https://<rtn-api>.onrender.com` (or your custom API domain).
    It is baked in at build time, so redeploy after changing it. The CSP in `next.config.mjs` derives from it.
-3. Add your custom domain in Vercel, then use that exact origin in the backend's `CORS_ORIGINS` / `WEB_BASE_URL`.
+3. Optional env vars (Production): `NEXT_PUBLIC_LEGAL_REVIEWED=true` hides the "draft, pending legal review" banner on
+   `/privacy` and `/terms`. Set it ONLY after counsel has approved the text in `frontend/messages/*.json` (`legal` section).
+   `NEXT_PUBLIC_EMBLEM_URL` lets an authorised department supply its own emblem.
+4. Add your custom domain in Vercel, then use that exact origin in the backend's `CORS_ORIGINS` / `WEB_BASE_URL`.
 
 ## 3. Things to know
 

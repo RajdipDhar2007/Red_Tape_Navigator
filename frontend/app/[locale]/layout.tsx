@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Noto_Sans_Bengali, Noto_Sans_Devanagari, Poppins } from "next/font/google";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -34,6 +35,7 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "app" });
+  const tl = await getTranslations({ locale, namespace: "legal" });
 
   return (
     <html lang={locale} className={`${head.variable} ${body.variable} ${deva.variable} ${beng.variable}`}>
@@ -53,6 +55,14 @@ export default async function LocaleLayout({
                 {t("disclaimer")}
               </p>
               <p>{t("independent")}</p>
+              <p className="space-x-4 pt-1">
+                <Link className="underline" href={`/${locale}/privacy`}>
+                  {tl("linkPrivacy")}
+                </Link>
+                <Link className="underline" href={`/${locale}/terms`}>
+                  {tl("linkTerms")}
+                </Link>
+              </p>
             </div>
           </footer>
         </NextIntlClientProvider>

@@ -287,5 +287,85 @@
     "saved": "Password changed. Your other devices were signed out.",
     "failed": "Could not change the password. Check your current password.",
     "signin": "Please sign in to see your account."
+  },
+  "legal": {
+    "privacyTitle": "Privacy policy",
+    "termsTitle": "Terms of use",
+    "linkPrivacy": "Privacy policy",
+    "linkTerms": "Terms of use",
+    "draft": "This text is a plain-language draft and is still being reviewed by legal counsel.",
+    "factsHeading": "Facts for this service",
+    "factRetention": "Your session data is deleted automatically after {days} days.",
+    "factRegion": "Data is stored in region: {region}.",
+    "factGrievance": "Grievance officer / contact: {contact}",
+    "factLoadError": "Could not load the live details. Please try again later.",
+    "privacy": {
+      "s1": {
+        "h": "Who we are",
+        "p": "Red Tape Navigator is an independent assistant that helps you find out which licences your business needs and fills in forms for you to review. It is not a government service. It never submits anything to a government portal for you."
+      },
+      "s2": {
+        "h": "What we collect",
+        "p": "Your email address and password (the password is stored only in scrambled form).\nThe goal you describe and the answers you give in the interview, such as your name, address and business details.\nAadhaar, PAN and bank details only if a form needs them. These are encrypted when stored.\nA log of actions on your account, kept for security and to show what happened."
+      },
+      "s3": {
+        "h": "Why we use it, and your consent",
+        "p": "To research the rules, ask for missing details and fill in forms (service).\nTo send follow-up reminders, only if you agree (reminders).\nTo share the form you reviewed with our signing partner, or to fetch documents you approve from DigiLocker, only if you agree (identity providers). You approve each step on the partner's own page."
+      },
+      "s4": {
+        "h": "Who else receives data",
+        "p": "Our hosting and database providers, and our email provider (password reset and reminders).\nOur SMS provider, only if you choose SMS reminders: your mobile number and the reminder text.\nDigio, only if you choose Aadhaar e-Sign or DigiLocker: the form you reviewed and your email address. You enter your Aadhaar OTP on Digio's page; we never see it.\nAn AI model provider, when switched on: only the goal sentence you write and public government web pages. Aadhaar, PAN, bank details and interview answers are never sent to it."
+      },
+      "s5": {
+        "h": "How long we keep it",
+        "p": "Session data is deleted automatically after the retention period shown above. You can download or delete your data at any time from the Account page."
+      },
+      "s6": {
+        "h": "Your rights",
+        "p": "You can access and download your data, correct your answers, withdraw consent, and ask us to erase your account and data. Use the Account page, or contact the grievance officer shown above."
+      },
+      "s7": {
+        "h": "Cookies and storage",
+        "p": "We use no advertising or tracking cookies.\nYour login is kept in your browser's session storage and is cleared when you close the tab.\nOne cookie remembers your chosen language."
+      },
+      "s8": {
+        "h": "Security",
+        "p": "Data is encrypted in transit. Aadhaar, PAN and bank details are encrypted when stored. No system is perfectly secure, so please keep your password private."
+      }
+    },
+    "terms": {
+      "s1": {
+        "h": "What this service is",
+        "p": "Red Tape Navigator gives AI-assisted guidance. It is not legal advice and it is not an official source. Rules, fees and timelines change, so always verify with the issuing authority."
+      },
+      "s2": {
+        "h": "You stay in control",
+        "p": "You review every form before you can download or sign it. We never submit anything for you. You submit on the official portal yourself and complete any OTP or captcha there."
+      },
+      "s3": {
+        "h": "Your responsibilities",
+        "p": "Give true and complete information. Keep your password private. Do not use the service for anything unlawful."
+      },
+      "s4": {
+        "h": "Accuracy",
+        "p": "Our rules are collected from official sources and each one is marked until a reviewer confirms it. Fees, timelines and documents may differ from what we show. We cannot guarantee that an authority will accept an application."
+      },
+      "s5": {
+        "h": "Other services",
+        "p": "Signing and DigiLocker are provided by our partner, Digio, under its own terms. Government portals have their own terms. Aadhaar signing is done on the partner's page, not on ours."
+      },
+      "s6": {
+        "h": "Availability and responsibility",
+        "p": "We work to keep the service running but cannot promise it will always be available. To the extent the law allows, we are not responsible for fees, delays or rejections by an authority."
+      },
+      "s7": {
+        "h": "Closing your account",
+        "p": "You can delete your account and data at any time from the Account page."
+      },
+      "s8": {
+        "h": "Governing law",
+        "p": "Indian law applies to these terms."
+      }
+    }
   }
 }

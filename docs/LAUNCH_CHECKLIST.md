@@ -29,6 +29,13 @@ Status key: DONE / WAITING ON OWNER / BLOCKED ON THIRD PARTY. Updated as work pr
 
 ## 6. Deployment (Render, Vercel, SMTP, first officer, backups, monitoring, load test): WAITING ON OWNER
 
-## 7. Launch hardening and pilot: NOT STARTED
+## 7. Launch hardening and pilot: partly done
+- [x] Privacy policy and terms pages (en/hi/bn) at `/privacy` and `/terms`, linked in the footer; retention, region and grievance contact read live from the API.
+- [x] Accessibility DOM audit of home, account, privacy, terms, reset, staff (lang, titles, one h1, labels, names, landmarks, no horizontal overflow on home): no issues found after hydration. Unique titles added for the legal pages.
+- [ ] Counsel review of privacy/terms/DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true` (WAITING ON OWNER/counsel).
+- [ ] Native-speaker review of Hindi and Bengali copy, especially `legal` and `done.esign*` strings (WAITING ON OWNER).
+- [ ] Real phone test (slow network, voice input) and screen-reader pass (WAITING ON OWNER: needs a real device).
+- [ ] Penetration test / security sign-off, backup restore test, secrets rotation drill.
+- [ ] Pilot with 5-10 shop owners (docs/PILOT_PLAN.md).
 
 ## 8. Final docs, CI green, final report: NOT STARTED

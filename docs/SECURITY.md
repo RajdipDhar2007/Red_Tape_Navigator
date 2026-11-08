@@ -38,3 +38,11 @@ BFF that stores tokens in `HttpOnly; Secure; SameSite=Strict` cookies, or use th
 
 ## Reporting
 Report vulnerabilities privately to the repository owner. Do not include real Aadhaar/PAN numbers in reports.
+
+## Provider webhooks (Digio)
+`POST /webhooks/digio` accepts only requests whose `X-Digio-Checksum` equals HMAC-SHA256(raw body, `DIGIO_WEBHOOK_SECRET`)
+(constant-time compare); the secret is mandatory in production when Digio credentials exist. Optional source-IP allowlist
+(`DIGIO_WEBHOOK_IPS`, only effective with `TRUST_PROXY=true`; the first `X-Forwarded-For` hop can be forged, so the checksum is the
+real control). Deliveries are de-duplicated by webhook id, bodies over 1 MB are refused, nothing from the payload is logged
+beyond status and error codes, and a late "partial" event never reopens a finished request. Documents are sent to Digio only after
+the citizen's `identity_providers` consent and are never stored by us after signing (the signed PDF is fetched from Digio on demand).
