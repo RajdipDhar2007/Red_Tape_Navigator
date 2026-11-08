@@ -120,6 +120,18 @@ ACTIVITIES: dict[str, dict] = {
     "tailoring": {"label": "Tailoring shop", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
     "beauty_parlour": {"label": "Beauty parlour / salon", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
     "small_manufacturing": {"label": "Small manufacturing unit", "licences": ["udyam", "trade_licence", "pollution_consent", "gst", "shops_est"], "food": False},
+    "retail_shop": {"label": "Retail shop", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
+    "juice_shop": {"label": "Juice / snack counter", "licences": ["udyam", "fssai", "trade_licence"], "food": True},
+    "catering": {"label": "Catering service", "licences": ["udyam", "fssai", "trade_licence", "gst"], "food": True},
+    "dairy_booth": {"label": "Dairy / milk booth", "licences": ["udyam", "fssai", "trade_licence"], "food": True},
+    "repair_shop": {"label": "Repair / service shop", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
+    "fitness_centre": {"label": "Gym / fitness centre", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
+    "coaching_centre": {"label": "Coaching / tuition centre", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False},
+    "online_seller": {"label": "Online seller / e-commerce", "licences": ["udyam", "gst"], "food": False},
+    "handicrafts": {"label": "Handicrafts / home-made goods", "licences": ["udyam", "gst"], "food": False},
+    # Fallback for businesses outside the rules pack: the licences almost every shop-type business needs.
+    # Activity-specific licences (e.g. drug, liquor, transport) are NOT covered; an officer reviews each such session.
+    "general_business": {"label": "Other business (baseline checklist)", "licences": ["udyam", "trade_licence", "shops_est", "gst"], "food": False, "general": True},
 }
 
 # keyword synonyms (English, Bengali, Hindi) -> activity
@@ -135,6 +147,15 @@ ACTIVITY_KEYWORDS: dict[str, list[str]] = {
     "tailoring": ["tailor", "tailoring", "boutique", "দর্জি", "दर्जी", "सिलाई"],
     "beauty_parlour": ["beauty parlour", "beauty parlor", "salon", "parlour", "পার্লার", "ब्यूटी पार्लर", "सैलून"],
     "small_manufacturing": ["manufacturing", "factory", "small unit", "workshop", "কারখানা", "फैक्ट्री", "कारखाना"],
+    "retail_shop": ["retail", "shop", "store", "showroom", "clothing", "garment", "stationery", "electronics", "mobile shop", "দোকান", "दुकान"],
+    "juice_shop": ["juice", "snack", "fast food", "street food", "জুস", "जूस"],
+    "catering": ["catering", "caterer", "ক্যাটারিং", "कैटरिंग"],
+    "dairy_booth": ["dairy", "milk booth", "milk shop", "দুধ", "डेयरी", "दूध"],
+    "repair_shop": ["repair", "garage", "mechanic", "service centre", "service center", "মেরামত", "मरम्मत"],
+    "fitness_centre": ["gym", "fitness", "yoga", "জিম", "जिम"],
+    "coaching_centre": ["coaching", "tuition", "training centre", "training center", "কোচিং", "कोचिंग", "ट्यूशन"],
+    "online_seller": ["online store", "online seller", "online business", "e-commerce", "ecommerce", "amazon seller", "অনলাইন", "ऑनलाइन"],
+    "handicrafts": ["handicraft", "handmade", "homemade goods", "crafts", "হস্তশিল্প", "हस्तशिल्प"],
 }
 
 CITIES: dict[str, dict] = {

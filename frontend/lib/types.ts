@@ -27,7 +27,7 @@ export type Session = {
   id: string;
   goal: string;
   language: string;
-  parsed: { activity: string | null; city: string | null; state: string | null; clarifying_question: string | null };
+  parsed: { activity: string | null; activity_label?: string | null; city: string | null; state: string | null; clarifying_question: string | null };
   plan: { steps?: Step[] };
   reviewed: boolean;
   tracker: Tracker;

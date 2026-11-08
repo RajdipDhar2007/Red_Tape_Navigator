@@ -25,6 +25,11 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
         {t("heading")}
       </h2>
       <p className="mb-1">{t("intro")}</p>
+      {session.parsed.activity === "general_business" && (
+        <p role="note" className="mb-3 rounded bg-amber-100 p-2 text-amber-950">
+          {t("generalNote", { label: session.parsed.activity_label ?? "" })}
+        </p>
+      )}
       {mode && (
         <p className="mb-3 text-sm text-slate-700">
           {t("mode")}: {t(`mode${mode.charAt(0).toUpperCase()}${mode.slice(1)}` as "modeKnowledge_base")}

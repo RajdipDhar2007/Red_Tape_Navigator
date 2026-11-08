@@ -38,6 +38,7 @@ class ParsedGoal(BaseModel):
     city: str | None = None
     city_known: bool = False
     clarifying_question: str | None = None
+    activity_label: str | None = None  # what the citizen called it, when it is outside the rules pack
 
 
 def _find(text: str, aliases: list[str]) -> bool:
@@ -116,4 +117,15 @@ async def parse_goal(goal: str, language: str = "en", llm: LLM | None = None) ->
             parsed.clarifying_question = next_question(parsed, language)
         except Exception as exc:  # degrade to the rules result, but leave a trace
             get_logger("intake").warning("llm_intake_failed", error_type=type(exc).__name__)
+    return parsed
+
+
+def apply_general_fallback(parsed: ParsedGoal, answer: str) -> ParsedGoal:
+    """After the citizen has answered, an activity we still cannot match is not a dead end: give them the baseline
+    checklist (Udyam, trade licence, shop registration, GST) and let an officer confirm activity-specific licences.
+    Only applies once the location is known, i.e. the business type is the only thing still missing."""
+    if parsed.activity is None and parsed.city and parsed.state:
+        parsed.activity = "general_business"
+        parsed.activity_label = " ".join(answer.split())[:80]
+        parsed.clarifying_question = None
     return parsed

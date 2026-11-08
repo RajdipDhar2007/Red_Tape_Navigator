@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agent.intake import parse_goal
+from app.agent.intake import apply_general_fallback, parse_goal
 from app.agent.llm import LLM
 from app.agent.research import DISCLAIMER, research
 from app.api.consent import has_consent
@@ -97,6 +97,7 @@ async def create(body: GoalIn, user: User = Depends(current_user), db: AsyncSess
 async def clarify(sid: str, body: ClarifyIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     ns = await svc.get_owned(db, user, sid)
     parsed = await parse_goal(f"{ns.goal}. {body.answer}", ns.language, LLM())
+    parsed = apply_general_fallback(parsed, body.answer)
     ns.parsed = parsed.model_dump()
     await db.commit()
     if not parsed.clarifying_question and parsed.activity:

@@ -88,7 +88,8 @@
     "mode": "Research mode",
     "modeKnowledge_base": "Curated knowledge base (not live-verified)",
     "modeLive_verified": "Verified against official sites",
-    "modeKnowledge_base_degraded": "Official sites unreachable: showing saved knowledge base"
+    "modeKnowledge_base_degraded": "Official sites unreachable: showing saved knowledge base",
+    "generalNote": "Your business type (“{label}”) is not in our rules pack, so this is the baseline checklist most shops need. Activity-specific licences may also apply; an officer will confirm which."
   },
   "interview": {
     "heading": "A few details",

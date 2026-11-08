@@ -333,3 +333,40 @@ async def test_create_admin_script(client, monkeypatch):
     assert login.status_code == 200
     me = await client.get("/auth/me", headers={"Authorization": f"Bearer {login.json()['access_token']}"})
     assert me.json()["role"] == "reviewer"
+
+
+async def test_common_business_types_are_recognised_directly(client, auth):
+    headers, _ = auth
+    await client.post("/consent", json={"purpose": "service", "granted": True}, headers=headers)
+    for goal, activity in [
+        ("I want to open a shop in Kolkata", "retail_shop"),
+        ("I want to start a gym in Pune", "fitness_centre"),
+        ("I want to start an online business in Delhi", "online_seller"),
+        ("I want to open a catering service in Chennai", "catering"),
+    ]:
+        s = (await client.post("/sessions", json={"goal": goal, "language": "en"}, headers=headers)).json()
+        assert s["parsed"]["activity"] == activity and not s["parsed"]["clarifying_question"], goal
+        r = await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)
+        assert r.status_code == 200 and r.json()["plan"]["steps"], goal
+
+
+async def test_unrecognised_business_gets_baseline_plan_and_officer_review(client, auth):
+    headers, _ = auth
+    await client.post("/consent", json={"purpose": "service", "granted": True}, headers=headers)
+    s = (await client.post("/sessions", json={"goal": "I want to open an aquarium fish farm in Kolkata", "language": "en"}, headers=headers)).json()
+    assert "kind of business" in s["parsed"]["clarifying_question"]
+    s2 = (await client.post(f"/sessions/{s['id']}/clarify", json={"answer": "ornamental fish breeding"}, headers=headers)).json()
+    assert s2["parsed"]["activity"] == "general_business" and s2["parsed"]["activity_label"] == "ornamental fish breeding"
+    assert not s2["parsed"]["clarifying_question"]
+    r = await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)
+    assert r.status_code == 200
+    plan = r.json()["plan"]
+    assert [x["licence"] for x in plan["steps"]][0] == "udyam" and "ornamental fish breeding" in plan["note"]
+    r2 = await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)  # idempotent: one review item
+    assert r2.status_code == 200
+    from sqlalchemy import select
+
+    from app.db.models import ReviewItem
+    async with maker()() as db:
+        items = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == s["id"], ReviewItem.claim_id.is_(None)))).scalars().all()
+    assert len(items) == 1 and "ornamental fish breeding" in items[0].reason

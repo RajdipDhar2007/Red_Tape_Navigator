@@ -154,6 +154,15 @@ async def research(
         mode = "live_verified" if live_report["fetched"] else "knowledge_base_degraded"
     by_key = {c.key: claim_dict(c) for c in claims}
     plan = build_plan(parsed, by_key)
+    if ACTIVITIES[activity].get("general"):
+        label = parsed.get("activity_label") or "unspecified"
+        plan["note"] = (
+            f"Your business type (\"{label}\") is not in our rules pack, so this is the baseline checklist most shops need. "
+            "Activity-specific licences may also apply; an officer will confirm which."
+        )
+        already = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == session_id, ReviewItem.claim_id.is_(None)))).first()
+        if session_id and not already:
+            db.add(ReviewItem(session_id=session_id, claim_id=None, reason=f"Activity outside rules pack: '{label}' - confirm activity-specific licences"))
     low = [claim_dict(c) for c in claims if c.needs_verification]
     LOW_CONFIDENCE.inc(len(low))
     for c in claims:

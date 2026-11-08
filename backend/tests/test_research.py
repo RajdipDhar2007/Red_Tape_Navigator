@@ -286,7 +286,7 @@ async def test_concurrent_upserts_of_same_key_keep_one_current(client):
 
 
 def test_missing_business_type_is_asked_not_silently_dropped():
-    p = parse_goal_rules("I want to open a shop in Kolkata")
+    p = parse_goal_rules("I want to open an aquarium fish farm in Kolkata")
     assert p.activity is None and p.city == "Kolkata"
     assert p.clarifying_question and "kind of business" in p.clarifying_question
     assert parse_goal_rules("मैं कोलकाता में कुछ खोलना चाहता हूँ", "hi").clarifying_question
