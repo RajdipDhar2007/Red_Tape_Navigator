@@ -169,7 +169,14 @@ async def research(
     if ACTIVITIES[activity].get("general"):
         label = parsed.get("activity_label") or "unspecified"
         reg = parsed.get("regulated")
-        if reg:
+        if reg and reg.get("mode") == "operated":
+            plan["note"] = (
+                f"Your business type (\"{label}\") is run by {reg['regulator']}. Post offices are operated by that department, so there is "
+                "no shop-style licence to open one with this tool. The checklist below only covers the premises registrations most "
+                "businesses need; for a courier or parcel business, or to ask about an India Post franchise or agency, contact them directly."
+            )
+            plan["regulated"] = reg
+        elif reg:
             plan["note"] = (
                 f"Your business type (\"{label}\") is regulated by {reg['regulator']}. Its main licence is issued by that authority, "
                 "not through the shop-licence route, so this tool cannot list it. The checklist below only covers the premises "
@@ -183,8 +190,16 @@ async def research(
             )
         already = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == session_id, ReviewItem.claim_id.is_(None)))).first()
         if session_id and not already:
-            db.add(ReviewItem(session_id=session_id, claim_id=None, reason=(f"Regulated business ({reg['regulator']}): '{label}' - main licence is outside this product" if reg
+            db.add(ReviewItem(session_id=session_id, claim_id=None, reason=(f"Regulated/operated business ({reg['regulator']}): '{label}' - main licence is outside this product" if reg
                                                                 else f"Activity outside rules pack: '{label}' - confirm activity-specific licences")))
+    if ACTIVITIES[activity].get("coverage") == "lodging":
+        plan["note"] = (
+            "This checklist covers food service, premises and tax registrations for a hotel. Lodging-specific licences or registrations "
+            "(which differ by state) are not in our rules pack yet; an officer will confirm which apply."
+        )
+        already = (await db.execute(select(ReviewItem).where(ReviewItem.session_id == session_id, ReviewItem.claim_id.is_(None)))).first()
+        if session_id and not already:
+            db.add(ReviewItem(session_id=session_id, claim_id=None, reason="Hotel / lodging: confirm state lodging-specific registrations"))
     low = [claim_dict(c) for c in claims if c.needs_verification]
     LOW_CONFIDENCE.inc(len(low))
     for c in claims:

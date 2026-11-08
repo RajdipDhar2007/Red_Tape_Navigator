@@ -56,7 +56,7 @@ def regulated_sector(text: str) -> dict | None:
     low = text.lower()
     for sector, info in REGULATED_SECTORS.items():
         if re.search(info["pattern"], low):
-            return {"sector": sector, "regulator": info["regulator"], "url": info["url"]}
+            return {"sector": sector, "regulator": info["regulator"], "url": info["url"], "mode": info.get("mode", "regulated")}
     return None
 
 

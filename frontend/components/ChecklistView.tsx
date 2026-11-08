@@ -27,7 +27,7 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
       <p className="mb-1">{t("intro")}</p>
       {session.parsed.activity === "general_business" && session.parsed.regulated && (
         <p role="note" className="mb-3 rounded border border-amber-500 bg-amber-100 p-3 text-amber-950">
-          {t("regulatedNote", { label: session.parsed.activity_label ?? "", regulator: session.parsed.regulated.regulator })}
+          {t(session.parsed.regulated.mode === "operated" ? "operatedNote" : "regulatedNote", { label: session.parsed.activity_label ?? "", regulator: session.parsed.regulated.regulator })}
           {session.parsed.regulated.url && (
             <>
               {" "}
@@ -36,6 +36,11 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
               </a>
             </>
           )}
+        </p>
+      )}
+      {session.parsed.activity === "hotel" && (
+        <p role="note" className="mb-3 rounded bg-amber-100 p-2 text-amber-950">
+          {t("hotelNote")}
         </p>
       )}
       {session.parsed.activity === "general_business" && !session.parsed.regulated && (

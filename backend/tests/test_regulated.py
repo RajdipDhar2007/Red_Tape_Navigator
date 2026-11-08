@@ -51,4 +51,40 @@ async def test_bank_session_gets_a_regulator_note_not_the_shop_message(client, a
 
     async with maker()() as db:
         reasons = [r.reason for r in (await db.execute(select(ReviewItem).where(ReviewItem.session_id == s["id"]))).scalars()]
-    assert any("Regulated business" in x for x in reasons)
+    assert any("Regulated/operated business" in x for x in reasons)
+
+
+def test_post_office_is_operated_by_india_post_not_a_licence_route():
+    reg = regulated_sector("post office")
+    assert reg["sector"] == "postal" and reg["mode"] == "operated" and reg["url"] == "https://www.indiapost.gov.in/"
+    assert regulated_sector("bank")["mode"] == "regulated"
+    assert regulated_sector("post-production studio") is None and regulated_sector("compost shop") is None
+
+
+async def test_post_office_session_note_says_it_is_run_by_india_post(client, auth):
+    headers, _ = auth
+    await client.post("/consent", json={"purpose": "service", "granted": True}, headers=headers)
+    s = (await client.post("/sessions", json={"goal": "I want to open a business in Pune", "language": "en"}, headers=headers)).json()
+    await client.post(f"/sessions/{s['id']}/clarify", json={"answer": "post office"}, headers=headers)
+    plan = (await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)).json()["plan"]
+    assert "is run by India Post" in plan["note"] and "regulated by" not in plan["note"] and plan["regulated"]["mode"] == "operated"
+
+
+async def test_hotel_gets_food_fire_and_premises_licences_and_a_lodging_caveat(client, auth):
+    headers, _ = auth
+    await client.post("/consent", json={"purpose": "service", "granted": True}, headers=headers)
+    s = (await client.post("/sessions", json={"goal": "I want to open a hotel in Chennai", "language": "en"}, headers=headers)).json()
+    assert s["parsed"]["activity"] == "hotel" and not s["parsed"]["clarifying_question"]
+    r = (await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)).json()
+    assert {x["licence"] for x in r["plan"]["steps"]} == {"udyam", "fssai", "trade_licence", "fire_noc", "shops_est", "gst"}
+    assert "Lodging-specific" in r["plan"]["note"]
+    from sqlalchemy import select
+
+    from app.db.models import ReviewItem
+    from app.db.session import maker
+
+    async with maker()() as db:
+        reasons = [x.reason for x in (await db.execute(select(ReviewItem).where(ReviewItem.session_id == s["id"]))).scalars()]
+    assert any("lodging" in x.lower() for x in reasons)
+    for goal in ("open a guest house in Pune", "start a homestay in Delhi", "I want to open a lodge in Kolkata"):
+        assert (await client.post("/sessions", json={"goal": goal, "language": "en"}, headers=headers)).json()["parsed"]["activity"] == "hotel"

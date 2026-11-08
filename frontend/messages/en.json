@@ -102,7 +102,9 @@
     "outOfScopeHeading": "We do not have verified rules for this yet",
     "outOfScope": "An officer has been asked to guide you through it; you do not need to do anything else here. Meanwhile you can search for the scheme or permit on the national portal below, the UMANG app, or your local office.",
     "regulatedNote": "Your business type (“{label}”) is regulated by {regulator}. Its main licence is issued by that authority, not through the shop-licence route, so this tool cannot list it. The checklist below only covers the premises registrations most businesses need. Please contact {regulator} directly for the licence. An officer will also review your session.",
-    "regulatorSite": "Official site"
+    "regulatorSite": "Official site",
+    "operatedNote": "Your business type (“{label}”) is run by {regulator}. Post offices are operated by that department, so there is no shop-style licence to open one with this tool. The checklist below only covers the premises registrations most businesses need. For a courier or parcel business, or to ask about an India Post franchise or agency, please contact them directly. An officer will also review your session.",
+    "hotelNote": "This checklist covers food service, premises and tax registrations for a hotel. Lodging-specific licences or registrations (which differ by state) are not in our rules pack yet; an officer will confirm which apply."
   },
   "interview": {
     "heading": "A few details",

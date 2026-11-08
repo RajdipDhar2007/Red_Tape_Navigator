@@ -120,6 +120,9 @@ LICENCES: dict[str, dict] = {
 ACTIVITIES: dict[str, dict] = {
     "bakery": {"label": "Bakery", "licences": ["udyam", "fssai", "trade_licence", "fire_noc", "shops_est", "gst"], "food": True},
     "restaurant": {"label": "Restaurant", "licences": ["udyam", "fssai", "trade_licence", "fire_noc", "shops_est", "gst"], "food": True},
+    # Food service + premises + tax registrations only. Lodging-specific registrations differ by state and are NOT in the pack,
+    # so `coverage` makes the UI say so and an officer is asked to confirm (see research()).
+    "hotel": {"label": "Hotel / guest house / lodge", "licences": ["udyam", "fssai", "trade_licence", "fire_noc", "shops_est", "gst"], "food": True, "coverage": "lodging"},
     "cafe": {"label": "Cafe", "licences": ["udyam", "fssai", "trade_licence", "fire_noc", "shops_est", "gst"], "food": True},
     "tea_stall": {"label": "Tea stall", "licences": ["udyam", "fssai", "trade_licence"], "food": True},
     "cloud_kitchen": {"label": "Cloud kitchen", "licences": ["udyam", "fssai", "trade_licence", "fire_noc", "gst"], "food": True},
@@ -147,6 +150,7 @@ ACTIVITIES: dict[str, dict] = {
 ACTIVITY_KEYWORDS: dict[str, list[str]] = {
     "bakery": ["bakery", "baker", "bake", "cake shop", "বেকারি", "बेकरी"],
     "restaurant": ["restaurant", "dhaba", "eatery", "রেস্তোরাঁ", "রেস্টুরেন্ট", "रेस्टोरेंट", "रेस्तरां", "ढाबा"],
+    "hotel": ["hotel", "guest house", "guesthouse", "lodge", "lodging", "homestay", "home stay", "হোটেল", "গেস্ট হাউস", "लॉज", "होटल", "गेस्ट हाउस"],
     "cafe": ["cafe", "café", "coffee shop", "কাফে", "कैफे"],
     "tea_stall": ["tea stall", "tea shop", "chai", "চায়ের দোকান", "चाय की दुकान", "चाय"],
     "cloud_kitchen": ["cloud kitchen", "ghost kitchen", "delivery kitchen"],
@@ -222,6 +226,9 @@ CITIES: dict[str, dict] = {
 # Only the regulator is named (a stable fact); no fees, timelines or conditions are stated. `pattern` is a regex on lower-case
 # text with word boundaries, so "blood bank" or "food bank" is not mistaken for a bank.
 REGULATED_SECTORS: dict[str, dict] = {
+    # mode "operated": the service is run by the authority itself, so there is no licence to obtain (default mode is "regulated").
+    "postal": {"regulator": "India Post (Department of Posts)", "url": "https://www.indiapost.gov.in/", "mode": "operated",
+               "pattern": r"\bpost ?offices?\b|\bindia post\b"},
     "bank": {"regulator": "the Reserve Bank of India (RBI)", "url": "https://www.rbi.org.in/",
              "pattern": r"(?<!blood )(?<!food )(?<!seed )(?<!eye )(?<!milk )\bbank(?:s|ing)?\b"},
     "nbfc": {"regulator": "the Reserve Bank of India (RBI)", "url": "https://www.rbi.org.in/",
