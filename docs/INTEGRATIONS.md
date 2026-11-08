@@ -128,3 +128,19 @@ Status: request shape is unit-tested against a mock transport; it has NOT been e
 Needs Digio sandbox credentials (client id / secret) and access to Digio's API reference. The current `ESign` interface
 only carries a document hash, but Digio signs an uploaded PDF and returns a signing link, and DigiLocker is a
 redirect-and-consent flow, so both interfaces must change before an adapter can be written.
+
+### Digio facts confirmed from documentation.digio.in (2026-11-08)
+
+- Base URLs: sandbox `https://ext.digio.in:444`, production `https://api.digio.in`. Each environment has its own client id/secret.
+  Webhook source IPs to whitelist: sandbox `35.154.20.28`; production `13.126.198.236` and `52.66.66.81`.
+- Auth: HTTP Basic (client id : client secret).
+- DigiLocker (Aadhaar/PAN fetch) runs through DigiStudio: `POST {BASE_URL}/client/kyc/v2/request/with_template` with JSON
+  `{customer_identifier (email/mobile, required), customer_name, template_name, reference_id, transaction_id, notify_customer,
+  expire_in_days, generate_access_token, ...}`. The standard template for Aadhaar + PAN is `DIGILOCKER_AADHAAR_PAN`.
+  The citizen then completes consent in Digio's flow (SDK or link); results come by webhook or the status API
+  (`POST {BASE_URL}/client/kyc/v2/{id}/response`, optional query `detail_response`; statuses: requested, approval_pending, approved, rejected, failed, expired, skipped).
+- A workflow template must exist in DigiStudio first (Digio support can create it).
+- eSign (Digi Sign): `POST {BASE_URL}/v2/client/document/upload` (multipart: `file` PDF + `request` JSON with `file_name`,
+  `signers`, `expire_in_days`, `display_on_page`, `notify_signers`, `will_self_sign`, `callback`, `sign_coordinates`, ...);
+  a JSON variant takes the PDF as base64 in `file_data`. HTTP Basic auth.
+- Still unread: webhook payloads, download-media, eSign status/download endpoints, eSign error codes.

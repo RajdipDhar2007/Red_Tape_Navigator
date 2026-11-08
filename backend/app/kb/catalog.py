@@ -179,15 +179,15 @@ CITIES: dict[str, dict] = {
     },
     "bengaluru": {
         "label": "Bengaluru", "state": "Karnataka", "aliases": ["bengaluru", "bangalore", "বেঙ্গালুরু", "बेंगलुरु", "बैंगलोर"],
-        "authority": "Bruhat Bengaluru Mahanagara Palike (BBMP)", "trade_url": "https://bbmp.gov.in/",
+        "authority": "Greater Bengaluru Authority / BBMP (Online Trade License System)", "trade_url": "https://site.bbmp.gov.in/tradelicenseneworrenewal.html",
         "fire_authority": "Karnataka State Fire & Emergency Services", "fire_url": "https://www.karnataka.gov.in/",
-        "labour_authority": "Karnataka Labour Department", "labour_url": "https://www.karnataka.gov.in/",
+        "labour_authority": "Karnataka Labour Department (eKarmika)", "labour_url": "https://www.ekarmika.karnataka.gov.in/ekarmika/static/home.aspx",
     },
     "chennai": {
         "label": "Chennai", "state": "Tamil Nadu", "aliases": ["chennai", "madras", "চেন্নাই", "चेन्नई"],
-        "authority": "Greater Chennai Corporation", "trade_url": "https://chennaicorporation.gov.in/",
+        "authority": "Greater Chennai Corporation", "trade_url": "https://chennaicorporation.gov.in/gcc/department/revenue/",
         "fire_authority": "Tamil Nadu Fire and Rescue Services", "fire_url": "https://www.tn.gov.in/",
-        "labour_authority": "Tamil Nadu Labour Department", "labour_url": "https://www.tn.gov.in/",
+        "labour_authority": "Tamil Nadu Labour Department", "labour_url": "https://labour.tn.gov.in/services/shop-establishments/registration",
     },
     "hyderabad": {
         "label": "Hyderabad", "state": "Telangana", "aliases": ["hyderabad", "হায়দরাবাদ", "हैदराबाद"],
