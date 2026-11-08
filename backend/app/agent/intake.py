@@ -156,6 +156,13 @@ async def parse_goal(goal: str, language: str = "en", llm: LLM | None = None) ->
     return parsed
 
 
+def asked_for_business_type(previous: dict | None) -> bool:
+    """True only when the last question put to the citizen was "what kind of business?". If the place was still unknown, the
+    answer they just gave was a city or state, and must never be mistaken for the business type."""
+    p = previous or {}
+    return bool(p.get("city") and p.get("state") and not p.get("activity") and p.get("intent") not in SERVICE_INTENTS)
+
+
 def apply_general_fallback(parsed: ParsedGoal, answer: str, goal: str = "") -> ParsedGoal:
     """After the citizen has answered, an activity we still cannot match is not a dead end: give them the baseline
     checklist (Udyam, trade licence, shop registration, GST) and let an officer confirm activity-specific licences.

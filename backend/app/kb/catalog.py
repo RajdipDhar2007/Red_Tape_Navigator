@@ -169,18 +169,18 @@ ACTIVITIES.update(EXTRA_ACTIVITIES)  # ~110 more business types (see business_ty
 
 # keyword synonyms (English, Bengali, Hindi) -> activity
 ACTIVITY_KEYWORDS: dict[str, list[str]] = {
-    "bakery": ["bakery", "baker", "bake", "cake shop", "বেকারি", "बेकरी"],
-    "restaurant": ["restaurant", "dhaba", "eatery", "রেস্তোরাঁ", "রেস্টুরেন্ট", "रेस्टोरेंट", "रेस्तरां", "ढाबा"],
+    "bakery": ["bakery", "baker", "bake", "cake shop", "cakes", "cake", "pastry", "pastries", "bread shop", "bakary", "bekary", "backery", "bakry", "বেকারি", "बेकरी"],
+    "restaurant": ["restaurant", "dhaba", "eatery", "resturent", "restaurent", "restarant", "resturant", "restraunt", "restorent", "resteraunt", "restuarant", "family restaurant", "রেস্তোরাঁ", "রেস্টুরেন্ট", "रेस्टोरेंट", "रेस्तरां", "ढाबा"],
     "hotel": ["hotel", "guest house", "guesthouse", "lodge", "lodging", "homestay", "home stay", "হোটেল", "গেস্ট হাউস", "लॉज", "होटल", "गेस्ट हाउस"],
-    "cafe": ["cafe", "café", "coffee shop", "কাফে", "कैफे"],
+    "cafe": ["cafe", "café", "cafee", "coffee shop", "coffee house", "কাফে", "कैफे"],
     "tea_stall": ["tea stall", "tea shop", "chai", "চায়ের দোকান", "चाय की दुकान", "चाय"],
     "cloud_kitchen": ["cloud kitchen", "ghost kitchen", "delivery kitchen"],
     "sweet_shop": ["sweet shop", "mithai", "sweets", "মিষ্টির দোকান", "मिठाई"],
     "home_food": ["home kitchen", "home-based food", "tiffin", "home food", "homemade food", "টিফিন", "टिफिन"],
-    "grocery_store": ["grocery", "kirana", "general store", "provision store", "supermarket", "departmental store", "মুদির দোকান", "किराना"],
+    "grocery_store": ["grocery", "grocary", "grosery", "kirana", "general store", "provision store", "supermarket", "departmental store", "মুদির দোকান", "किराना"],
     "jewellery": ["gold shop", "gold store", "gold dealer", "gold jewel", "jewellery", "jewelry", "jeweller", "jeweler", "ornament shop", "silver shop", "সোনার দোকান", "গয়না", "জুয়েলারি", "সোনা", "सोने की दुकान", "ज्वेलरी", "गहने", "सुनार", "ज्वैलर"],
     "tailoring": ["tailor", "tailoring", "boutique", "দর্জি", "दर्जी", "सिलाई"],
-    "beauty_parlour": ["beauty parlour", "beauty parlor", "salon", "parlour", "পার্লার", "ब्यूटी पार्लर", "सैलून"],
+    "beauty_parlour": ["beauty parlour", "beauty parlor", "salon", "saloon", "parlour", "পার্লার", "ब्यूटी पार्लर", "सैलून"],
     "small_manufacturing": ["manufacturing", "factory", "small unit", "workshop", "কারখানা", "फैक्ट्री", "कारखाना"],
     "retail_shop": ["retail", "shop", "store", "showroom", "clothing", "garment", "stationery", "electronics", "mobile shop", "gift", "toy", "footwear", "furniture", "hardware", "saree", "textile", "fabric", "cosmetic", "দোকান", "दुकान", "গিফট", "गिफ्ट", "उपहार"],
     "juice_shop": ["juice", "snack", "fast food", "street food", "জুস", "जूस"],

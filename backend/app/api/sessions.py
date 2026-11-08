@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agent.intake import SERVICE_INTENTS, apply_general_fallback, parse_goal
+from app.agent.intake import SERVICE_INTENTS, apply_general_fallback, asked_for_business_type, next_question, parse_goal
 from app.agent.llm import LLM
 from app.agent.research import DISCLAIMER, research
 from app.api.consent import has_consent
@@ -110,8 +110,16 @@ async def create(body: GoalIn, user: User = Depends(current_user), db: AsyncSess
 @router.post("/{sid}/clarify")
 async def clarify(sid: str, body: ClarifyIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     ns = await svc.get_owned(db, user, sid)
+    asked_business = asked_for_business_type(ns.parsed)  # was the question "what kind of business?" (not "which city?")
     parsed = await parse_goal(f"{ns.goal}. {body.answer}", ns.language, LLM())
-    parsed = apply_general_fallback(parsed, body.answer, ns.goal)
+    prev = ns.parsed or {}
+    for k in ("city", "state", "activity", "regulated", "activity_label"):  # keep what an earlier answer already told us
+        if not getattr(parsed, k) and prev.get(k):
+            setattr(parsed, k, prev[k])
+    parsed.city_known = parsed.city_known or bool(prev.get("city_known"))
+    parsed.clarifying_question = next_question(parsed, ns.language)
+    if asked_business:
+        parsed = apply_general_fallback(parsed, body.answer, ns.goal)
     ns.parsed = parsed.model_dump()
     await db.commit()
     if not parsed.clarifying_question and parsed.activity:
