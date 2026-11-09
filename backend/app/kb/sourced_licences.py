@@ -35,9 +35,8 @@ _WB_DOCS = [
 _MH = {
     "authority": "District Collector, through the Superintendent of State Excise of your district (Maharashtra State Excise)",
     "url": "https://stateexcise.maharashtra.gov.in/1178/FL-II",
-    "fee": "Application fee for the FL-II (foreign liquor vendor) licence, Form FL/A-IB: Rs 2,000 if the population is above 1 lakh, otherwise Rs 1,000. "
-           "The licence fee is on the department's separate 'current licence fee' page, which was not read; confirm it with the Superintendent of State Excise",
-    "fee_conf": 0.5,
+    "fee": "Maharashtra Government Gazette, Part IV-B Extraordinary, 18 February 2026 (Home Department notification under the Maharashtra Prohibition Act, 1949), fee for grant, renewal or continuance for one year in 2026-27: FL-II vendor's licence by the population of the place: up to 50,000 Rs 3,09,700; 50,001 to 1 lakh Rs 4,92,700; 1,00,001 to 2.5 lakh Rs 7,45,200; 2.5 lakh to 5 lakh Rs 10,43,900; 5 lakh to 10 lakh Rs 12,96,100; 10 lakh to 20 lakh Rs 17,33,700; above 20 lakh Rs 20,32,100. FL-III licence for a restaurant bar: Rs 95,500 up to 50,000 population, rising to Rs 10,45,600 for 10 lakh to 20 lakh and Rs 11,40,500 above 20 lakh; star hotels pay an additional fee (three star Rs 8,94,400, four star Rs 14,90,600, five star Rs 22,85,100). Form E (beer and wine on hotel, restaurant or club premises) runs from Rs 55,000 to Rs 4,95,000 by population. The application fee for FL-II (Form FL/A-IB) is Rs 2,000 above 1 lakh population, otherwise Rs 1,000 (department page). Which population band applies to your city is set by the Rules, so confirm it with the Superintendent of State Excise",
+    "fee_conf": 0.75,
     "timeline": "Not stated. The page says a police antecedent report is required and the distance rules (educational and religious institutions, State Transport depots) are checked",
     "timeline_conf": 0.3,
     "documents": [

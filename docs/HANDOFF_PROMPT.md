@@ -38,7 +38,7 @@ costs and how it is funded.
 - The previous owner's personal machine preferences (drive letters, accounts) do not apply to your machine unless told.
 
 ## Snapshot at handoff (November 2026)
-Backend 427 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
+Backend 428 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
 5 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
 306 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
 against the real services. Four Alembic migrations (0001 to 0004).
@@ -50,7 +50,7 @@ against the real services. Four Alembic migrations (0001 to 0004).
    `docs/DEPLOYMENT_VERCEL_RENDER.md`, `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/ASSUMPTIONS.md`, `docs/RUNBOOK.md`, `docs/LOAD_TEST.md`,
    `docs/PILOT_PLAN.md`.
 3. Backend (Python 3.12 or 3.13): `cd backend && python -m venv .venv`, activate, `pip install -e ".[dev]"`, then `ruff check .`, `mypy app`,
-   `python -m pytest` (about 427 passing), `python -m evals.run` (golden cases and hallucination gate must pass).
+   `python -m pytest` (about 428 passing), `python -m evals.run` (golden cases and hallucination gate must pass).
 4. Frontend (Node 20+, CI uses 22): `cd frontend && npm ci && npm run lint && npm run typecheck && npm test && npm run build`.
 5. Run locally without Docker: in `backend` set `DATABASE_URL=sqlite+aiosqlite:///./dev_local.db`, run `alembic upgrade head`,
    `python -m app.kb.seed_loader`, `uvicorn app.main:app --port 8000`. In `frontend`: `npm run dev` (http://localhost:3000) or

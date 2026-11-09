@@ -117,3 +117,9 @@ def test_clinic_registration_names_each_pilot_state_law_where_a_source_was_found
         assert "state's own law and health authority apply" in req(city)
     assert drafts["clinical_registration:delhi:authority"].source_url == "https://dgehs.delhi.gov.in/dghs/nhc/actsrules"
 
+
+def test_maharashtra_liquor_fee_is_the_2026_gazette_schedule():
+    for city in ("mumbai", "pune"):
+        f = fee(f"liquor_licence:{city}:fee")
+        assert "18 February 2026" in f.text and "Rs 17,33,700" in f.text and "Rs 10,43,900" in f.text and f.confidence < 0.9
+
