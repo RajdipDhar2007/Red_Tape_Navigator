@@ -3,7 +3,7 @@
 Pure data, merged into ``catalog.LICENCES``. Rules of this file:
   * only what an official page/document said is stated; anything not found says so ("not stated", "confirm with ...");
   * every claim built from these entries stays flagged for a reviewer (confidence < 0.9) until an officer signs it off;
-  * ``by_city`` licences are state-specific: each of the 8 pilot cities has an entry written from its state's own official source,
+  * ``by_city`` licences are state-specific: each of the 9 pilot cities has an entry written from its state's own official source,
     or says plainly that the state's page could not be read. ``restricted`` marks states where the official source shows there is
     no ordinary private route (the UI then explains this prominently instead of listing a checklist that cannot be completed).
 """
@@ -220,7 +220,7 @@ DRUG = {
     "why": _DRUG_BASE["why"],
     "portal_login": True,
     "by_city": {
-        **_same(_DRUG_BASE, ("kolkata", "mumbai", "bengaluru", "chennai", "hyderabad", "pune", "ahmedabad")),
+        **_same(_DRUG_BASE, ("kolkata", "mumbai", "bengaluru", "chennai", "hyderabad", "pune", "ahmedabad", "surat")),
         "delhi": {
             **_DRUG_BASE,
             "authority": "Department of Drugs Control, Government of NCT of Delhi",
@@ -230,6 +230,10 @@ DRUG = {
         },
     },
 }
+
+# Surat is in Gujarat: the state's own sources apply unchanged, so it shares Ahmedabad's liquor entry.
+_liquor_by_city: dict[str, dict] = LIQUOR["by_city"]  # type: ignore[assignment]
+_liquor_by_city["surat"] = dict(_liquor_by_city["ahmedabad"])
 
 SOURCED_LICENCES: dict[str, dict] = {
     "liquor_licence": LIQUOR,

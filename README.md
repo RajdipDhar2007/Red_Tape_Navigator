@@ -135,7 +135,7 @@ Tests fail if an English string is added without a translation, or if a full Hin
 ### 3.4 The rules pipeline
 
 ```text
-catalog.py (licences, 8 cities)  +  sourced_licences.py (read from official documents, state-specific by_city)
+catalog.py (licences, 9 cities)  +  sourced_licences.py (read from official documents, state-specific by_city)
   + business_types.py (114 types mapped to sourced licence sets)
         -> seed_loader.py -> claims (key licence:scope:category, text, source_url, hash, confidence, seed flag) in the KB
         -> verify_sources.py (reports which numbers appear on the live official page; never marks anything verified)
@@ -186,7 +186,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 - **How:** official pages and documents were read in a browser or extracted locally (PyMuPDF, isolated Python) and recorded with their sources
   in `docs/RULES_VERIFICATION.md`; nothing is copied from memory.
 - `make verify-sources` now reports numeric versus qualitative claims; a reviewer worksheet is exported (`docs/RULES_REVIEW_EXPORT.csv`, 306 rules).
-- **Sourced licences** (`backend/app/kb/sourced_licences.py`): liquor retail (state-specific for all 8 cities: West Bengal, Maharashtra, Delhi,
+- **Sourced licences** (`backend/app/kb/sourced_licences.py`): liquor retail (state-specific for all 9 cities: West Bengal, Maharashtra, Delhi,
   Karnataka e-auction from the 01.07.2026 Gazette, Tamil Nadu, Telangana, Gujarat), retail drug licence (Delhi checklist + Drugs Rules), pet shop
   (final Pet Shop Rules 2018), clinic/hospital registration, bio-medical waste, school recognition, college approval, coaching registration, BIS
   hallmarking for jewellers.
@@ -240,7 +240,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **418 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **8 cities**,
+Numbers as of the last update: **421 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -318,7 +318,7 @@ integration mocks (`test_digio.py`), browser e2e (`frontend/e2e`), evals (`backe
 | To add | Do this |
 | --- | --- |
 | A business type | Add a row to `backend/app/kb/business_types.py` (id, label, licence profile, keywords, `coverage="specific"` if extra permits exist). Keywords are lower-case; the longest match wins; `test_catalog_integrity.py` checks collisions. |
-| A licence | Read the official document first. Add it to `backend/app/kb/sourced_licences.py` (state-specific: a `by_city` entry for all 8 cities, `restricted: True` where the state has no ordinary private route). Add the domain to `backend/config/sources.yaml`. Add rows to `data_hi.py` and `data_bn.py`. Record the source in `docs/RULES_VERIFICATION.md`. Regenerate the export (`python scripts/export_rules_for_review.py docs/RULES_REVIEW_EXPORT.csv`). |
+| A licence | Read the official document first. Add it to `backend/app/kb/sourced_licences.py` (state-specific: a `by_city` entry for all 9 cities, `restricted: True` where the state has no ordinary private route). Add the domain to `backend/config/sources.yaml`. Add rows to `data_hi.py` and `data_bn.py`. Record the source in `docs/RULES_VERIFICATION.md`. Regenerate the export (`python scripts/export_rules_for_review.py docs/RULES_REVIEW_EXPORT.csv`). |
 | A city | Add it to `CITIES` in `catalog.py` (authority and official URL for trade licence, fire, labour), a `by_city` entry for every state-specific licence, city names in the translation `CITIES` dicts, then tests. |
 | A form | See "How to add a real form" in `docs/INTEGRATIONS.md` (field map JSON, official-PDF fetch and officer approval workflow). |
 | A translation | Add the English string's row in the same position in `data_hi.py` and `data_bn.py` (tests tell you what is missing). Interface strings go in all three `frontend/messages/*.json`. |
@@ -341,12 +341,13 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | H | **Business readiness** (**HUMAN** decisions) | Decide who pays (free for citizens funded by a department/CSC programme, subscription or per use), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
 | I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
 
-**Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`): Karnataka's 03.07.2026 amendment and any later liquor auction round
-(the Bengaluru first round was July 2026); current Maharashtra and Telangana liquor notifications; each pilot state's own clinic law and
-authority; state school and coaching forms; UGC and university rules; GST registration fee, timeline and per-state goods threshold (the GST
-portal blocks automated reads); FSSAI 2026 fee slabs and validity; trade-licence fee schedules for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru,
-Chennai, Kolkata; shops-and-establishments fees and timelines for every state; fire-safety NOC and pollution-board pages outside West Bengal;
-a cited source for every timeline; Gujarat health-permit rules.
+**Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`; DONE since the first list: GST fee and timeline, FSSAI 2026 fee slabs,
+trade-licence fees for Kolkata, Delhi and Mumbai, shops-and-establishments fees for West Bengal, Delhi, Telangana and Tamil Nadu, the
+Maharashtra fire-fee structure): Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor
+notifications; each pilot state's own clinic law and authority; state school and coaching forms; UGC and university rules; trade-licence
+fee schedules for Pune, Ahmedabad, Bengaluru, Chennai and the rest of Delhi's general chart; shops-and-establishments fees for Maharashtra,
+Karnataka and Gujarat; Maharashtra fire rupee rates; fire-safety NOC and pollution-board pages outside West Bengal; a cited source for every
+timeline; Gujarat health-permit rules. Jaipur and Lucknow were considered as new cities and left out because the sources conflict.
 
 ## 11. Definition of done
 

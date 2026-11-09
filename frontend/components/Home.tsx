@@ -173,7 +173,7 @@ function Landing({ onDone }: { onDone: () => void }) {
               </a>
             </div>
             <dl className="mt-8 grid max-w-md grid-cols-3 gap-4 text-center">
-              {[[3, t("langs")], [8, t("cities")], [0, t("autoSubmits")]].map(([n, l]) => (
+              {[[3, t("langs")], [9, t("cities")], [0, t("autoSubmits")]].map(([n, l]) => (
                 <div key={l} className="rounded-xl bg-white/10 p-3 ring-1 ring-white/15 transition hover:-translate-y-1 hover:bg-white/15">
                   <dt className="font-head text-2xl font-bold text-saffron-300">
                     <CountUp to={Number(n)} />

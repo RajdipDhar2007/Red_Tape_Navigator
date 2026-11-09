@@ -2,7 +2,7 @@
 tests fail if the order, the count or an English prefix does not match. FLAGGED FOR NATIVE-SPEAKER REVIEW before launch."""
 
 CITIES = {"Kolkata": "कोलकाता", "Mumbai": "मुंबई", "Delhi": "दिल्ली", "Bengaluru": "बेंगलुरु", "Chennai": "चेन्नई",
-          "Hyderabad": "हैदराबाद", "Pune": "पुणे", "Ahmedabad": "अहमदाबाद"}
+          "Hyderabad": "हैदराबाद", "Pune": "पुणे", "Ahmedabad": "अहमदाबाद", "Surat": "सूरत"}
 
 TEMPLATES = {
     "authority": "{x} के लिए जारी करने वाला प्राधिकरण: {v}",
@@ -118,6 +118,8 @@ AUTHORITIES = [
     ("Ahmedabad Municipal Corporation (AMC)", "अहमदाबाद नगर निगम (AMC)"),
     ("Gujarat Fire", "गुजरात अग्निशमन सेवाएँ"),
     ("Ahmedabad Municipal Corporation (Shops", "अहमदाबाद नगर निगम (दुकान एवं प्रतिष्ठान विभाग)"),
+    ("Surat Municipal Corporation (SMC)", "सूरत नगर निगम (SMC)"),
+    ("Surat Municipal Corporation (Shops", "सूरत नगर निगम (दुकान एवं प्रतिष्ठान)"),
     ("Food Safety and Standards Authority of India", "भारतीय खाद्य सुरक्षा एवं मानक प्राधिकरण"),
     ("Municipal Corporation (varies", "नगर निगम (शहर के अनुसार अलग)"),
     ("Ministry of MSME", "सूक्ष्म, लघु एवं मध्यम उद्यम मंत्रालय (MSME)"),

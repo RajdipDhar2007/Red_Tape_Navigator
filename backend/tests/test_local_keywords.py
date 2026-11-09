@@ -67,3 +67,12 @@ def test_more_business_types(goal, activity):
 )
 def test_local_keywords_for_remaining_types(goal, activity):
     assert parse_goal_rules(goal).activity == activity
+
+
+@pytest.mark.parametrize(
+    "goal",
+    ["open a bakery in Surat", "सूरत में बेकरी खोलनी है", "সুরাটে বেকারি খুলতে চাই"],
+)
+def test_surat_is_a_known_city_in_gujarat(goal):
+    p = parse_goal_rules(goal)
+    assert p.city == "Surat" and p.state == "Gujarat" and p.city_known and p.activity == "bakery"

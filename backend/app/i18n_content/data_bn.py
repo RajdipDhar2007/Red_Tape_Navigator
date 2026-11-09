@@ -1,7 +1,7 @@
 """Bengali translations of backend text. Same structure and order as data_hi.py. FLAGGED FOR NATIVE-SPEAKER REVIEW before launch."""
 
 CITIES = {"Kolkata": "কলকাতা", "Mumbai": "মুম্বই", "Delhi": "দিল্লি", "Bengaluru": "বেঙ্গালুরু", "Chennai": "চেন্নাই",
-          "Hyderabad": "হায়দরাবাদ", "Pune": "পুনে", "Ahmedabad": "আহমেদাবাদ"}
+          "Hyderabad": "হায়দরাবাদ", "Pune": "পুনে", "Ahmedabad": "আহমেদাবাদ", "Surat": "সুরাট"}
 
 TEMPLATES = {
     "authority": "{x}-এর জন্য অনুমোদনকারী কর্তৃপক্ষ: {v}",
@@ -117,6 +117,8 @@ AUTHORITIES = [
     ("Ahmedabad Municipal Corporation (AMC)", "আহমেদাবাদ পুরনিগম (AMC)"),
     ("Gujarat Fire", "গুজরাট দমকল পরিষেবা"),
     ("Ahmedabad Municipal Corporation (Shops", "আহমেদাবাদ পুরনিগম (দোকান ও প্রতিষ্ঠান বিভাগ)"),
+    ("Surat Municipal Corporation (SMC)", "সুরাট মিউনিসিপ্যাল কর্পোরেশন (SMC)"),
+    ("Surat Municipal Corporation (Shops", "সুরাট মিউনিসিপ্যাল কর্পোরেশন (দোকান ও প্রতিষ্ঠান)"),
     ("Food Safety and Standards Authority of India", "ভারতীয় খাদ্য সুরক্ষা ও মান কর্তৃপক্ষ"),
     ("Municipal Corporation (varies", "পুরনিগম (শহরভেদে আলাদা)"),
     ("Ministry of MSME", "ক্ষুদ্র, ক্ষুদ্রতর ও মাঝারি উদ্যোগ মন্ত্রক (MSME)"),

@@ -75,3 +75,13 @@ Ration shops are "authorised" by the state, post offices are "operated" by India
 With `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` set and `DEMO_MODE=false`, an admin can `POST /admin/refresh` to extract claims
 whose quote must appear verbatim on the official page; low-confidence or changed claims then land in the review queue.
 That costs API usage and sends public page text to the provider, so it is left for you to switch on.
+
+## Added city: Surat (2026-11-09)
+
+Authority and portal only. Surat Municipal Corporation (suratmunicipal.gov.in, the domain used by SMC's own help document "ShopsAndEstablishment.pdf" and online forms) is listed as the trade-licence authority and, for shops and establishments, the office the SMC help document sends applicants to (Online Services > Shops & Establishments Certificate). Fire and liquor use Gujarat's state sources exactly as Ahmedabad does (Gujarat Fire Services; Gujarat Prohibition Act, 1949 restricted entry); the drug licence is the shared State Licensing Authority entry. No Surat fee or timeline was added: no official fee schedule was read. A reviewer should confirm the SMC trade-licence route and the Surat shops-and-establishments route.
+
+## Cities considered and NOT added (2026-11-09)
+
+- **Jaipur:** sources conflict on which corporation (Greater / Heritage) issues what, on whether new trade licences are open (a ban was reported), and fire NOC runs through the Local Self Government SSO portal under the Rajasthan Municipalities Act, 2009 (section 337) rather than a fire directorate; no official page was read.
+- **Lucknow:** one guide says trade licences are not issued by the Nagar Nigam but through the Nivesh Mitra single-window portal; another says the Nagar Nigam portal; no official URL was confirmed.
+

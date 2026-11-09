@@ -18,8 +18,8 @@ Decisions made without asking, so work could continue end to end. Revisit before
   a copy of the law. Fees and timelines are indicative; municipal fees are deliberately left as "varies, confirm with
   the authority" with low confidence so they are flagged. Everything must be verified by a domain expert before a pilot.
 - Coverage: 11 activities (bakery, restaurant, cafe, tea stall, cloud kitchen, sweet shop, home food, grocery,
-  tailoring, beauty parlour, small manufacturing) x 8 cities (Kolkata, Mumbai, Delhi, Bengaluru, Chennai, Hyderabad,
-  Pune, Ahmedabad). Other cities get national licences plus an explicit "no municipal data, a human has been notified" flag.
+  tailoring, beauty parlour, small manufacturing) x 9 cities (Kolkata, Mumbai, Delhi, Bengaluru, Chennai, Hyderabad,
+  Pune, Ahmedabad, Surat). Other cities get national licences plus an explicit "no municipal data, a human has been notified" flag.
 - Dependency order between licences (Udyam -> FSSAI -> trade licence -> fire NOC / shops & establishment) is a
   reasonable default; actual sequencing varies by city and must be confirmed.
 - Real government form PDFs could not be fetched/redistributed offline. The three templates (FSSAI Form A, Udyam

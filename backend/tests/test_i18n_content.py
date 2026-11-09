@@ -36,7 +36,7 @@ def test_fixed_phrases_and_templates_are_translated(lang):
         assert SCRIPT[lang].search(text), en
     for key in ("authority", "fee", "timeline", "documents", "form_link", "complete_first", "could_not_format", "reminder_status", "reminder_renewal"):
         assert SCRIPT[lang].search(d.TEMPLATES[key]), key
-    assert set(d.CITIES) == {"Kolkata", "Mumbai", "Delhi", "Bengaluru", "Chennai", "Hyderabad", "Pune", "Ahmedabad"}
+    assert set(d.CITIES) == {"Kolkata", "Mumbai", "Delhi", "Bengaluru", "Chennai", "Hyderabad", "Pune", "Ahmedabad", "Surat"}
 
 
 def test_language_helpers():

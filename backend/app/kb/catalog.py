@@ -277,6 +277,12 @@ CITIES: dict[str, dict] = {
         "fire_authority": "Gujarat Fire Services", "fire_url": "https://www.gujarat.gov.in/",
         "labour_authority": "Ahmedabad Municipal Corporation (Shops & Establishment department)", "labour_url": "https://ahmedabadcity.gov.in/StaticPage/shops_establishment",
     },
+    "surat": {
+        "label": "Surat", "state": "Gujarat", "aliases": ["surat", "সুরাট", "सूरत"],
+        "authority": "Surat Municipal Corporation (SMC)", "trade_url": "https://www.suratmunicipal.gov.in/",
+        "fire_authority": "Gujarat Fire Services", "fire_url": "https://www.gujarat.gov.in/",
+        "labour_authority": "Surat Municipal Corporation (Shops & Establishment)", "labour_url": "https://www.suratmunicipal.gov.in/",
+    },
 }
 
 # Businesses whose main licence comes from a sector regulator, not from the shop/municipal route this product covers.
