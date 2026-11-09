@@ -66,13 +66,21 @@ class DigioClient:
         self._auth = (client_id, client_secret)
         self._transport = transport
 
-    async def call(self, method: str, path: str, *, timeout: float = 30, **kw) -> tuple[httpx.Response | None, dict]:
-        """Returns (response, parsed json or {}). Never raises for network/HTTP errors; response is None if unreachable."""
-        try:
-            async with httpx.AsyncClient(timeout=timeout, auth=self._auth, transport=self._transport) as c:
-                r = await c.request(method, self.base + path, **kw)
-        except httpx.HTTPError as exc:
-            log.warning("digio unreachable: %s %s", type(exc).__name__, path.split("?")[0])
+    async def call(self, method: str, path: str, *, timeout: float = 30, retry: bool = False, **kw) -> tuple[httpx.Response | None, dict]:
+        """Returns (response, parsed json or {}). Never raises for network/HTTP errors; response is None if unreachable.
+        ``retry`` allows ONE more attempt after a network error or a 5xx reply; use it only for read-only calls."""
+        r: httpx.Response | None = None
+        for attempt in range(2 if retry else 1):
+            try:
+                async with httpx.AsyncClient(timeout=timeout, auth=self._auth, transport=self._transport) as c:
+                    r = await c.request(method, self.base + path, **kw)
+            except httpx.HTTPError as exc:
+                log.warning("digio unreachable: %s %s (attempt %d)", type(exc).__name__, path.split("?")[0], attempt + 1)
+                r = None
+                continue
+            if r.status_code < 500:
+                break
+        if r is None:
             return None, {}
         data: dict = {}
         if r.headers.get("content-type", "").startswith("application/json"):
@@ -120,7 +128,7 @@ class DigioESign:
                                     "signing_url": url, "legally_valid": False}, False, None)
 
     async def get_status(self, document_id: str) -> AdapterResult:
-        r, data = await self.c.call("GET", f"/v2/client/document/{document_id}")
+        r, data = await self.c.call("GET", f"/v2/client/document/{document_id}", retry=True)
         if r is None or r.status_code != 200:
             return _failure(r, data, "esign.status")
         parties = [p for p in (data.get("signing_parties") or []) if isinstance(p, dict)]
@@ -130,7 +138,7 @@ class DigioESign:
         return AdapterResult(True, {"document_id": document_id, "status": status}, False, None)
 
     async def download_signed(self, document_id: str) -> AdapterResult:
-        r, data = await self.c.call("GET", f"/v2/client/document/download?document_id={document_id}", timeout=60)
+        r, data = await self.c.call("GET", f"/v2/client/document/download?document_id={document_id}", timeout=60, retry=True)
         if r is None or r.status_code != 200 or not r.content.startswith(b"%PDF"):
             return _failure(r, data, "esign.download")
         return AdapterResult(True, {"pdf": r.content}, False, None)
@@ -153,7 +161,7 @@ class DigioDigiLocker:
         return AdapterResult(True, {"request_id": data["id"], "status": normalise_kyc_status(data.get("status")), "fields": {}}, False, None)
 
     async def get_status(self, request_id: str) -> AdapterResult:
-        r, data = await self.c.call("POST", f"/client/kyc/v2/{request_id}/response")
+        r, data = await self.c.call("POST", f"/client/kyc/v2/{request_id}/response", retry=True)
         if r is None or r.status_code != 200:
             return _failure(r, data, "digilocker.status")
         # Field mapping of the returned Aadhaar/PAN data is NOT implemented until verified in the sandbox.

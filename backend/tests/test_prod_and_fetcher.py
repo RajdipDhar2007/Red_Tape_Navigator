@@ -172,3 +172,81 @@ async def test_msg91_request_shape_and_error_handling(monkeypatch):
 
     monkeypatch.setattr("app.integrations.real.msg91.httpx.AsyncClient", lambda **kw: real_client(transport=httpx.MockTransport(lambda r: httpx.Response(200, json={"type": "error"})), **kw))
     assert not (await Msg91Sms("KEY", "TPL1").send("9876543210", "x")).ok
+
+
+import httpx as _httpx  # noqa: E402
+
+_REAL_ASYNC_CLIENT = _httpx.AsyncClient
+
+
+def _msg91_with(monkeypatch, handler):
+    import httpx
+
+    real_client = _REAL_ASYNC_CLIENT
+    monkeypatch.setattr("app.integrations.real.msg91.httpx.AsyncClient", lambda **kw: real_client(transport=httpx.MockTransport(handler), **kw))
+
+
+@pytest.mark.asyncio
+async def test_msg91_retries_once_on_server_error_then_succeeds(monkeypatch):
+    import httpx
+
+    from app.integrations.real.msg91 import Msg91Sms
+
+    calls = []
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        return httpx.Response(503) if len(calls) == 1 else httpx.Response(200, json={"type": "success", "message": "m1"})
+
+    _msg91_with(monkeypatch, handler)
+    res = await Msg91Sms("K", "T").send("9876543210", "hi")
+    assert res.ok and len(calls) == 2
+
+
+@pytest.mark.asyncio
+async def test_msg91_gives_up_after_two_network_failures_and_does_not_retry_rejections(monkeypatch):
+    import httpx
+
+    from app.integrations.real.msg91 import Msg91Sms
+
+    calls = []
+
+    def boom(req: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        raise httpx.ConnectError("down")
+
+    _msg91_with(monkeypatch, boom)
+    res = await Msg91Sms("K", "T").send("9876543210", "hi")
+    assert not res.ok and res.data["error"] == "provider_unreachable" and len(calls) == 2
+
+    calls.clear()
+
+    def reject(req: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        return httpx.Response(200, json={"type": "error", "code": 211, "message": "template not approved"})
+
+    _msg91_with(monkeypatch, reject)
+    res = await Msg91Sms("K", "T").send("9876543210", "hi")
+    assert not res.ok and res.data["provider_code"] == "211" and len(calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_msg91_non_json_reply_text_truncation_and_custom_variable(monkeypatch):
+    import json
+
+    import httpx
+
+    from app.integrations.real.msg91 import Msg91Sms
+
+    _msg91_with(monkeypatch, lambda r: httpx.Response(200, text="<html>gateway</html>", headers={"content-type": "text/html"}))
+    assert not (await Msg91Sms("K", "T").send("9876543210", "hi")).ok
+
+    seen = {}
+
+    def ok(req: httpx.Request) -> httpx.Response:
+        seen["body"] = json.loads(req.content)
+        return httpx.Response(200, json={"type": "success", "message": "x"})
+
+    _msg91_with(monkeypatch, ok)
+    assert (await Msg91Sms("K", "T", text_var="msg").send("9876543210", "a" * 400)).ok
+    assert len(seen["body"]["recipients"][0]["msg"]) == 160

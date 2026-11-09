@@ -337,3 +337,41 @@ def test_prod_config_requires_webhook_secret_when_digio_is_configured(monkeypatc
     assert any("DIGIO_WEBHOOK_SECRET" in p for p in production_problems(s))
     assert not any("DIGIO" in p for p in production_problems(Settings(digio_client_id="a", digio_client_secret="b", digio_webhook_secret="x")))
     assert not any("DIGIO" in p for p in production_problems(Settings()))  # no Digio configured: nothing required
+
+
+# ---------------- retry policy ----------------
+
+
+@pytest.mark.asyncio
+async def test_read_only_calls_retry_once_on_5xx_and_network_errors():
+    calls = []
+
+    def flaky(req: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        if len(calls) == 1:
+            return httpx.Response(502)
+        return httpx.Response(200, json={"agreement_status": "completed"})
+
+    res = await DigioESign(digio_client(flaky)).get_status("DID1")
+    assert res.ok and res.data["status"] == "completed" and len(calls) == 2
+
+    calls.clear()
+
+    def down(req: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        raise httpx.ConnectError("down")
+
+    res = await DigioESign(digio_client(down)).get_status("DID1")
+    assert not res.ok and res.data["error"] == "provider_unreachable" and len(calls) == 2
+
+
+@pytest.mark.asyncio
+async def test_create_is_never_retried_so_a_signature_request_is_not_duplicated():
+    calls = []
+
+    def always_500(req: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        return httpx.Response(500, json={"code": "1001"})
+
+    res = await DigioESign(digio_client(always_500)).create_request(PDF, "f.pdf", "a@b.in", "reason", "ref1")
+    assert not res.ok and len(calls) == 1

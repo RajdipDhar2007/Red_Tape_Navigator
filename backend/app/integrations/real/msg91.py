@@ -45,14 +45,28 @@ class Msg91Sms:
             "short_url": "0",
             "recipients": [{"mobiles": msisdn, self.text_var: text[:160]}],
         }
-        try:
-            async with httpx.AsyncClient(timeout=15) as c:
-                r = await c.post(self.url, json=body, headers={"authkey": self.authkey, "accept": "application/json"})
-            data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
-        except (httpx.HTTPError, ValueError) as exc:
-            log.warning("msg91 request failed: %s", type(exc).__name__)
+        r: httpx.Response | None = None
+        data: dict = {}
+        for attempt in range(2):  # one retry, only for network errors and 5xx/429; the provider may rate-limit
+            try:
+                async with httpx.AsyncClient(timeout=15) as c:
+                    r = await c.post(self.url, json=body, headers={"authkey": self.authkey, "accept": "application/json"})
+                data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+            except (httpx.HTTPError, ValueError) as exc:
+                log.warning("msg91 request failed: %s (attempt %d)", type(exc).__name__, attempt + 1)
+                r = None
+                continue
+            if r.status_code >= 500 or r.status_code == 429:
+                continue
+            break
+        if r is None:
             return AdapterResult(False, {"error": "provider_unreachable"}, False, "SMS provider unreachable")
+        if not isinstance(data, dict):
+            data = {}
         ok = r.status_code == 200 and str(data.get("type", "")).lower() == "success"
         if not ok:  # never log the phone number or message text
             log.warning("msg91 rejected request: status=%s type=%s", r.status_code, data.get("type"))
-        return AdapterResult(ok, {"status": r.status_code, "provider_type": data.get("type"), "message_id": data.get("message")}, False, None if ok else "SMS provider rejected the message")
+        info = {"status": r.status_code, "provider_type": data.get("type"), "message_id": data.get("message")}
+        if not ok and data.get("code") is not None:
+            info["provider_code"] = str(data.get("code"))  # e.g. DLT template errors 203/211, for the operator's log
+        return AdapterResult(ok, info, False, None if ok else "SMS provider rejected the message")
