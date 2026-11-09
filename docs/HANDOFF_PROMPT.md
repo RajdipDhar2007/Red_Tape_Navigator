@@ -39,7 +39,7 @@ costs and how it is funded.
 
 ## Snapshot at handoff (November 2026)
 Backend 428 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
-5 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
+7 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
 306 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
 against the real services. Four Alembic migrations (0001 to 0004).
 
