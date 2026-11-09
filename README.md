@@ -342,13 +342,14 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | H | **Business readiness** (**HUMAN** decisions) | Decide who pays (free for citizens funded by a department/CSC programme, subscription or per use), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
 | I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
 
-**Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`; DONE since the first list: GST fee and timeline, FSSAI 2026 fee slabs,
-trade-licence fees for Kolkata, Delhi and Mumbai, shops-and-establishments fees for West Bengal, Delhi, Telangana and Tamil Nadu, the
-Maharashtra fire-fee structure): Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor
-notifications; each pilot state's own clinic law and authority; state school and coaching forms; UGC and university rules; trade-licence
-fee schedules for Pune, Ahmedabad, Bengaluru, Chennai and the rest of Delhi's general chart; shops-and-establishments fees for Maharashtra,
-Karnataka and Gujarat were DONE on 2026-11-09 (second pass); Maharashtra fire rupee rates; fire-safety NOC and pollution-board pages outside West Bengal; a cited source for every
-timeline; Gujarat health-permit rules. Jaipur and Lucknow were considered as new cities and left out because the sources conflict.
+**Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence
+fees for Kolkata, Delhi (health trade licence) and Mumbai (eating house, hair saloon), shops-and-establishments fees for West Bengal, Delhi,
+Telangana, Tamil Nadu, Karnataka, Maharashtra and Gujarat, the Maharashtra fire-fee structure, and the pollution White-category rule. STILL
+OPEN: Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor notifications; each pilot
+state's own clinic law and authority; state school and coaching forms; UGC and university rules; trade-licence fee schedules for Pune,
+Ahmedabad, Bengaluru, Chennai and the rest of Delhi's general chart; Maharashtra fire rupee rates; fire-safety NOC and pollution-board
+fees and timelines outside West Bengal and Maharashtra; a cited source for every timeline; Gujarat health-permit rules. Jaipur and Lucknow
+were considered as new cities and left out because the sources conflict.
 
 ## 11. Definition of done
 
