@@ -22,3 +22,9 @@ def test_kolkata_fee_comes_from_the_kmc_chart():
     d = fee("trade_licence:kolkata:fee")
     assert "KMC publishes" in d.text and "2026-27" in d.text
     assert d.confidence < 0.9
+
+
+def test_delhi_fee_comes_from_the_mcd_health_trade_licence_order():
+    d = fee("trade_licence:delhi:fee")
+    assert "MCD publishes" in d.text and "28.03.2025" in d.text
+    assert d.confidence < 0.9

@@ -55,6 +55,9 @@ LICENCES: dict[str, dict] = {
             "kolkata": (
                 "KMC publishes a 2026-27 chart of Certificate of Enlistment (trade licence) fees by nature of trade; the total is the sum of section-wise charges plus a Rs 100 processing fee, and some trades add area-based Table 1 and food-item Table 2 amounts. Examples (before those add-ons): retail seller of non-food items Rs 400; retail seller of food items Rs 300; restaurant or snack bar without manufacturing, up to 150 sq ft Rs 600, 151-300 sq ft Rs 1,000, 501-1,000 sq ft Rs 2,350; sweetmeat seller (non A/C) Rs 800; garments shop up to 500 sq ft Rs 350. Confirm your exact trade and total on the KMC chart or portal"
             ),
+            "delhi": (
+                "MCD publishes a Health Trade Licence fee structure (office order of 28.03.2025, 15% rise from 1 April 2025, FY 2025-28) with a one-time registration charge and an annual licence fee by trade. Eating houses: up to 20 seats Rs 10,000 registration + Rs 11,500 a year; 21 to 50 seats Rs 15,000 + Rs 23,000; above 50 seats Rs 20,000 + Rs 28,750; takeaway/others Rs 15,000 + Rs 6,900; catering Rs 10,000 + Rs 11,500; dhaba Rs 15,000 + Rs 6,900; guest house with dining Rs 10,000 + Rs 11,500. Other shops use MCD's separate General Trade Licence, whose fee chart was not read. A Rs 1,000 processing fee per application is stated in MCD's citizen charter. Confirm on the MCD portal before paying"
+            ),
         },
         "fee_by_city_conf": 0.6,
         "timeline": "Varies; typically 2-6 weeks including inspection",

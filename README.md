@@ -136,7 +136,7 @@ Tests fail if an English string is added without a translation, or if a full Hin
 
 ```text
 catalog.py (licences, 8 cities)  +  sourced_licences.py (read from official documents, state-specific by_city)
-  + business_types.py (112 types mapped to sourced licence sets)
+  + business_types.py (114 types mapped to sourced licence sets)
         -> seed_loader.py -> claims (key licence:scope:category, text, source_url, hash, confidence, seed flag) in the KB
         -> verify_sources.py (reports which numbers appear on the live official page; never marks anything verified)
         -> officer console review queue: verified / corrected / rejected (audited)
@@ -190,7 +190,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
   Karnataka e-auction from the 01.07.2026 Gazette, Tamil Nadu, Telangana, Gujarat), retail drug licence (Delhi checklist + Drugs Rules), pet shop
   (final Pet Shop Rules 2018), clinic/hospital registration, bio-medical waste, school recognition, college approval, coaching registration, BIS
   hallmarking for jewellers.
-- **112 business types** (`backend/app/kb/business_types.py`), including hotel, gold shop, ration shop, pharmacy, school, college, clinic, hospital.
+- **114 business types** (`backend/app/kb/business_types.py`), including hotel, gold shop, ration shop, pharmacy, school, college, clinic, hospital.
   Regulated sectors with no sourced checklist (bank, insurance, post office...) get an accurate regulator note.
 - Licences with extra permits outside the pack carry `coverage="specific"` (the UI says so and an officer is asked to confirm).
 - Hyderabad trade licence fee table (GHMC) and Ahmedabad shops-and-establishments (AMC) were added from official pages.
@@ -230,8 +230,8 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **373 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **8 cities**,
-**112 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
+Numbers as of the last update: **386 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **8 cities**,
+**114 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
 | --- | --- |
