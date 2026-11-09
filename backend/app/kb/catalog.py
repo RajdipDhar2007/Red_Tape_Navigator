@@ -74,6 +74,15 @@ LICENCES: dict[str, dict] = {
         "depends_on": ["trade_licence"],
         "fee": "Fee depends on premises size and risk category; confirm with the fire service",
         "fee_conf": 0.45,
+        "fee_by_city": {
+            "mumbai": (
+                "Maharashtra Fire Prevention and Life Safety Measures Act, 2006, section 11: a Fire Service fee is levied on owners of the building types listed in Schedule II, at the Schedule's rate for that type subject to a minimum fee, and section 13 adds a further annual fee. The authority can revise the rates, so the amount for your building is fixed by the fire authority's assessment. Confirm on the Maharashtra Fire Services portal"
+            ),
+            "pune": (
+                "Maharashtra Fire Prevention and Life Safety Measures Act, 2006, section 11: a Fire Service fee is levied on owners of the building types listed in Schedule II, at the Schedule's rate for that type subject to a minimum fee, and section 13 adds a further annual fee. The authority can revise the rates, so the amount for your building is fixed by the fire authority's assessment. Confirm on the Maharashtra Fire Services portal"
+            ),
+        },
+        "fee_by_city_conf": 0.7,
         "timeline": "Varies; inspection required",
         "timeline_conf": 0.45,
         "documents": ["Building plan / layout", "Fire extinguisher installation proof", "Trade licence copy", "Electrical safety certificate"],

@@ -46,3 +46,10 @@ def test_hyderabad_shops_establishments_fee_is_sourced():
 def test_chennai_shops_establishments_fee_is_sourced():
     c = fee("shops_est:chennai:fee")
     assert "G.O. Ms. No. 55" in c.text and "Rs 100" in c.text and c.confidence < 0.9
+
+
+def test_maharashtra_fire_fee_states_the_act_structure_without_inventing_rates():
+    for city in ("mumbai", "pune"):
+        f = fee(f"fire_noc:{city}:fee")
+        assert "section 11" in f.text and "Schedule II" in f.text and f.confidence < 0.9
+        assert "Rs" not in f.text
