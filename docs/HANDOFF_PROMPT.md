@@ -202,3 +202,14 @@ Owner instruction: push to `main` after every verified change; human-only steps 
 Done: Hindi/Bengali keywords for about 75 business types; FSSAI 2026 fee slabs and turnover thresholds (FoSCoS list updated 01.04.2026, order 13.03.2026); GST registration timeline from CGST Rule 9 (7 working days) and thresholds re-confirmed from CBIC; Kolkata trade licence fee examples from the KMC 2026-27 chart. All sourced in `docs/RULES_VERIFICATION.md`; review export regenerated. Gates: ruff, mypy, 373 tests, evals, frontend lint/typecheck/unit/build, 5 Playwright tests all green.
 Lesson: a `cmd | tail` in an `&&` chain hides a failing pytest; check the exit status before committing.
 Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai; shops-and-establishments fees per state; fire/pollution pages outside West Bengal; keywords for the remaining ~37 types; then the human-dependent items.
+
+### Session log: 2026-11-09 (continued: more rules, hardening, UX, Surat)
+
+- Rules added from official text: Chennai shops-act fee (G.O. Ms. No. 55 of 2024), Mumbai eating-house and hair-saloon licence fees (MCGM Section 394 schedule),
+  Maharashtra fire-fee structure (Act 2006 s.11, s.13, no rates), pollution White-category intimation (MPCB page). Not added (no official text): Karnataka shop fees,
+  Maharashtra and Gujarat shop fees, Jaipur and Lucknow as cities. See `docs/RULES_VERIFICATION.md`.
+- Surat added as a ninth city (authority and portal only; Gujarat state sources reused).
+- MSG91 and read-only Digio calls retry once; creating a signature request is never retried.
+- UX: `frontend/components/fx/` (Reveal, CountUp, Confetti, ProgressRing), tick-off checklist, typing indicator, dashboard badges, print/copy/WhatsApp share.
+  A temporary Playwright spec was used to take screenshots and then deleted; do the same for visual checks (the e2e config starts both servers).
+- Lesson: in a PowerShell/bash tool call, a Python edit script that needs a backslash-n inside a TS string must build it with `chr(92)`; a doubled backslash was turned into a real newline.
