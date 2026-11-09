@@ -37,6 +37,8 @@ def english_sources() -> dict[str, list[str]]:
             add("authorities", entry["authority"])
         for v in (lic.get("fee_by_city") or {}).values():
             add("prose", v)
+        for v in (lic.get("timeline_by_city") or {}).values():
+            add("prose", v)
     for c in CITIES.values():
         for k in ("authority", "fire_authority", "labour_authority", "pollution_authority"):
             add("authorities", c[k])

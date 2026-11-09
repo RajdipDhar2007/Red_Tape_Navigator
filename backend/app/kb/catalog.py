@@ -86,6 +86,12 @@ LICENCES: dict[str, dict] = {
             ),
         },
         "fee_by_city_conf": 0.7,
+        "timeline_by_city": {
+            "delhi": (
+                "Delhi Fire Service FAQ page (dfs.delhi.gov.in/faqs): for buildings covered by Rule 27 of the Delhi Fire Service Rules, 2010, the NOC is needed at two stages: before construction (plans approved and fire safety recommendations issued, valid until the approved plan changes) and after construction, before occupancy, when the Fire Safety Certificate is issued. Under Rule 35 the certificate is valid for 5 years for residential buildings other than hotels and 3 years for non-residential buildings including hotels, and renewal is applied for in Form I at least six months before it expires. The page does not state how many days the department takes to issue it"
+            ),
+        },
+        "timeline_by_city_conf": 0.8,
         "timeline": "Varies; inspection required",
         "timeline_conf": 0.45,
         "documents": ["Building plan / layout", "Fire extinguisher installation proof", "Trade licence copy", "Electrical safety certificate"],
@@ -279,7 +285,7 @@ CITIES: dict[str, dict] = {
     "delhi": {
         "label": "Delhi", "state": "Delhi", "aliases": ["delhi", "new delhi", "দিল্লি", "दिल्ली"],
         "authority": "Municipal Corporation of Delhi (MCD)", "trade_url": "https://mcdonline.nic.in/",
-        "fire_authority": "Delhi Fire Service", "fire_url": "https://delhi.gov.in/",
+        "fire_authority": "Delhi Fire Service", "fire_url": "https://dfs.delhi.gov.in/",
         "labour_authority": "Delhi Labour Department", "labour_url": "https://labour.delhi.gov.in/hi/node/2932",
         "pollution_authority": "Delhi Pollution Control Committee (DPCC)", "pollution_url": "https://cpcb.nic.in/",
     },

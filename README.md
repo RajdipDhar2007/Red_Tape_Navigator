@@ -219,6 +219,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 - Interview: slide-in chat bubbles, a typing indicator, an animated progress bar and milestone cheers. Dashboard: a progress ring and
   badges derived from the citizen's own plans.
 - The plan can be printed or saved as PDF (print stylesheet), copied, or shared to WhatsApp (licence names only, never answers or identifiers).
+- Every rule shows a review tag: "Awaiting expert review" until a reviewer verifies it in the officer console, then "Expert-reviewed".
 - Every effect is skipped when the visitor's system asks for reduced motion; the strings exist in `en`, `hi` and `bn`.
 
 ## 5. Technology and tools used
@@ -241,7 +242,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **425 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **9 cities**,
+Numbers as of the last update: **427 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -345,8 +346,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 **Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence
 fees for Kolkata, Delhi (health trade licence) and Mumbai (eating house, hair saloon), shops-and-establishments fees for West Bengal, Delhi,
 Telangana, Tamil Nadu, Karnataka, Maharashtra and Gujarat, the Maharashtra fire-fee structure, the pollution White-category rule, and state pollution-board consent fees for Karnataka, Tamil Nadu and Gujarat
-(Telangana partly). STILL OPEN: Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor notifications; each pilot
-state's own clinic law and authority; state school and coaching forms; UGC and university rules; trade-licence fee schedules for Pune,
+(Telangana partly). STILL OPEN: Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor notifications; clinic laws and authorities for Tamil Nadu, Telangana and Gujarat (West Bengal, Delhi, Maharashtra and Karnataka are named, from partly press-based sources); state school and coaching forms; UGC and university rules; trade-licence fee schedules for Pune,
 Ahmedabad, Bengaluru (portal being replaced), Chennai and the rest of Delhi's general chart; Maharashtra fire rupee rates; fire-safety NOC fees and timelines;
 pollution-board fees for Maharashtra, Delhi and West Bengal (sites unreadable or fee document outdated); a cited source for every timeline; Gujarat health-permit rules. Jaipur and Lucknow
 were considered as new cities and left out because the sources conflict.

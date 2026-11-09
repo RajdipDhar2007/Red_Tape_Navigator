@@ -22,9 +22,17 @@ export default function CitationLine({ source_url, fetched_at, content_hash, con
       </a>{" "}
       · {t("fetched")} {f.dateTime(new Date(fetched_at), { dateStyle: "medium" })} · {t("confidence")} {Math.round(confidence * 100)}% ·{" "}
       <span title={content_hash}>#{content_hash.slice(0, 8)}</span>
-      {verify && (
+      {verify ? (
         <span className="badge ml-2 bg-amber-200 text-amber-950" title={t("verifyHelp")}>
           {t("verify")}
+        </span>
+      ) : confidence >= 0.9 ? (
+        <span className="badge ml-2 bg-indgreen-100 text-indgreen-800" title={t("reviewedHelp")}>
+          {t("reviewedBadge")}
+        </span>
+      ) : (
+        <span className="badge ml-2 bg-slate-200 text-slate-800" title={t("pendingHelp")}>
+          {t("pending")}
         </span>
       )}
     </p>

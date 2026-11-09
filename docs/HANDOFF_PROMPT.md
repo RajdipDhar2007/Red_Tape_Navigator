@@ -38,7 +38,7 @@ costs and how it is funded.
 - The previous owner's personal machine preferences (drive letters, accounts) do not apply to your machine unless told.
 
 ## Snapshot at handoff (November 2026)
-Backend 425 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
+Backend 427 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
 5 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
 306 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
 against the real services. Four Alembic migrations (0001 to 0004).
@@ -50,7 +50,7 @@ against the real services. Four Alembic migrations (0001 to 0004).
    `docs/DEPLOYMENT_VERCEL_RENDER.md`, `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/ASSUMPTIONS.md`, `docs/RUNBOOK.md`, `docs/LOAD_TEST.md`,
    `docs/PILOT_PLAN.md`.
 3. Backend (Python 3.12 or 3.13): `cd backend && python -m venv .venv`, activate, `pip install -e ".[dev]"`, then `ruff check .`, `mypy app`,
-   `python -m pytest` (about 425 passing), `python -m evals.run` (golden cases and hallucination gate must pass).
+   `python -m pytest` (about 427 passing), `python -m evals.run` (golden cases and hallucination gate must pass).
 4. Frontend (Node 20+, CI uses 22): `cd frontend && npm ci && npm run lint && npm run typecheck && npm test && npm run build`.
 5. Run locally without Docker: in `backend` set `DATABASE_URL=sqlite+aiosqlite:///./dev_local.db`, run `alembic upgrade head`,
    `python -m app.kb.seed_loader`, `uvicorn app.main:app --port 8000`. In `frontend`: `npm run dev` (http://localhost:3000) or
@@ -223,4 +223,11 @@ Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai;
   (progress ring, "Next up"), Hindi view with the ticks kept, no console errors. A claim whose confidence is 0.8 shows no "Verify with the authority" chip
   (the chip appears below the confidence threshold); officially-read rules are capped at 0.8, so they look verified until a reviewer acts. Consider showing a "pending review" tag.
 - Defect found and fixed: the Gujarat fee cited the municipal site as its source; the rule text now names col.gujarat.gov.in.
+
+### Session log: 2026-11-09 (fourth pass: pollution fees, review label, fire validity, clinic laws)
+
+- New rule mechanisms: `fee_by_city` on pollution_consent (city-scoped, with `NATIONAL_FALLBACK` for other cities), `timeline_by_city` (Delhi fire certificate validity), clinical_registration `by_city` entries.
+- UI: every citation now shows "Awaiting expert review" (confidence under 0.9) or "Expert-reviewed" (0.9 or more, set when a reviewer verifies it), next to the "Verify with the authority" flag. Strings in en/hi/bn.
+- PITFALL: before `npx playwright test`, kill every leftover `next start` and `uvicorn` process (PowerShell: Get-CimInstance Win32_Process, match the command line). A stale `next start` from an earlier test pass kept port 3000 after I rebuilt `.next`, served the old HTML with missing chunks, and all 5 e2e tests failed with "Application error: a client-side exception". Playwright reuses a server it finds on the port (`reuseExistingServer` is on outside CI).
+- Writing multi-line Unicode edit scripts: use the Write tool to create the .py file, not a bash heredoc (a long heredoc with quotes made bash fail with "unexpected EOF").
 

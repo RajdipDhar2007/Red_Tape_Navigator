@@ -235,6 +235,22 @@ DRUG = {
 _liquor_by_city: dict[str, dict] = LIQUOR["by_city"]  # type: ignore[assignment]
 _liquor_by_city["surat"] = dict(_liquor_by_city["ahmedabad"])
 
+_CLINIC_BASE: dict[str, object] = {
+    "authority": "State or district health authority under your state's clinical-establishment law (the central Act applies only in the states listed by the Health Ministry)",
+    "url": "https://clinicalestablishments.mohfw.gov.in/faq",
+    "fee": "Not stated in the Health Ministry's FAQ; confirm with your state health authority",
+    "fee_conf": 0.3,
+    "timeline": "Not stated in the Health Ministry's FAQ; confirm with your state health authority",
+    "timeline_conf": 0.3,
+    "documents": [
+        "Documents depend on your state's law. Where the central Clinical Establishments Act, 2010 applies, registration is in two steps: provisional (self-declaration, without inquiry or inspection) and permanent (after category-wise minimum standards are notified)",
+        "Confirm with your state health department or District Registering Authority which law and forms apply to you",
+    ],
+    "why": "The Clinical Establishments Act, 2010 covers hospitals, maternity homes, nursing homes, dispensaries, clinics, sanatoriums and laboratory/diagnostic centres, across all systems of medicine. "
+           "The Health Ministry's FAQ says it is in force in Arunachal Pradesh, Sikkim, Mizoram, Himachal Pradesh and all Union Territories except Delhi, and in states that adopted it "
+           "(Uttar Pradesh, Bihar, Rajasthan, Jharkhand, Uttarakhand). Elsewhere a state's own law and health authority apply, so check with your state.",
+}
+
 SOURCED_LICENCES: dict[str, dict] = {
     "liquor_licence": LIQUOR,
     "drug_licence": DRUG,
@@ -275,6 +291,17 @@ SOURCED_LICENCES: dict[str, dict] = {
         "why": "The Clinical Establishments Act, 2010 covers hospitals, maternity homes, nursing homes, dispensaries, clinics, sanatoriums and laboratory/diagnostic centres, across all systems of medicine. "
                "The Health Ministry's FAQ says it is in force in Arunachal Pradesh, Sikkim, Mizoram, Himachal Pradesh and all Union Territories except Delhi, and in states that adopted it "
                "(Uttar Pradesh, Bihar, Rajasthan, Jharkhand, Uttarakhand). Elsewhere a state's own law and health authority apply, so check with your state.",
+        "by_city": {
+            "kolkata": {**_CLINIC_BASE, "authority": "West Bengal State Registrar of Clinical Establishments and Clinical Establishment Regulatory Commission (Act of 2017)", "url": "https://www.wb.gov.in/", "why": "West Bengal has its own law: the West Bengal Clinical Establishments (Registration, Regulation and Transparency) Act, 2017 (West Bengal Act IV of 2017, notified 17 March 2017, text on indiacode.nic.in) with Rules notified on 21 August 2017. It provides for a State Registrar of Clinical Establishments, who grants registration, and a Clinical Establishment Regulatory Commission. Amendments followed (Act IX of 2022, and a 2025 Bill whose status was not confirmed). Confirm the current forms and fees with the West Bengal Health Department"},
+            "mumbai": {**_CLINIC_BASE, "authority": "Public Health Department, Government of Maharashtra, through the local supervising authority (municipal health office or the Zilla Parishad's District Health Officer)", "url": "https://www.maharashtra.gov.in/", "why": "Maharashtra's own law applies: the Maharashtra Nursing Homes Registration Act (the Bombay Nursing Homes Registration Act, 1949, Act 15 of 1949), administered by the Public Health Department. The local supervising authority registers nursing homes and an application or renewal is made every year; the Rules were amended in 2021 and fees were reported as revised. Press reports say a Maharashtra Clinical Establishments (Registration and Regulation) Bill, 2026 was introduced to replace the 1949 Act; its status was not confirmed, so check which law applies before applying"},
+            "delhi": {**_CLINIC_BASE, "authority": "Nursing Home Cell, Directorate General of Health Services, Government of NCT of Delhi", "url": "https://dgehs.delhi.gov.in/dghs/nhc/actsrules", "why": "Delhi's own law applies: the Delhi Nursing Homes Registration Act, 1953 with the Delhi Nursing Homes Registration Rules, 2011, which the Directorate General of Health Services lists on dgehs.delhi.gov.in (Nursing Home Cell page 'Acts and Rules'). The Cell registers private nursing homes and hospitals and inspects them. A press report of a central government letter says the Act covers only allopathic hospitals and nursing homes, not clinics, laboratories or AYUSH facilities, so confirm with the Cell whether your clinic or laboratory needs registration"},
+            "bengaluru": {**_CLINIC_BASE, "authority": "District Health and Family Welfare Officer (secretary of the district registration committee under the Karnataka Private Medical Establishments Act, 2007)", "url": "https://www.karnataka.gov.in/", "why": "Karnataka's own law applies: the Karnataka Private Medical Establishments Act, 2007 (KPME). Press reports of official statements say applications go to the District Health and Family Welfare Officer, who is secretary of a district committee chaired by the Deputy Commissioner, and that a 2025 amendment allowed a provisional registration reported as renewable only up to September 2026. The text of the Act was not read, so confirm the route, forms and fees with your district health office"},
+            "chennai": dict(_CLINIC_BASE),
+            "hyderabad": dict(_CLINIC_BASE),
+            "pune": {**_CLINIC_BASE, "authority": "Public Health Department, Government of Maharashtra, through the local supervising authority (municipal health office or the Zilla Parishad's District Health Officer)", "url": "https://www.maharashtra.gov.in/", "why": "Maharashtra's own law applies: the Maharashtra Nursing Homes Registration Act (the Bombay Nursing Homes Registration Act, 1949, Act 15 of 1949), administered by the Public Health Department. The local supervising authority registers nursing homes and an application or renewal is made every year; the Rules were amended in 2021 and fees were reported as revised. Press reports say a Maharashtra Clinical Establishments (Registration and Regulation) Bill, 2026 was introduced to replace the 1949 Act; its status was not confirmed, so check which law applies before applying"},
+            "ahmedabad": dict(_CLINIC_BASE),
+            "surat": dict(_CLINIC_BASE),
+        },
         "portal_login": False,
     },
     "bmw_authorisation": {

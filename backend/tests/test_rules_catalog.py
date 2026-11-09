@@ -94,3 +94,26 @@ def test_pollution_consent_keeps_the_national_entry_for_cities_outside_the_pack(
     assert scope_for("pollution_consent", "Chennai") == "chennai"
     assert scope_for("trade_licence", "Nagpur") is None
     assert "Central / State Pollution Control Board" in fee("pollution_consent:national:authority").text
+
+
+def test_delhi_fire_certificate_validity_comes_from_the_dfs_faq():
+    from app.kb.seed_loader import seed_drafts
+
+    t = next(d for d in seed_drafts() if d.key == "fire_noc:delhi:timeline")
+    assert "Rule 35" in t.text and "5 years for residential" in t.text and "Form I" in t.text and t.confidence < 0.9
+    assert t.source_url == "https://dfs.delhi.gov.in/"
+
+
+def test_clinic_registration_names_each_pilot_state_law_where_a_source_was_found():
+    from app.kb.seed_loader import seed_drafts
+
+    drafts = {d.key: d for d in seed_drafts()}
+    req = lambda city: drafts[f"clinical_registration:{city}:requirement"].text  # noqa: E731
+    assert "Act IV of 2017" in req("kolkata")
+    assert "Nursing Homes Registration Act, 1953" in req("delhi")
+    assert "Bombay Nursing Homes Registration Act, 1949" in req("mumbai") and req("pune") == req("mumbai").replace("Mumbai", "Pune")
+    assert "Karnataka Private Medical Establishments Act, 2007" in req("bengaluru")
+    for city in ("chennai", "hyderabad", "ahmedabad", "surat"):
+        assert "state's own law and health authority apply" in req(city)
+    assert drafts["clinical_registration:delhi:authority"].source_url == "https://dgehs.delhi.gov.in/dghs/nhc/actsrules"
+

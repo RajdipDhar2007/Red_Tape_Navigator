@@ -116,7 +116,11 @@
     "copy": "Copy checklist",
     "copied": "Copied",
     "share": "Share on WhatsApp",
-    "shareIntro": "My licence checklist from Red Tape Navigator (guidance only, verify with each authority):"
+    "shareIntro": "My licence checklist from Red Tape Navigator (guidance only, verify with each authority):",
+    "pending": "Awaiting expert review",
+    "pendingHelp": "This rule was read from an official source but no person has checked it yet. Confirm with the issuing authority.",
+    "reviewedBadge": "Expert-reviewed",
+    "reviewedHelp": "A reviewer checked this rule against the official source."
   },
   "interview": {
     "heading": "A few details",
