@@ -123,3 +123,11 @@ def test_maharashtra_liquor_fee_is_the_2026_gazette_schedule():
         f = fee(f"liquor_licence:{city}:fee")
         assert "18 February 2026" in f.text and "Rs 17,33,700" in f.text and "Rs 10,43,900" in f.text and f.confidence < 0.9
 
+
+def test_gujarat_liquor_entry_notes_the_gift_city_exception_but_stays_restricted():
+    from app.kb.catalog import LICENCES
+
+    e = LICENCES["liquor_licence"]["by_city"]["ahmedabad"]
+    assert "20 December 2025" in e["why"] and "GIFT City" in e["why"] and "does not open ordinary liquor shops" in e["why"]
+    assert e["restricted"] is True
+

@@ -160,7 +160,7 @@ LIQUOR = {
             "timeline_conf": 0.4,
             "documents": ["Not applicable. Health permits for foreign liquor (section 40A of the Act) go to individuals who need it for their health, issued by an officer the State Government authorises"],
             "why": "Gujarat is a prohibition state. The Gujarat Prohibition Act, 1949 bars the manufacture, sale, purchase and possession of liquor unless a licence or permit allows it, and provides "
-                   "for health permits (section 40A). No route to open an ordinary liquor shop was found; ask the Prohibition and Excise Department.",
+                   "for health permits (section 40A). No route to open an ordinary liquor shop was found; ask the Prohibition and Excise Department. One official exception exists: a Home Department order of 20 December 2025 (Gujarat Government Gazette Extraordinary, linked on the department's site) amends its earlier orders of 30 December 2023 and 15 April 2025 for GIFT City, exempting people working at or visiting GIFT City, and FL-III licensees there, from certain sections of the Act; an FL-III licensee may serve liquor in an approved wine-and-dine area, or other hotel or restaurant areas, only to Liquor Access Permit holders, temporary permit holders or external persons. This does not open ordinary liquor shops elsewhere in Gujarat.",
             "restricted": True,
         },
     },
