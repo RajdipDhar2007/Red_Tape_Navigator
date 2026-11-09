@@ -52,6 +52,9 @@ LICENCES: dict[str, dict] = {
                 "Rs 3 for a single lane (20 ft), Rs 4 for a double lane (30 ft), Rs 6 for multiple lanes (wider than 30 ft). "
                 "The table does not say whether this is yearly or whether other charges apply; confirm on the GHMC page before paying"
             ),
+            "kolkata": (
+                "KMC publishes a 2026-27 chart of Certificate of Enlistment (trade licence) fees by nature of trade; the total is the sum of section-wise charges plus a Rs 100 processing fee, and some trades add area-based Table 1 and food-item Table 2 amounts. Examples (before those add-ons): retail seller of non-food items Rs 400; retail seller of food items Rs 300; restaurant or snack bar without manufacturing, up to 150 sq ft Rs 600, 151-300 sq ft Rs 1,000, 501-1,000 sq ft Rs 2,350; sweetmeat seller (non A/C) Rs 800; garments shop up to 500 sq ft Rs 350. Confirm your exact trade and total on the KMC chart or portal"
+            ),
         },
         "fee_by_city_conf": 0.6,
         "timeline": "Varies; typically 2-6 weeks including inspection",

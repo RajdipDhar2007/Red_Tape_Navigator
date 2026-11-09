@@ -66,7 +66,7 @@ Ration shops are "authorised" by the state, post offices are "operated" by India
 - **Fire safety NOC** and **pollution control (CTE/CTO)** sources for Maharashtra, Delhi, Karnataka, Tamil Nadu, Telangana and Gujarat:
   searches of government domains found portals for other states only. The department or its single-window portal must supply the exact page.
   (The pack currently cites each state's general government home page for fire NOC and the CPCB home page for pollution; treat these as placeholders.)
-- **Trade licence fees**: Pune (PMC), Ahmedabad (AMC), Mumbai, Delhi, Bengaluru, Chennai, Kolkata: fee schedules not yet read. (Hyderabad: table read, see above.)
+- **Trade licence fees**: Kolkata DONE 2026-11-09 from the KMC "Rates, Taxes, Fees & Charges 2026-27" Licence chart (kmcgov.in/KMCPortal/downloads/Licence_RatesCharges_2026_2027.pdf): only example totals are quoted (T1/T2 add-ons and SWM charges depend on area and food items and are not computed). Still not read: Pune (PMC), Ahmedabad (AMC), Mumbai, Delhi, Bengaluru, Chennai. (Hyderabad: table read, see above.)
 - **Shops & establishments** fees and timelines for every state.
 - Timelines quoted in the pack ("about 7 days", "3-7 working days", etc.) have no cited official source yet.
 
