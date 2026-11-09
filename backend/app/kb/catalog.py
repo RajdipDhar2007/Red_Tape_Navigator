@@ -95,6 +95,9 @@ LICENCES: dict[str, dict] = {
             "delhi": (
                 "Delhi Labour Department: registration under the Delhi Shops and Establishments Act, 1954 is available online, on a real-time basis, free of cost (department time-frame page and FAQ). Confirm on the Delhi Labour Department site before filing"
             ),
+            "hyderabad": (
+                "Telangana Labour Department checklist page (last reviewed 06 April 2024) lists the Shops and Establishments registration and renewal fee by number of employees: none Rs 100; 1 to 5 Rs 500; 6 to 10 Rs 1,000; 11 to 20 Rs 2,000; 21 to 50 Rs 5,000; 51 to 100 Rs 10,000; 101 and above Rs 10,000 plus Rs 5,000 for each additional 50 persons. Annual payment after 1 December carries a 25% penalty and after 31 December 50%. Confirm the current amount with the labour department before paying"
+            ),
         },
         "fee_by_city_conf": 0.8,
         "timeline": "Varies; often a few working days online",
