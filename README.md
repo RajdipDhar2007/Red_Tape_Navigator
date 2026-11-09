@@ -230,7 +230,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **400 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **8 cities**,
+Numbers as of the last update: **401 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **8 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |

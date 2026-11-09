@@ -88,6 +88,15 @@ LICENCES: dict[str, dict] = {
         "depends_on": ["trade_licence"],
         "fee": "Fee depends on number of employees; confirm with the labour department",
         "fee_conf": 0.5,
+        "fee_by_city": {
+            "kolkata": (
+                "West Bengal Shops and Establishments Act, 1963 registration fee (listed on the state's common application form page): shop with no employee Rs 25, 1 to 5 employees Rs 30, 6 to 20 Rs 40, more than 20 Rs 100; other establishment with no employee Rs 25, 1 to 5 Rs 30, 6 to 20 Rs 50, more than 20 Rs 250. Confirm the current amount on the SilpaSathi or e-District portal before paying"
+            ),
+            "delhi": (
+                "Delhi Labour Department: registration under the Delhi Shops and Establishments Act, 1954 is available online, on a real-time basis, free of cost (department time-frame page and FAQ). Confirm on the Delhi Labour Department site before filing"
+            ),
+        },
+        "fee_by_city_conf": 0.8,
         "timeline": "Varies; often a few working days online",
         "timeline_conf": 0.5,
         "documents": ["Trade licence copy", "ID and address proof", "Employee count declaration"],
