@@ -85,3 +85,7 @@ Authority and portal only. Surat Municipal Corporation (suratmunicipal.gov.in, t
 - **Jaipur:** sources conflict on which corporation (Greater / Heritage) issues what, on whether new trade licences are open (a ban was reported), and fire NOC runs through the Local Self Government SSO portal under the Rajasthan Municipalities Act, 2009 (section 337) rather than a fire directorate; no official page was read.
 - **Lucknow:** one guide says trade licences are not issued by the Nagar Nigam but through the Nivesh Mitra single-window portal; another says the Nagar Nigam portal; no official URL was confirmed.
 
+## Pollution consent: White category (2026-11-09)
+
+Read on the Maharashtra Pollution Control Board page "Revised Categorisation of Industries (R/O/G/W/B)" (mpcb.gov.in/en/node/4036): "White" category industries (virtually pollution-free) do not need to obtain Consent to Operate, and an intimation to the concerned SPCB/PCC is sufficient. The same page links an MPCB circular of 23/06/2025 on the CPCB's harmonised Red/Orange/Green/White/Blue classification (CPCB directions of 12/02/2025 and 23/06/2025; the Blue category, for essential environmental services, is named in the circular titles only). The CPCB documents themselves and the actual sector lists (419 sectors in search summaries) were not read, and other state boards may differ, so the rule text says to check the state board's current list. Fees and timelines per state remain unread.
+

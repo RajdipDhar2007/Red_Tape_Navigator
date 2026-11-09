@@ -58,3 +58,10 @@ def test_maharashtra_fire_fee_states_the_act_structure_without_inventing_rates()
 def test_mumbai_trade_fee_comes_from_the_mcgm_section_394_schedule():
     m = fee("trade_licence:mumbai:fee")
     assert "Section 394" in m.text and "Rs 47,320" in m.text and "Rs 3,590" in m.text and m.confidence < 0.9
+
+
+def test_pollution_rule_mentions_the_white_category_intimation():
+    from app.kb.catalog import LICENCES
+
+    why = LICENCES["pollution_consent"]["why"]
+    assert "White category" in why and "intimation" in why

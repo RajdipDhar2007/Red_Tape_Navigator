@@ -160,7 +160,7 @@ LICENCES: dict[str, dict] = {
         "timeline": "Varies by category (white/green/orange/red)",
         "timeline_conf": 0.45,
         "documents": ["Udyam certificate", "Layout plan", "Process description", "Trade licence copy"],
-        "why": "Needed for manufacturing units depending on pollution category.",
+        "why": "Needed for manufacturing units depending on pollution category. Sectors in the White category (practically non-polluting) do not need Consent to Operate: an intimation to the State Pollution Control Board is enough (stated on the Maharashtra board's page on the CPCB classification, with CPCB directions of 2025 adding a Blue category for essential environmental services). Check your own state board's current list.",
         "portal_login": True,
     },
 }
