@@ -14,5 +14,11 @@ def test_hyderabad_trade_fee_states_the_published_table_and_its_limits():
 
 
 def test_other_cities_keep_the_generic_fee_text():
-    d = fee("trade_licence:kolkata:fee")
+    d = fee("trade_licence:mumbai:fee")
     assert "varies by trade category" in d.text and "Rs 3" not in d.text
+
+
+def test_kolkata_fee_comes_from_the_kmc_chart():
+    d = fee("trade_licence:kolkata:fee")
+    assert "KMC publishes" in d.text and "2026-27" in d.text
+    assert d.confidence < 0.9
