@@ -38,7 +38,7 @@ costs and how it is funded.
 - The previous owner's personal machine preferences (drive letters, accounts) do not apply to your machine unless told.
 
 ## Snapshot at handoff (November 2026)
-Backend 368 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
+Backend 373 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
 5 Playwright e2e tests pass, CI has 7 jobs. 8 cities, 112 business types, 16 licences (liquor and drug licences are state-specific per city),
 306 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
 against the real services. Four Alembic migrations (0001 to 0004).
@@ -50,7 +50,7 @@ against the real services. Four Alembic migrations (0001 to 0004).
    `docs/DEPLOYMENT_VERCEL_RENDER.md`, `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/ASSUMPTIONS.md`, `docs/RUNBOOK.md`, `docs/LOAD_TEST.md`,
    `docs/PILOT_PLAN.md`.
 3. Backend (Python 3.12 or 3.13): `cd backend && python -m venv .venv`, activate, `pip install -e ".[dev]"`, then `ruff check .`, `mypy app`,
-   `python -m pytest` (about 368 passing), `python -m evals.run` (golden cases and hallucination gate must pass).
+   `python -m pytest` (about 373 passing), `python -m evals.run` (golden cases and hallucination gate must pass).
 4. Frontend (Node 20+, CI uses 22): `cd frontend && npm ci && npm run lint && npm run typecheck && npm test && npm run build`.
 5. Run locally without Docker: in `backend` set `DATABASE_URL=sqlite+aiosqlite:///./dev_local.db`, run `alembic upgrade head`,
    `python -m app.kb.seed_loader`, `uvicorn app.main:app --port 8000`. In `frontend`: `npm run dev` (http://localhost:3000) or
@@ -196,3 +196,9 @@ pushed to `main`; and a final written report listing what is live, what is simul
 ## First message to the human (send this when you start)
 Confirm you have repo access and CI is green, then list the eight items under "What ONLY THE HUMAN can do", ask which they have already done, and start
 immediately on everything that does not depend on them (sections D, F and the code parts of B and C).
+
+## Session log: 2026-11-09 (demo-readiness round)
+Owner instruction: push to `main` after every verified change; human-only steps (section "What ONLY THE HUMAN can do") are deferred until the demo is selected.
+Done: Hindi/Bengali keywords for about 75 business types; FSSAI 2026 fee slabs and turnover thresholds (FoSCoS list updated 01.04.2026, order 13.03.2026); GST registration timeline from CGST Rule 9 (7 working days) and thresholds re-confirmed from CBIC; Kolkata trade licence fee examples from the KMC 2026-27 chart. All sourced in `docs/RULES_VERIFICATION.md`; review export regenerated. Gates: ruff, mypy, 373 tests, evals, frontend lint/typecheck/unit/build, 5 Playwright tests all green.
+Lesson: a `cmd | tail` in an `&&` chain hides a failing pytest; check the exit status before committing.
+Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai; shops-and-establishments fees per state; fire/pollution pages outside West Bengal; keywords for the remaining ~37 types; then the human-dependent items.
