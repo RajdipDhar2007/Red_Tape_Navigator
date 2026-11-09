@@ -14,7 +14,7 @@ def test_hyderabad_trade_fee_states_the_published_table_and_its_limits():
 
 
 def test_other_cities_keep_the_generic_fee_text():
-    d = fee("trade_licence:mumbai:fee")
+    d = fee("trade_licence:pune:fee")
     assert "varies by trade category" in d.text and "Rs 3" not in d.text
 
 
@@ -53,3 +53,8 @@ def test_maharashtra_fire_fee_states_the_act_structure_without_inventing_rates()
         f = fee(f"fire_noc:{city}:fee")
         assert "section 11" in f.text and "Schedule II" in f.text and f.confidence < 0.9
         assert "Rs" not in f.text
+
+
+def test_mumbai_trade_fee_comes_from_the_mcgm_section_394_schedule():
+    m = fee("trade_licence:mumbai:fee")
+    assert "Section 394" in m.text and "Rs 47,320" in m.text and "Rs 3,590" in m.text and m.confidence < 0.9

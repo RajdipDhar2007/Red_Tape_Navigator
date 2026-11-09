@@ -58,6 +58,9 @@ LICENCES: dict[str, dict] = {
             "delhi": (
                 "MCD publishes a Health Trade Licence fee structure (office order of 28.03.2025, 15% rise from 1 April 2025, FY 2025-28) with a one-time registration charge and an annual licence fee by trade. Eating houses: up to 20 seats Rs 10,000 registration + Rs 11,500 a year; 21 to 50 seats Rs 15,000 + Rs 23,000; above 50 seats Rs 20,000 + Rs 28,750; takeaway/others Rs 15,000 + Rs 6,900; catering Rs 10,000 + Rs 11,500; dhaba Rs 15,000 + Rs 6,900; guest house with dining Rs 10,000 + Rs 11,500. Other shops use MCD's separate General Trade Licence, whose fee chart was not read. A Rs 1,000 processing fee per application is stated in MCD's citizen charter. Confirm on the MCD portal before paying"
             ),
+            "mumbai": (
+                "MCGM's published Schedule of Licence Fees (Section 394, Bombay Municipal Corporation Act, Schedule M; rates per year, document undated) lists by premises area: eating house or catering establishment up to 20 sq m Rs 980, 20 to 50 Rs 1,435, 50 to 100 Rs 2,355, 100 to 150 Rs 3,335, then Rs 980 for each extra 50 sq m, maximum Rs 47,320; hair dressing saloon or barber's shop up to 20 sq m Rs 475, 20 to 40 Rs 735, 40 to 75 Rs 1,435, 75 to 100 Rs 1,770, over 100 Rs 3,590. Other trades have their own scales. Confirm the current amount on the MCGM portal before paying"
+            ),
         },
         "fee_by_city_conf": 0.6,
         "timeline": "Varies; typically 2-6 weeks including inspection",
