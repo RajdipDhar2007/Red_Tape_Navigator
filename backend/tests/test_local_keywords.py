@@ -50,3 +50,20 @@ def test_spa_parlour_sports_coaching_and_games(goal, activity):
 )
 def test_more_business_types(goal, activity):
     assert parse_goal_rules(goal).activity == activity
+
+
+@pytest.mark.parametrize(
+    ("goal", "activity"),
+    [
+        ("चांदी के गहने की दुकान पुणे में", "silver_jewellery"),
+        ("দর্জি নয়, রুপোর দোকান খুলব কলকাতায়", "silver_jewellery"),
+        ("बच्चों के कपड़े की दुकान दिल्ली में", "kids_wear"),
+        ("প্লাইউডের দোকান কলকাতায়", "plywood_shop"),
+        ("दंत चिकित्सालय खोलना है दिल्ली में", "clinic"),
+        ("খাদি ভান্ডার খুলব কলকাতায়", "handloom_shop"),
+        ("नर्सिंग होम खोलना है पुणे में", "hospital"),
+        ("पाठशाला खोलना है पुणे में", "school"),
+    ],
+)
+def test_local_keywords_for_remaining_types(goal, activity):
+    assert parse_goal_rules(goal).activity == activity
