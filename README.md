@@ -241,7 +241,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **423 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **9 cities**,
+Numbers as of the last update: **424 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -344,11 +344,11 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 
 **Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence
 fees for Kolkata, Delhi (health trade licence) and Mumbai (eating house, hair saloon), shops-and-establishments fees for West Bengal, Delhi,
-Telangana, Tamil Nadu, Karnataka, Maharashtra and Gujarat, the Maharashtra fire-fee structure, and the pollution White-category rule. STILL
-OPEN: Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor notifications; each pilot
+Telangana, Tamil Nadu, Karnataka, Maharashtra and Gujarat, the Maharashtra fire-fee structure, the pollution White-category rule, and state pollution-board consent fees for Karnataka, Tamil Nadu and Gujarat
+(Telangana partly). STILL OPEN: Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor notifications; each pilot
 state's own clinic law and authority; state school and coaching forms; UGC and university rules; trade-licence fee schedules for Pune,
-Ahmedabad, Bengaluru, Chennai and the rest of Delhi's general chart; Maharashtra fire rupee rates; fire-safety NOC and pollution-board
-fees and timelines outside West Bengal and Maharashtra; a cited source for every timeline; Gujarat health-permit rules. Jaipur and Lucknow
+Ahmedabad, Bengaluru (portal being replaced), Chennai and the rest of Delhi's general chart; Maharashtra fire rupee rates; fire-safety NOC fees and timelines;
+pollution-board fees for Maharashtra, Delhi and West Bengal (sites unreadable or fee document outdated); a cited source for every timeline; Gujarat health-permit rules. Jaipur and Lucknow
 were considered as new cities and left out because the sources conflict.
 
 ## 11. Definition of done

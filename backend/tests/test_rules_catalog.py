@@ -75,3 +75,13 @@ def test_shops_establishments_fees_for_maharashtra_karnataka_and_gujarat():
         g = fee(f"shops_est:{city}:fee")
         assert "Rs 2,500" in g.text and "Rs 5,000" in g.text and "Act 1 of 2026" in g.text
     assert all(fee(f"shops_est:{c}:fee").confidence < 0.9 for c in ("mumbai", "pune", "bengaluru", "ahmedabad", "surat"))
+
+
+def test_pollution_consent_fees_for_karnataka_tamil_nadu_telangana_and_gujarat():
+    assert "26 October 2021" in fee("pollution_consent:bengaluru:fee").text
+    assert "G.O. (Ms) No. 40" in fee("pollution_consent:chennai:fee").text
+    assert "fee calculator" in fee("pollution_consent:hyderabad:fee").text
+    for city in ("ahmedabad", "surat"):
+        assert "17 October 2018" in fee(f"pollution_consent:{city}:fee").text
+    assert fee("pollution_consent:bengaluru:fee").confidence < 0.9
+

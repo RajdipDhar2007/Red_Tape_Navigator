@@ -53,6 +53,9 @@ domains:
     - tn.gov.in
     - telangana.gov.in
     - gujarat.gov.in
+    - mpcb.gov.in
+    - tnpcb.gov.in
+    - tgpcb.cgg.gov.in
   municipal:
     - kmcgov.in
     - mcgm.gov.in

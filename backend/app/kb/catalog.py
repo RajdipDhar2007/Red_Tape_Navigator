@@ -176,6 +176,24 @@ LICENCES: dict[str, dict] = {
         "timeline_conf": 0.45,
         "documents": ["Udyam certificate", "Layout plan", "Process description", "Trade licence copy"],
         "why": "Needed for manufacturing units depending on pollution category. Sectors in the White category (practically non-polluting) do not need Consent to Operate: an intimation to the State Pollution Control Board is enough (stated on the Maharashtra board's page on the CPCB classification, with CPCB directions of 2025 adding a Blue category for essential environmental services). Check your own state board's current list.",
+        "fee_by_city": {
+            "bengaluru": (
+                "Karnataka State Pollution Control Board consent fee page (Water Act amendment rules notified in the Gazette of 26 October 2021, with a matching Air Act table): the consent fee per year depends on capital investment, for example Rs 400 up to Rs 1 lakh, Rs 1,000 above Rs 1 lakh to Rs 5 lakh, Rs 3,000 to Rs 10 lakh, Rs 4,000 to Rs 25 lakh, Rs 6,000 to Rs 50 lakh, Rs 12,000 to Rs 1 crore and Rs 30,000 to Rs 5 crore, rising in further steps. One year's fee is paid for consent to establish. Consent to operate is valid for 5 years for red, 10 for orange and 15 for green units, and a micro unit (under Rs 25 lakh) pays one year's fee for it. The page also lists a red, orange and green table from a Government Order of 12 November 2020 and separate tables for infrastructure projects and DG sets. Confirm the current table with the Board before paying"
+            ),
+            "chennai": (
+                "Tamil Nadu G.O. (Ms) No. 40 of 9 April 2018 (in force from 1 April 2018, linked on the Tamil Nadu Pollution Control Board's consent fee page) amends the Tamil Nadu Water Rules, 1983 and sets the consent fee by gross fixed assets for red, orange and green categories: up to Rs 1 lakh Rs 400, 300 and 200; above Rs 1 lakh to Rs 2 lakh Rs 700, 600 and 400; above Rs 5 lakh to Rs 6 lakh Rs 1,700, 1,500 and 1,200; above Rs 9 lakh to Rs 10 lakh Rs 2,600, 2,400 and 2,000; above Rs 75 lakh to Rs 1 crore Rs 16,300, 12,600 and 10,100; above Rs 1 crore to Rs 5 crore Rs 21,800, 17,900 and 14,200. An Air Act notification is linked on the same page and was not read. Confirm the current rates with the Board before paying"
+            ),
+            "hyderabad": (
+                "Telangana Pollution Control Board consent fee page: separate fee tables for consent for establishment and for operation are used through an online fee calculator (the tables were not shown as text), the fee is paid with the application under the Water and Air Acts, and no fee is prescribed for authorisations or registrations under the hazardous waste, e-waste, plastic waste, solid waste and construction and demolition waste rules. Confirm the amount with the Board's calculator before paying"
+            ),
+            "ahmedabad": (
+                "Gujarat Water (Prevention and Control of Pollution) (Amendment) Rules, 2018 (Gujarat Government Gazette Extraordinary of 17 October 2018, linked on the Gujarat Pollution Control Board's Consent Fees Structure page): the processing fee for consent to establish is Rs 2,000 for investment below Rs 0.25 crore, Rs 3,000 for 0.25 to 0.5 crore, Rs 6,000 for 0.5 to 1 crore and Rs 15,000 for 1 to 5 crore, rising to Rs 10,00,000 for Rs 5,000 crore and above. The yearly processing fee for consent to operate under the Water Act depends on water use: for example Rs 2,000 (red), Rs 1,800 (orange) and Rs 1,500 (green) below 10 kilolitres a day, and Rs 10,000, Rs 8,800 and Rs 7,500 for 100 to 500 kilolitres a day. Confirm the current table with the Board before paying"
+            ),
+            "surat": (
+                "Gujarat Water (Prevention and Control of Pollution) (Amendment) Rules, 2018 (Gujarat Government Gazette Extraordinary of 17 October 2018, linked on the Gujarat Pollution Control Board's Consent Fees Structure page): the processing fee for consent to establish is Rs 2,000 for investment below Rs 0.25 crore, Rs 3,000 for 0.25 to 0.5 crore, Rs 6,000 for 0.5 to 1 crore and Rs 15,000 for 1 to 5 crore, rising to Rs 10,00,000 for Rs 5,000 crore and above. The yearly processing fee for consent to operate under the Water Act depends on water use: for example Rs 2,000 (red), Rs 1,800 (orange) and Rs 1,500 (green) below 10 kilolitres a day, and Rs 10,000, Rs 8,800 and Rs 7,500 for 100 to 500 kilolitres a day. Confirm the current table with the Board before paying"
+            ),
+        },
+        "fee_by_city_conf": 0.8,
         "portal_login": True,
     },
 }
@@ -249,54 +267,63 @@ CITIES: dict[str, dict] = {
         "authority": "Kolkata Municipal Corporation (KMC)", "trade_url": "https://www.kmcgov.in/KMCPortal/jsp/KMCTradeLicenseHome.jsp",
         "fire_authority": "West Bengal Fire & Emergency Services", "fire_url": "https://wbfireservices.gov.in/",
         "labour_authority": "West Bengal Labour Department", "labour_url": "https://lc.wb.gov.in/",
+        "pollution_authority": "West Bengal Pollution Control Board", "pollution_url": "https://cpcb.nic.in/",
     },
     "mumbai": {
         "label": "Mumbai", "state": "Maharashtra", "aliases": ["mumbai", "bombay", "মুম্বই", "मुंबई"],
         "authority": "Brihanmumbai Municipal Corporation (MCGM)", "trade_url": "https://portal.mcgm.gov.in/",
         "fire_authority": "Maharashtra Fire Services", "fire_url": "https://www.maharashtra.gov.in/",
         "labour_authority": "Maharashtra Labour Department (Mahakamgar)", "labour_url": "https://mahakamgar.maharashtra.gov.in/lc-registration-of-shops-and-establishments.htm",
+        "pollution_authority": "Maharashtra Pollution Control Board (MPCB)", "pollution_url": "https://mpcb.gov.in/",
     },
     "delhi": {
         "label": "Delhi", "state": "Delhi", "aliases": ["delhi", "new delhi", "দিল্লি", "दिल्ली"],
         "authority": "Municipal Corporation of Delhi (MCD)", "trade_url": "https://mcdonline.nic.in/",
         "fire_authority": "Delhi Fire Service", "fire_url": "https://delhi.gov.in/",
         "labour_authority": "Delhi Labour Department", "labour_url": "https://labour.delhi.gov.in/hi/node/2932",
+        "pollution_authority": "Delhi Pollution Control Committee (DPCC)", "pollution_url": "https://cpcb.nic.in/",
     },
     "bengaluru": {
         "label": "Bengaluru", "state": "Karnataka", "aliases": ["bengaluru", "bangalore", "বেঙ্গালুরু", "बेंगलुरु", "बैंगलोर"],
         "authority": "Greater Bengaluru Authority / BBMP (Online Trade License System)", "trade_url": "https://site.bbmp.gov.in/tradelicenseneworrenewal.html",
         "fire_authority": "Karnataka State Fire & Emergency Services", "fire_url": "https://www.karnataka.gov.in/",
         "labour_authority": "Karnataka Labour Department (eKarmika)", "labour_url": "https://www.ekarmika.karnataka.gov.in/ekarmika/static/home.aspx",
+        "pollution_authority": "Karnataka State Pollution Control Board (KSPCB)", "pollution_url": "https://kspcb.karnataka.gov.in/",
     },
     "chennai": {
         "label": "Chennai", "state": "Tamil Nadu", "aliases": ["chennai", "madras", "চেন্নাই", "चेन्नई"],
         "authority": "Greater Chennai Corporation", "trade_url": "https://chennaicorporation.gov.in/gcc/department/revenue/",
         "fire_authority": "Tamil Nadu Fire and Rescue Services", "fire_url": "https://www.tn.gov.in/",
         "labour_authority": "Tamil Nadu Labour Department", "labour_url": "https://labour.tn.gov.in/services/shop-establishments/registration",
+        "pollution_authority": "Tamil Nadu Pollution Control Board (TNPCB)", "pollution_url": "https://www.tnpcb.gov.in/",
     },
     "hyderabad": {
         "label": "Hyderabad", "state": "Telangana", "aliases": ["hyderabad", "হায়দরাবাদ", "हैदराबाद"],
         "authority": "Greater Hyderabad Municipal Corporation (GHMC)", "trade_url": "https://www.ghmc.gov.in/Trade.aspx",
         "fire_authority": "Telangana State Disaster Response & Fire Services", "fire_url": "https://www.telangana.gov.in/",
         "labour_authority": "Telangana Labour Department", "labour_url": "https://labour.telangana.gov.in/",
+        "pollution_authority": "Telangana Pollution Control Board (TGPCB)", "pollution_url": "https://tgpcb.cgg.gov.in/",
     },
     "pune": {
         "label": "Pune", "state": "Maharashtra", "aliases": ["pune", "poona", "পুনে", "पुणे", "पुने"],
         "authority": "Pune Municipal Corporation (PMC)", "trade_url": "https://pmc.gov.in/",
         "fire_authority": "Maharashtra Fire Services", "fire_url": "https://www.maharashtra.gov.in/",
         "labour_authority": "Maharashtra Labour Department (Mahakamgar)", "labour_url": "https://mahakamgar.maharashtra.gov.in/lc-registration-of-shops-and-establishments.htm",
+        "pollution_authority": "Maharashtra Pollution Control Board (MPCB)", "pollution_url": "https://mpcb.gov.in/",
     },
     "ahmedabad": {
         "label": "Ahmedabad", "state": "Gujarat", "aliases": ["ahmedabad", "আহমেদাবাদ", "अहमदाबाद"],
         "authority": "Ahmedabad Municipal Corporation (AMC)", "trade_url": "https://ahmedabadcity.gov.in/",
         "fire_authority": "Gujarat Fire Services", "fire_url": "https://www.gujarat.gov.in/",
         "labour_authority": "Ahmedabad Municipal Corporation (Shops & Establishment department)", "labour_url": "https://ahmedabadcity.gov.in/StaticPage/shops_establishment",
+        "pollution_authority": "Gujarat Pollution Control Board (GPCB)", "pollution_url": "https://gpcb.gujarat.gov.in/",
     },
     "surat": {
         "label": "Surat", "state": "Gujarat", "aliases": ["surat", "সুরাট", "सूरत"],
         "authority": "Surat Municipal Corporation (SMC)", "trade_url": "https://www.suratmunicipal.gov.in/",
         "fire_authority": "Gujarat Fire Services", "fire_url": "https://www.gujarat.gov.in/",
         "labour_authority": "Surat Municipal Corporation (Shops & Establishment)", "labour_url": "https://www.suratmunicipal.gov.in/",
+        "pollution_authority": "Gujarat Pollution Control Board (GPCB)", "pollution_url": "https://gpcb.gujarat.gov.in/",
     },
 }
 
@@ -354,4 +381,5 @@ REQUIRED_OVERRIDES = {
     "trade_licence": ("authority", "trade_url"),
     "fire_noc": ("fire_authority", "fire_url"),
     "shops_est": ("labour_authority", "labour_url"),
+    "pollution_consent": ("pollution_authority", "pollution_url"),
 }

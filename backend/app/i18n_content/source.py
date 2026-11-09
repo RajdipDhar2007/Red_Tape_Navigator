@@ -38,7 +38,7 @@ def english_sources() -> dict[str, list[str]]:
         for v in (lic.get("fee_by_city") or {}).values():
             add("prose", v)
     for c in CITIES.values():
-        for k in ("authority", "fire_authority", "labour_authority"):
+        for k in ("authority", "fire_authority", "labour_authority", "pollution_authority"):
             add("authorities", c[k])
     for p in sorted(glob.glob(str(_TEMPLATES / "*.json"))):
         d = json.load(open(p, encoding="utf-8"))
