@@ -35,7 +35,6 @@ def test_shops_establishments_fee_for_kolkata_and_delhi_is_sourced():
     assert "1963" in k.text and "Rs 250" in k.text and k.confidence < 0.9
     d = fee("shops_est:delhi:fee")
     assert "free of cost" in d.text and d.confidence < 0.9
-    assert "depends on number of employees" in fee("shops_est:mumbai:fee").text
 
 
 def test_hyderabad_shops_establishments_fee_is_sourced():
@@ -65,3 +64,14 @@ def test_pollution_rule_mentions_the_white_category_intimation():
 
     why = LICENCES["pollution_consent"]["why"]
     assert "White category" in why and "intimation" in why
+
+
+def test_shops_establishments_fees_for_maharashtra_karnataka_and_gujarat():
+    m = fee("shops_est:mumbai:fee")
+    assert "no registration fee is prescribed" in m.text and "Form F" in m.text and fee("shops_est:pune:fee").text.split(": ", 1)[1] == m.text.split(": ", 1)[1]
+    k = fee("shops_est:bengaluru:fee")
+    assert "Rs 405" in k.text and "Rs 1,01,250" in k.text and "e-Karmika" in k.text
+    for city in ("ahmedabad", "surat"):
+        g = fee(f"shops_est:{city}:fee")
+        assert "Rs 2,500" in g.text and "Rs 5,000" in g.text and "Act 1 of 2026" in g.text
+    assert all(fee(f"shops_est:{c}:fee").confidence < 0.9 for c in ("mumbai", "pune", "bengaluru", "ahmedabad", "surat"))

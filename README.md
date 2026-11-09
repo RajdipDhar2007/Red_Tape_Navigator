@@ -241,7 +241,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **422 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **9 cities**,
+Numbers as of the last update: **423 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -347,7 +347,7 @@ trade-licence fees for Kolkata, Delhi and Mumbai, shops-and-establishments fees 
 Maharashtra fire-fee structure): Karnataka's 03.07.2026 liquor amendment (no official text found); current Maharashtra and Telangana liquor
 notifications; each pilot state's own clinic law and authority; state school and coaching forms; UGC and university rules; trade-licence
 fee schedules for Pune, Ahmedabad, Bengaluru, Chennai and the rest of Delhi's general chart; shops-and-establishments fees for Maharashtra,
-Karnataka and Gujarat; Maharashtra fire rupee rates; fire-safety NOC and pollution-board pages outside West Bengal; a cited source for every
+Karnataka and Gujarat were DONE on 2026-11-09 (second pass); Maharashtra fire rupee rates; fire-safety NOC and pollution-board pages outside West Bengal; a cited source for every
 timeline; Gujarat health-permit rules. Jaipur and Lucknow were considered as new cities and left out because the sources conflict.
 
 ## 11. Definition of done
