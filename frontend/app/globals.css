@@ -50,3 +50,20 @@ html { scroll-behavior: smooth; }
   .section-title { @apply text-2xl font-bold text-navy-900 sm:text-3xl; }
   .tricolour-bar { background: linear-gradient(90deg, #f58a1f 0 33.33%, #ffffff 33.33% 66.66%, #138808 66.66% 100%); }
 }
+
+/* ---- motion & delight (all disabled by the prefers-reduced-motion rule above) ---- */
+.btn-accent { background-size: 200% 100%; }
+.btn-accent:not(:disabled):hover { animation: shimmer 1.6s linear infinite; background-image: linear-gradient(110deg, #ffa94d 30%, #ffd199 50%, #ffa94d 70%); }
+.card-tilt { transition: transform .25s ease, box-shadow .25s ease; }
+.card-tilt:hover { transform: translateY(-4px) rotate(-.4deg); box-shadow: 0 2px 4px rgba(11,26,64,.08), 0 22px 40px -12px rgba(11,26,64,.32); }
+.typing-dot { display: inline-block; width: 7px; height: 7px; margin: 0 2px; border-radius: 9999px; background: #86a3da; animation: dots 1.2s ease-in-out infinite; }
+.typing-dot:nth-child(2) { animation-delay: .15s; }
+.typing-dot:nth-child(3) { animation-delay: .3s; }
+.fill-bar { background: linear-gradient(90deg, #f58a1f, #ffa94d, #2e9e44); background-size: 200% 100%; animation: shimmer 4s linear infinite; transition: width .6s cubic-bezier(.2,.7,.2,1); }
+.confetti-bit { position: absolute; top: -20px; border-radius: 2px; opacity: 0; animation-name: confettiFall; animation-timing-function: cubic-bezier(.25,.6,.35,1); animation-fill-mode: forwards; }
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translate3d(0,0,0) rotate(0); }
+  100% { opacity: 0; transform: translate3d(var(--drift), 105vh, 0) rotate(var(--spin)); }
+}
+.step-done { background-image: linear-gradient(90deg, rgba(46,158,68,.08), transparent 60%); }
+

@@ -19,9 +19,14 @@ export default function InterviewChat({ session, onReview }: { session: Session;
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
+  const [typing, setTyping] = useState(false);
+
   const ask = useCallback((s: InterviewState) => {
     setSt(s);
     setLog((l) => [...l, ...s.questions.map((q) => ({ role: "bot" as const, text: q.question }))]);
+    // a short "thinking" pulse makes the exchange feel like a conversation; the questions are already usable underneath
+    setTyping(true);
+    window.setTimeout(() => setTyping(false), 450);
   }, []);
 
   useEffect(() => {
@@ -30,7 +35,7 @@ export default function InterviewChat({ session, onReview }: { session: Session;
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
-  }, [log]);
+  }, [log, typing]);
 
   const send = async (override?: Record<string, string>) => {
     if (!st) return;
@@ -67,6 +72,8 @@ export default function InterviewChat({ session, onReview }: { session: Session;
 
   if (!st) return <p aria-live="polite">…</p>;
   const skippedCount = st.progress.skipped.length;
+  const pct = st.progress.percent;
+  const cheer = pct >= 75 && pct < 100 ? t("m75") : pct >= 50 && pct < 75 ? t("m50") : pct >= 25 && pct < 50 ? t("m25") : null;
 
   return (
     <section aria-labelledby="int-h">
@@ -76,17 +83,27 @@ export default function InterviewChat({ session, onReview }: { session: Session;
       <p className="mb-2">{t("intro")}</p>
       <div className="mb-3">
         <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={st.progress.percent} aria-label={t("progress", { answered: st.progress.answered, total: st.progress.total })} className="h-3 w-full overflow-hidden rounded bg-slate-300">
-          <div className="h-full bg-brand-600" style={{ width: `${st.progress.percent}%` }} />
+          <div className="fill-bar h-full" style={{ width: `${st.progress.percent}%` }} />
         </div>
-        <p className="text-sm">{t("progress", { answered: st.progress.answered, total: st.progress.total })}</p>
+        <p className="flex items-center justify-between text-sm">
+          <span>{t("progress", { answered: st.progress.answered, total: st.progress.total })}</span>
+          {cheer && <span key={cheer} className="font-semibold text-saffron-700 animate-pop">{cheer}</span>}
+        </p>
       </div>
 
       <div className="card mb-3 max-h-80 space-y-2 overflow-y-auto" role="log" aria-live="polite" aria-relevant="additions">
         {log.map((m, i) => (
-          <p key={i} className={m.role === "bot" ? "mr-10 rounded-lg bg-slate-100 p-2" : "ml-10 rounded-lg bg-brand-50 p-2 text-right"}>
+          <p key={i} className={m.role === "bot" ? "mr-10 rounded-lg bg-slate-100 p-2 animate-slide-in-left" : "ml-10 rounded-lg bg-brand-50 p-2 text-right animate-slide-in-right"}>
             {m.text}
           </p>
         ))}
+        {typing && (
+          <p className="mr-10 w-16 rounded-lg bg-slate-100 p-2 animate-pop" aria-hidden="true">
+            <span className="typing-dot" />
+            <span className="typing-dot" />
+            <span className="typing-dot" />
+          </p>
+        )}
         <div ref={endRef} />
       </div>
 

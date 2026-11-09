@@ -210,6 +210,16 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
   `LocalizeMiddleware`, reminder titles in the citizen's language, and tests that check a complete Hindi and Bengali session. **Native-speaker
   review is still pending.**
 
+### Phase 7: delight and motion (frontend)
+
+- Pure CSS and small React helpers in `frontend/components/fx/` (no new packages): scroll reveals, counting stats, floating glow orbs, a
+  rotating example goal in the empty goal box, card tilt, a shimmer on the main button, page fade-in (`app/[locale]/template.tsx`).
+- Checklist: each step can be ticked off (kept only in this browser's storage, never sent anywhere), a progress ring, a pulsing "Next up"
+  marker, and a tricolour confetti burst when every step is done. The finished-forms screen also celebrates.
+- Interview: slide-in chat bubbles, a typing indicator, an animated progress bar and milestone cheers. Dashboard: a progress ring and
+  badges derived from the citizen's own plans.
+- Every effect is skipped when the visitor's system asks for reduced motion; the strings exist in `en`, `hi` and `bn`.
+
 ## 5. Technology and tools used
 
 | Area | Used |

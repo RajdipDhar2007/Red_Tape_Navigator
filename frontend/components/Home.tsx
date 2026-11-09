@@ -6,6 +6,9 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { api, ApiError, hasToken, post, setTokens } from "@/lib/api";
 import Icon, { type IconName } from "./Icon";
 import { ChakraWheel } from "./LogoMark";
+import CountUp from "./fx/CountUp";
+import ProgressRing from "./fx/ProgressRing";
+import Reveal from "./fx/Reveal";
 import VoiceInput from "./VoiceInput";
 
 type Consent = { purpose: string; granted: boolean }[];
@@ -150,8 +153,8 @@ function Landing({ onDone }: { onDone: () => void }) {
     <div className="space-y-16">
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 px-6 py-12 text-white shadow-lift sm:px-10 lg:py-16">
         <ChakraWheel size={460} className="pointer-events-none absolute -right-24 -top-24 animate-spin-slow text-white/[0.06]" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-saffron-500/20 blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-10 right-1/3 h-56 w-56 rounded-full bg-indgreen-500/20 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 animate-orb rounded-full bg-saffron-500/20 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-10 right-1/3 h-56 w-56 animate-orb rounded-full bg-indgreen-500/20 blur-3xl [animation-delay:-6s]" aria-hidden="true" />
         <div className="relative grid items-center gap-10 lg:grid-cols-[1.25fr_1fr]">
           <div className="animate-fade-up">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-saffron-200 ring-1 ring-white/20">
@@ -170,9 +173,11 @@ function Landing({ onDone }: { onDone: () => void }) {
               </a>
             </div>
             <dl className="mt-8 grid max-w-md grid-cols-3 gap-4 text-center">
-              {[["3", t("langs")], ["8", t("cities")], ["0", t("autoSubmits")]].map(([n, l]) => (
-                <div key={l} className="rounded-xl bg-white/10 p-3 ring-1 ring-white/15">
-                  <dt className="font-head text-2xl font-bold text-saffron-300">{n}</dt>
+              {[[3, t("langs")], [8, t("cities")], [0, t("autoSubmits")]].map(([n, l]) => (
+                <div key={l} className="rounded-xl bg-white/10 p-3 ring-1 ring-white/15 transition hover:-translate-y-1 hover:bg-white/15">
+                  <dt className="font-head text-2xl font-bold text-saffron-300">
+                    <CountUp to={Number(n)} />
+                  </dt>
                   <dd className="text-xs text-navy-100">{l}</dd>
                 </div>
               ))}
@@ -184,11 +189,12 @@ function Landing({ onDone }: { onDone: () => void }) {
         </div>
       </section>
 
+      <Reveal>
       <section id="how" className="scroll-mt-24">
         <h2 className="section-title text-center">{t("howTitle")}</h2>
         <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {how.map(([icon, k], i) => (
-            <li key={k} className="card card-hover relative animate-fade-up" style={{ animationDelay: `${i * 90}ms` }}>
+            <li key={k} className="card card-tilt relative animate-fade-up" style={{ animationDelay: `${i * 90}ms` }}>
               <span className="absolute -top-3 left-5 rounded-full bg-saffron-500 px-2.5 py-0.5 text-xs font-bold text-navy-900">{i + 1}</span>
               <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-navy-50 text-navy-700">
                 <Icon name={icon} />
@@ -199,13 +205,15 @@ function Landing({ onDone }: { onDone: () => void }) {
           ))}
         </ol>
       </section>
+      </Reveal>
 
+      <Reveal>
       <section>
         <h2 className="section-title text-center">{t("servicesTitle")}</h2>
         <p className="mx-auto mt-2 max-w-2xl text-center text-slate-700">{t("servicesSub")}</p>
         <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {services.map(([icon, k], i) => (
-            <li key={k} className="card card-hover flex flex-col items-center gap-2 text-center animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
+            <li key={k} className="card card-tilt flex cursor-default flex-col items-center gap-2 text-center animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
               <span className={`flex h-12 w-12 items-center justify-center rounded-full ${i % 3 === 0 ? "bg-saffron-100 text-saffron-700" : i % 3 === 1 ? "bg-navy-100 text-navy-700" : "bg-indgreen-100 text-indgreen-700"}`}>
                 <Icon name={icon} size={26} />
               </span>
@@ -214,7 +222,9 @@ function Landing({ onDone }: { onDone: () => void }) {
           ))}
         </ul>
       </section>
+      </Reveal>
 
+      <Reveal>
       <section className="rounded-3xl bg-white p-6 shadow-card ring-1 ring-slate-200 sm:p-10">
         <h2 className="section-title text-center">{t("trustTitle")}</h2>
         <ul className="mt-8 grid gap-6 sm:grid-cols-2">
@@ -231,6 +241,7 @@ function Landing({ onDone }: { onDone: () => void }) {
           ))}
         </ul>
       </section>
+      </Reveal>
     </div>
   );
 }
@@ -287,6 +298,40 @@ function ConsentGate({ onDone }: { onDone: () => void }) {
   );
 }
 
+/** Progress and badges, derived from the citizen's own plans (nothing extra is stored). */
+function Momentum({ apps }: { apps: AppRow[] }) {
+  const t = useTranslations("dash");
+  const started = apps.length;
+  const reviewed = apps.filter((a) => a.reviewed).length;
+  const badges = [
+    { id: "first", ok: started >= 1, label: t("badgeFirst"), icon: "goal" as IconName },
+    { id: "reviewed", ok: reviewed >= 1, label: t("badgeReviewed"), icon: "file" as IconName },
+    { id: "three", ok: started >= 3, label: t("badgeThree"), icon: "shield" as IconName },
+  ];
+  const next = badges.find((b) => !b.ok);
+  return (
+    <section aria-labelledby="mom-h" className="card flex flex-wrap items-center gap-5 animate-fade-up">
+      <ProgressRing percent={(reviewed / started) * 100} size={76} label={t("formsReviewed", { n: reviewed })} />
+      <div className="min-w-48 flex-1">
+        <h2 id="mom-h" className="text-lg font-bold">
+          {t("momentum")}
+        </h2>
+        <p className="text-sm text-slate-700">
+          {t("plansStarted", { n: started })} · {t("formsReviewed", { n: reviewed })}
+        </p>
+      </div>
+      <ul className="flex flex-wrap gap-2">
+        {badges.map((b, i) => (
+          <li key={b.id} className={`badge !px-3 !py-1.5 text-sm ${b.ok ? "bg-indgreen-100 text-indgreen-800 animate-pop" : "bg-slate-100 text-slate-500"}`} style={{ animationDelay: `${i * 120}ms` }}>
+            <Icon name={b.icon} size={16} /> {b.label}
+            {next?.id === b.id && <span className="sr-only"> ({t("nextBadge")})</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function Dashboard() {
   const t = useTranslations("dash");
   const tg = useTranslations("goal");
@@ -297,6 +342,13 @@ function Dashboard() {
   const [err, setErr] = useState<string | null>(null);
   const [apps, setApps] = useState<AppRow[] | null>(null);
   const id = useId();
+  const [ph, setPh] = useState(0);
+
+  // the empty box cycles through the example goals so a first-time visitor sees what to type
+  useEffect(() => {
+    const timer = window.setInterval(() => setPh((n) => (n + 1) % 3), 3200);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     api<AppRow[]>("/sessions")
@@ -332,7 +384,7 @@ function Dashboard() {
           }}
         >
           <label htmlFor={id}>{tg("label")}</label>
-          <textarea id={id} className="input min-h-28 text-base" minLength={5} maxLength={1000} required value={goal} placeholder={tg("placeholder")} onChange={(e) => setGoal(e.target.value)} />
+          <textarea id={id} className="input min-h-28 text-base" minLength={5} maxLength={1000} required value={goal} placeholder={goal ? undefined : t(["ex1", "ex2", "ex3"][ph])} onChange={(e) => setGoal(e.target.value)} />
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium text-slate-600">{t("tryExamples")}</span>
             {["ex1", "ex2", "ex3"].map((k) => (
@@ -354,6 +406,8 @@ function Dashboard() {
           )}
         </form>
       </section>
+
+      {apps && apps.length > 0 && <Momentum apps={apps} />}
 
       <section aria-labelledby="mine-h">
         <h2 id="mine-h" className="mb-3 text-xl font-bold">

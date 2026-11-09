@@ -14,9 +14,9 @@ export default function ProgressTracker({ tracker }: { tracker: Tracker }) {
             <span
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-all ${
                 s.active
-                  ? "scale-110 bg-saffron-500 text-navy-900 shadow-md ring-4 ring-saffron-100"
+                  ? "scale-110 bg-saffron-500 text-navy-900 shadow-md ring-4 ring-saffron-100 animate-ring-pulse"
                   : s.done
-                    ? "bg-indgreen-600 text-white"
+                    ? "bg-indgreen-600 text-white animate-pop"
                     : "bg-slate-100 text-slate-600 ring-1 ring-slate-300"
               }`}
               aria-hidden="true"
@@ -25,7 +25,7 @@ export default function ProgressTracker({ tracker }: { tracker: Tracker }) {
             </span>
             <span className={`text-sm font-semibold ${s.active ? "text-navy-900" : s.done ? "text-indgreen-800" : "text-slate-600"}`}>{t(s.id)}</span>
             <span className="sr-only">{s.active ? t("current") : s.done ? t("done") : ""}</span>
-            {i < tracker.steps.length - 1 && <span className={`mx-1 hidden h-0.5 flex-1 rounded sm:block ${s.done ? "bg-indgreen-600" : "bg-slate-200"}`} aria-hidden="true" />}
+            {i < tracker.steps.length - 1 && <span className="mx-1 hidden h-0.5 flex-1 overflow-hidden rounded bg-slate-200 sm:block" aria-hidden="true"><span className={`block h-full bg-indgreen-600 transition-all duration-700 ${s.done ? "w-full" : "w-0"}`} /></span>}
           </li>
         ))}
       </ol>

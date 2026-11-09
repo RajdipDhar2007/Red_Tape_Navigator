@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, apiBlob, ApiError, post } from "@/lib/api";
 import type { ChecklistItem, Session } from "@/lib/types";
+import Confetti from "./fx/Confetti";
 import KeyInSheet from "./KeyInSheet";
 
 type Esign = { request_id: string; status: string; mock: boolean; label?: string; signing_url?: string | null };
@@ -20,6 +21,9 @@ export default function DoneView({ session }: { session: Session }) {
   const [sched, setSched] = useState<{ title: string; due_at: string }[] | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const forms = [...new Set((session.plan.steps ?? []).map((s) => s.form).filter((f): f is string => !!f))];
+
+  const [burst, setBurst] = useState(0);
+  useEffect(() => setBurst(1), []);
 
   useEffect(() => {
     void api<{ items: ChecklistItem[] }>(`/sessions/${sid}/submission-checklist`).then((r) => setItems(r.items));
@@ -81,7 +85,8 @@ export default function DoneView({ session }: { session: Session }) {
   };
 
   return (
-    <section aria-labelledby="done-h" className="space-y-4">
+    <section aria-labelledby="done-h" className="space-y-4 animate-fade-up">
+      <Confetti burst={burst} />
       <h2 id="done-h" className="text-xl font-semibold">
         {t("heading")}
       </h2>
