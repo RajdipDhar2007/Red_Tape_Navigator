@@ -128,7 +128,7 @@ Form B central `https://fcstraining.fssai.gov.in/assets/docs/centralForm_b.pdf`)
 officer approves it. FSSAI and Udyam registration are online-only, so keep the key-in sheet. Other departments need their own written permission.
 ### F. Language quality
 Native Hindi and Bengali review of `backend/app/i18n_content/data_hi.py`, `data_bn.py` and `frontend/messages/*.json` (legal and fee wording first).
-Hindi and Bengali keywords for all business types are done (`_LOCAL_KEYWORDS`, pending native review); translate the officer console if officers need it.
+Hindi and Bengali keywords for all business types are done (`_LOCAL_KEYWORDS`, pending native review); the officer console is already translated (`staff.*` in all three message files).
 ### G. Launch hardening
 Counsel review of privacy/terms/DPDP consent text, then `NEXT_PUBLIC_LEGAL_REVIEWED=true` on Vercel. Real-phone, slow-network, voice-input and
 screen-reader tests. Penetration test or at least the `docs/SECURITY.md` checklist, secrets-rotation plan, backup-restore drill, move browser tokens
