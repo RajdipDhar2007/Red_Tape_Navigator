@@ -213,3 +213,14 @@ Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai;
 - UX: `frontend/components/fx/` (Reveal, CountUp, Confetti, ProgressRing), tick-off checklist, typing indicator, dashboard badges, print/copy/WhatsApp share.
   A temporary Playwright spec was used to take screenshots and then deleted; do the same for visual checks (the e2e config starts both servers).
 - Lesson: in a PowerShell/bash tool call, a Python edit script that needs a backslash-n inside a TS string must build it with `chr(92)`; a doubled backslash was turned into a real newline.
+
+### Session log: 2026-11-09 (browser pass with the owner's Chrome)
+
+- Karnataka (e-Karmika home page), Maharashtra (2018 Rules PDF, English text) and Gujarat (2020 Rules, a scanned PDF checked as an image; Act 1 of 2026 for the new
+  threshold) shop-registration fees were read from official sources and added. Not readable in Chrome: site.bbmp.gov.in (did not load), the AMC site (froze the tab).
+  Chennai's revised trade fee exists only in news reports. After a frozen tab, close it and open a new one with `tabs_context_mcp` (createIfEmpty).
+- App test in Chrome against local servers (production build, DEMO_MODE): signup with a throwaway account, consent, a Surat parlour goal, the plan, ticking steps
+  (progress ring, "Next up"), Hindi view with the ticks kept, no console errors. A claim whose confidence is 0.8 shows no "Verify with the authority" chip
+  (the chip appears below the confidence threshold); officially-read rules are capped at 0.8, so they look verified until a reviewer acts. Consider showing a "pending review" tag.
+- Defect found and fixed: the Gujarat fee cited the municipal site as its source; the rule text now names col.gujarat.gov.in.
+
