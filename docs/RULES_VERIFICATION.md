@@ -62,7 +62,7 @@ Ration shops are "authorised" by the state, post offices are "operated" by India
 
 - **GST registration fee and timeline**, and the **per-state goods threshold today**: gst.gov.in/tutorial.gst.gov.in block automated and in-page fetches
   (firewall rejection); a reviewer should read the registration FAQ on the portal.
-- **FSSAI fees and validity** (changed in 2026): FoSCoS calculates the fee per business type; a reviewer should record the current slabs.
+- **FSSAI fees and validity**: RESOLVED on 2026-11-09 from foscos.fssai.gov.in "Kind of Business" list (updated 01.04.2026) and FSSAI order dated 13.03.2026 (thresholds effective 01.04.2026): registration Rs 100 (turnover up to Rs 1.5 crore), State licence Rs 5,000 (above Rs 1.5 crore to Rs 50 crore), Central licence Rs 7,500 (above Rs 50 crore); hawker registration Rs 0; importer, e-commerce, five-star hotel need a Central licence. The 10.03.2026 amendment provides perpetual validity subject to risk-based inspections; how FoSCoS applies it was not confirmed, and the product says so. Still marked "verify with the authority" until a reviewer signs off.
 - **Fire safety NOC** and **pollution control (CTE/CTO)** sources for Maharashtra, Delhi, Karnataka, Tamil Nadu, Telangana and Gujarat:
   searches of government domains found portals for other states only. The department or its single-window portal must supply the exact page.
   (The pack currently cites each state's general government home page for fire NOC and the CPCB home page for pollution; treat these as placeholders.)
