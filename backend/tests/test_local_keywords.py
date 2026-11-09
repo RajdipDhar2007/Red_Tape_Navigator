@@ -33,3 +33,20 @@ def test_hindi_bengali_business_keywords(goal, activity):
 )
 def test_spa_parlour_sports_coaching_and_games(goal, activity):
     assert parse_goal_rules(goal).activity == activity
+
+
+@pytest.mark.parametrize(
+    ("goal", "activity"),
+    [
+        ("swimming pool in Pune", "swimming_pool"),
+        ("cinema hall in Pune", "cinema_theatre"),
+        ("scrap dealer in Pune", "scrap_dealer"),
+        ("bike rental in Pune", "vehicle_rental"),
+        ("recording studio in Pune", "recording_studio"),
+        ("pizza outlet in Pune", "fast_food_outlet"),
+        ("dance academy in Pune", "hobby_classes"),
+        ("mehndi artist in Pune", "tattoo_studio"),
+    ],
+)
+def test_more_business_types(goal, activity):
+    assert parse_goal_rules(goal).activity == activity

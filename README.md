@@ -190,7 +190,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
   Karnataka e-auction from the 01.07.2026 Gazette, Tamil Nadu, Telangana, Gujarat), retail drug licence (Delhi checklist + Drugs Rules), pet shop
   (final Pet Shop Rules 2018), clinic/hospital registration, bio-medical waste, school recognition, college approval, coaching registration, BIS
   hallmarking for jewellers.
-- **114 business types** (`backend/app/kb/business_types.py`), including hotel, gold shop, ration shop, pharmacy, school, college, clinic, hospital.
+- **120 business types** (`backend/app/kb/business_types.py`), including hotel, gold shop, ration shop, pharmacy, school, college, clinic, hospital.
   Regulated sectors with no sourced checklist (bank, insurance, post office...) get an accurate regulator note.
 - Licences with extra permits outside the pack carry `coverage="specific"` (the UI says so and an officer is asked to confirm).
 - Hyderabad trade licence fee table (GHMC) and Ahmedabad shops-and-establishments (AMC) were added from official pages.
@@ -230,8 +230,8 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **386 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **8 cities**,
-**114 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
+Numbers as of the last update: **400 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 5 browser e2e tests, **8 cities**,
+**120 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
 | --- | --- |
@@ -326,7 +326,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | C | **MSG91 SMS live** (**HUMAN** DLT KYC) | Complete DLT registration on an operator portal (Airtel / Vi / BSNL / STPL / Tata), register a 6-character header and the template `Red Tape Navigator reminder: {#var#}`, link it to a MSG91 Flow, put `MSG91_AUTHKEY` / `MSG91_TEMPLATE_ID` in Render, send a real test SMS, fix the adapter if the live shape differs (DLT errors 203/211 mean not approved) | `real/msg91.py`, MSG91 dashboard |
 | D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`, officer console `/en/staff` |
 | E | **Official forms** (**HUMAN** FSSAI permission) | Email `helpdesk-foscos@fssai.gov.in` for permission to reproduce Form A and Form B; then officers fetch the PDFs through the console (allowlisted URLs), you write the field-map JSON in `backend/app/forms/templates/`, an officer approves; keep the key-in sheet for FoSCoS and Udyam | `docs/INTEGRATIONS.md` (field-map procedure), `backend/app/forms/official.py` |
-| F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for about 75 of the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review; the rest are English only). Then: translate the officer console if officers need it | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
+| F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for about 85 of the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review; the rest are English only). Then: translate the officer console if officers need it | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
 | G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
 | H | **Business readiness** (**HUMAN** decisions) | Decide who pays (free for citizens funded by a department/CSC programme, subscription or per use), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
 | I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
