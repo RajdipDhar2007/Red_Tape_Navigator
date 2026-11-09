@@ -41,3 +41,8 @@ def test_shops_establishments_fee_for_kolkata_and_delhi_is_sourced():
 def test_hyderabad_shops_establishments_fee_is_sourced():
     h = fee("shops_est:hyderabad:fee")
     assert "Telangana Labour Department" in h.text and "Rs 10,000" in h.text and h.confidence < 0.9
+
+
+def test_chennai_shops_establishments_fee_is_sourced():
+    c = fee("shops_est:chennai:fee")
+    assert "G.O. Ms. No. 55" in c.text and "Rs 100" in c.text and c.confidence < 0.9

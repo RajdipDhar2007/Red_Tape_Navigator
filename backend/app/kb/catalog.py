@@ -98,6 +98,9 @@ LICENCES: dict[str, dict] = {
             "hyderabad": (
                 "Telangana Labour Department checklist page (last reviewed 06 April 2024) lists the Shops and Establishments registration and renewal fee by number of employees: none Rs 100; 1 to 5 Rs 500; 6 to 10 Rs 1,000; 11 to 20 Rs 2,000; 21 to 50 Rs 5,000; 51 to 100 Rs 10,000; 101 and above Rs 10,000 plus Rs 5,000 for each additional 50 persons. Annual payment after 1 December carries a 25% penalty and after 31 December 50%. Confirm the current amount with the labour department before paying"
             ),
+            "chennai": (
+                "Tamil Nadu Shops and Establishments Rules, 1948, rule 2A (G.O. Ms. No. 55, 2 July 2024): every application for registration (Form Y) is made online through the Labour Department's web portal with a fee of Rs 100, and the Inspector issues the registration certificate (Form Z) online within 24 hours. Confirm on the Labour Department portal before filing"
+            ),
         },
         "fee_by_city_conf": 0.8,
         "timeline": "Varies; often a few working days online",
