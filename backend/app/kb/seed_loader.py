@@ -4,7 +4,7 @@ import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.kb import confidence as conf
-from app.kb.catalog import CITIES, LICENCES, REQUIRED_OVERRIDES
+from app.kb.catalog import CITIES, LICENCES, NATIONAL_FALLBACK, REQUIRED_OVERRIDES
 from app.kb.store import ClaimDraft, now, upsert_claim
 from app.scraping.sanitizer import content_hash
 
@@ -27,6 +27,8 @@ def seed_drafts() -> list[ClaimDraft]:
         if lid in REQUIRED_OVERRIDES:
             a_key, u_key = REQUIRED_OVERRIDES[lid]
             scopes = [(c, city[a_key], city[u_key]) for c, city in CITIES.items()]
+            if lid in NATIONAL_FALLBACK:  # keep the general national entry for cities outside the pack
+                scopes.append(("national", lic["authority"], lic["url"]))
         elif by_city:  # state-specific licence: each city's entry carries its own authority, URL and details
             scopes = [(c, e["authority"], e["url"]) for c, e in by_city.items()]
         else:

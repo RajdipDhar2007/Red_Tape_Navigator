@@ -376,6 +376,9 @@ STATE_ALIASES = {
     "delhi": "Delhi",
 }
 
+# Licences whose per-city source is a bonus: cities outside the pack still get the general national entry.
+NATIONAL_FALLBACK = {"pollution_consent"}
+
 REQUIRED_OVERRIDES = {
     # which per-city source feeds which licence
     "trade_licence": ("authority", "trade_url"),

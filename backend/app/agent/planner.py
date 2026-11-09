@@ -1,7 +1,7 @@
 """C. Requirement checklist: ordered plan in dependency order with forms and documents."""
 from graphlib import TopologicalSorter
 
-from app.kb.catalog import ACTIVITIES, CITIES, LICENCES, REQUIRED_OVERRIDES
+from app.kb.catalog import ACTIVITIES, CITIES, LICENCES, NATIONAL_FALLBACK, REQUIRED_OVERRIDES
 
 
 def licences_for(activity: str) -> list[str]:
@@ -33,7 +33,7 @@ def city_scope(city_label: str | None) -> str | None:
 def scope_for(lid: str, city_label: str | None) -> str | None:
     """Claim scope for a licence: 'national' or a city key; None when we have no municipal data."""
     if lid in REQUIRED_OVERRIDES or LICENCES[lid].get("by_city"):
-        return city_scope(city_label)
+        return city_scope(city_label) or ("national" if lid in NATIONAL_FALLBACK else None)
     return "national"
 
 

@@ -106,7 +106,7 @@ Read with the owner's Chrome (official sites) and PDF text extraction:
 - **Telangana, partly:** tgpcb.cgg.gov.in/Home/ConsentFee shows only an online fee calculator and the statement that no fee is prescribed for the waste-rule authorisations; no fee table was visible as text.
 - **Maharashtra, NOT added:** the only fee document found (mpcb.gov.in/.../Revisionofconsentfees.pdf) is a Government Resolution of 25-08-2011 in a legacy Marathi font; too old and unreadable to use. The consent-fee-structure page returned 404.
 - **Delhi and West Bengal, NOT read:** dpcc.delhigovt.nic.in returned an error page and wbpcb.gov.in did not load in Chrome; those two cities keep the CPCB link as a placeholder source under the correct board name.
-- The pollution rule is now city-scoped (each city names its own board). In a city outside the nine, the pollution step now says municipal/state data is missing instead of showing the national CPCB entry.
+- The pollution rule is now city-scoped (each city names its own board). In a city outside the nine, the pollution step keeps the general national CPCB entry (`NATIONAL_FALLBACK`), while trade licence and shops registration say municipal data is missing. Checked in Chrome: Chennai manufacturing shows the Tamil Nadu board and its fee text; Nagpur showed the missing-data note before the fallback was added.
 
 ## Municipal trade-licence fees, browser pass (2026-11-09)
 

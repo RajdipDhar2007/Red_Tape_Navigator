@@ -85,3 +85,12 @@ def test_pollution_consent_fees_for_karnataka_tamil_nadu_telangana_and_gujarat()
         assert "17 October 2018" in fee(f"pollution_consent:{city}:fee").text
     assert fee("pollution_consent:bengaluru:fee").confidence < 0.9
 
+
+
+def test_pollution_consent_keeps_the_national_entry_for_cities_outside_the_pack():
+    from app.agent.planner import scope_for
+
+    assert scope_for("pollution_consent", "Nagpur") == "national"
+    assert scope_for("pollution_consent", "Chennai") == "chennai"
+    assert scope_for("trade_licence", "Nagpur") is None
+    assert "Central / State Pollution Control Board" in fee("pollution_consent:national:authority").text
