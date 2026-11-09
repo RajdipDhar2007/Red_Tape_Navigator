@@ -58,6 +58,18 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
     if (allDone && !wasAllDone.current) setBurst((b) => b + 1);
     wasAllDone.current = allDone;
   }, [allDone]);
+  // Only licence names go out (never the citizen's answers or identifiers), and only when they press a button.
+  const planText = [t("shareIntro"), ...steps.map((st) => `${st.order}. ${st.name}`)].join("\n");
+  const [copied, setCopied] = useState(false);
+  const copyPlan = async () => {
+    try {
+      await navigator.clipboard.writeText(planText);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* clipboard blocked: the share link still works */
+    }
+  };
   const nextId = steps.find((st) => !doneSteps.includes(st.licence))?.licence;
   return (
     <section aria-labelledby="chk-h">
@@ -71,6 +83,19 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
         </div>
         {steps.length > 0 && <ProgressRing percent={percent} label={t("progressLabel", { done: doneCount, total: steps.length })} />}
       </div>
+      {steps.length > 0 && !session.plan.out_of_scope && (
+        <div className="no-print mb-3 flex flex-wrap gap-2">
+          <button type="button" className="btn-secondary" onClick={() => window.print()}>
+            {t("print")}
+          </button>
+          <button type="button" className="btn-secondary" onClick={() => void copyPlan()}>
+            {copied ? t("copied") : t("copy")}
+          </button>
+          <a className="btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(planText)}`} target="_blank" rel="noopener noreferrer">
+            {t("share")}
+          </a>
+        </div>
+      )}
       {allDone && (
         <p role="status" className="mb-3 flex items-center gap-2 rounded-xl bg-indgreen-50 p-3 font-semibold text-indgreen-800 animate-pop">
           <Icon name="check" size={20} /> {t("allDone")}
@@ -128,7 +153,7 @@ export default function ChecklistView({ session, mode, onStart }: { session: Ses
               {st.conditional && <span className="badge ml-2 bg-slate-200">{t("conditional")}</span>}
               {!isDone && st.licence === nextId && <span className="badge ml-2 bg-saffron-100 text-saffron-700 animate-ring-pulse">{t("nextUp")}</span>}
             </h3>
-            <button type="button" aria-pressed={isDone} aria-label={`${t("markDone")}: ${st.name}`} onClick={() => toggle(st.licence)} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition ${isDone ? "border-indgreen-600 bg-indgreen-600 text-white" : "border-slate-300 bg-white text-transparent hover:border-indgreen-500 hover:text-indgreen-500"}`}>
+            <button type="button" aria-pressed={isDone} aria-label={`${t("markDone")}: ${st.name}`} onClick={() => toggle(st.licence)} className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 transition ${isDone ? "border-indgreen-600 bg-indgreen-600 text-white" : "border-slate-300 bg-white text-transparent hover:border-indgreen-500 hover:text-indgreen-500"}`}>
               <Icon name="check" size={18} className={isDone ? "animate-tick" : ""} />
             </button>
             </div>

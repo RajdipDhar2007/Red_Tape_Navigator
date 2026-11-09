@@ -111,7 +111,12 @@
     "markDone": "Mark this step as done",
     "progressLabel": "{done} of {total} steps done",
     "allDone": "Every step is done. Well done!",
-    "nextUp": "Next up"
+    "nextUp": "Next up",
+    "print": "Print or save as PDF",
+    "copy": "Copy checklist",
+    "copied": "Copied",
+    "share": "Share on WhatsApp",
+    "shareIntro": "My licence checklist from Red Tape Navigator (guidance only, verify with each authority):"
   },
   "interview": {
     "heading": "A few details",

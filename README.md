@@ -218,6 +218,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
   marker, and a tricolour confetti burst when every step is done. The finished-forms screen also celebrates.
 - Interview: slide-in chat bubbles, a typing indicator, an animated progress bar and milestone cheers. Dashboard: a progress ring and
   badges derived from the citizen's own plans.
+- The plan can be printed or saved as PDF (print stylesheet), copied, or shared to WhatsApp (licence names only, never answers or identifiers).
 - Every effect is skipped when the visitor's system asks for reduced motion; the strings exist in `en`, `hi` and `bn`.
 
 ## 5. Technology and tools used
