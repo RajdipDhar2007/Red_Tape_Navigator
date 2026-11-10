@@ -1,3 +1,5 @@
+> **SUPERSEDED 2026-11-10:** the owner decided the site is free to use and charges no one. Ignore every billing, pricing, Razorpay, paywall, invoice and plan-limit item below; do not build them. See `docs/BUSINESS_MODEL.md`.
+
 # Prompt for the next session (copy everything below the line)
 
 ---

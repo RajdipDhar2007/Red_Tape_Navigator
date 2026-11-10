@@ -11,7 +11,6 @@ from app.agent.llm import LLM
 from app.agent.research import DISCLAIMER, research
 from app.api.consent import has_consent
 from app.api.deps import current_user
-from app.billing.service import entitlements
 from app.core import audit
 from app.core.config import get_settings
 from app.db.models import ExternalRequest, NavSession, User
@@ -375,8 +374,6 @@ def _require_reviewed(ns: NavSession) -> None:
 async def download(sid: str, fid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     ns = await svc.get_owned(db, user, sid)
     _require_reviewed(ns)
-    if "form_prefill" not in (await entitlements(db, user.id))["features"]:  # server-side paywall; open while billing is off
-        raise HTTPException(402, {"error": "upgrade_required", "feature": "form_prefill"})
     fills = await svc.fill_all(db, ns)
     if fid not in fills:
         raise HTTPException(404, "Unknown form")

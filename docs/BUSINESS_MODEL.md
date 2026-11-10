@@ -1,31 +1,26 @@
-# Business model (draft, all prices and numbers are placeholders)
+# Business model: free for everyone
 
-Status: DRAFT for the owner. Nothing here is a market study. Every number is an assumption unless a source is cited.
+Decision (owner, 2026-11-10): **Red Tape Navigator is free to use. No one is ever charged for the app or the site.**
+
+This is enforced in code, not just stated:
+- There is no payment provider, checkout, subscription, invoice or paywall in the code base, and no price list. Migration `0006` removed the billing tables that an earlier test-mode build had created.
+- `backend/tests/test_free_forever.py` fails if a billing, checkout, invoice, Razorpay or subscription route, setting or table is ever added back.
+- Every feature (plan, checklist, form pre-fill and download, reminders, vault, calendar) is open to every signed-in user.
+- The product never collects card, UPI or bank details.
 
 ## Who it is for
-1. Individuals and first-time shop owners (one business): need to know what to apply for, in what order.
+1. Individuals and first-time shop owners: need to know what to apply for, in what order.
 2. Owners with several outlets: need a calendar of renewals across outlets.
-3. Professionals (CAs, consultants, lawyers, CSC operators): manage many clients and want one place for each client's plan, documents and renewals.
+3. Professionals (CAs, consultants, lawyers, CSC operators): manage many clients' plans and renewals. Also free.
 
-## Plans (prices live in `backend/config/pricing.yaml`, placeholders)
-| Plan | For | Limits | Placeholder price |
-|---|---|---|---|
-| Free | trying it, one business | 1 business, 5 vault documents, email reminders | Rs 0 |
-| Plus | one serious business | form pre-fill, SMS reminders, vault, calendar export, city comparison | Rs 199/month or 1,999/year |
-| Multi-outlet | up to 10 businesses | everything in Plus plus bulk calendar | Rs 599/month or 5,999/year |
-| Partner | professionals, up to 100 clients | client workspaces, white-label, referrals | Rs 1,499/month or 14,999/year |
+## Who pays for running it
+The owner, or someone the owner chooses. Nothing here is decided or asserted; these are options for the owner:
+- the owner's own funds
+- a grant, a CSR programme or a sponsor
+- a government department or CSC programme that wants it for its citizens
+- volunteers and donated services
 
-The plan, the checklist and the cited rules stay free: they are the public-good part and the reason people trust the product. Payment is for convenience features (pre-filled forms, reminders by SMS, storage, many businesses).
+Any option that puts a price, a donation prompt or advertising in front of users is a product change and needs the owner's explicit decision first.
 
-## What is built (test mode only)
-Done 2026-11-10: plans from `pricing.yaml`, `GET /billing/plans|me|invoices`, `POST /billing/checkout|cancel`, a Razorpay hosted-link adapter and signed idempotent webhook, gap-free invoice numbers with GST split, grace period after a plan lapses, admin refund record, and a server-side paywall on the prefilled-form download (402 `upgrade_required`). Invoice PDF done (`GET /billing/invoices/{number}/pdf`, marked DRAFT until GSTIN and SAC are set). Still to build: billing page and customer portal in the web app, plan-limit enforcement (businesses, team members, vault), teams, partner portal.
-Plan/entitlement model, payment-provider abstraction (Razorpay test mode first), signed webhooks with idempotency, GST invoice records, server-side entitlement checks. No real money moves until the owner supplies live provider keys and company details (see `docs/OWNER_ACTIONS.md`).
-
-## Costs the product itself carries (see docs/FINAL_REPORT.md when written)
-Hosting and Postgres, email, SMS per message (MSG91), Digio per signature and DigiLocker call, optional LLM usage, payment gateway fees. All are the owner's contracts; amounts depend on the owner's quotes and are not asserted here.
-
-## Unit economics
-Not estimated. Needs real conversion and cost data from the pilot (docs/PILOT_PLAN.md). Assumption to test: a small share of free users convert to Plus, and partners bring several clients each.
-
-## Alternatives the owner may prefer
-Free for citizens and funded by a department or CSC programme (then billing stays off: set `BILLING_ENABLED=false`).
+## Running costs (the owner's contracts; amounts are not asserted)
+Hosting and Postgres, email, SMS per message (MSG91, only if SMS reminders are switched on), Digio per signature and DigiLocker call (only if e-sign is switched on), and optional LLM usage. The free product works without SMS, e-sign and the LLM (rules-first mode). See `docs/HUMAN_TODO.md` Part 4 for indicative figures.
