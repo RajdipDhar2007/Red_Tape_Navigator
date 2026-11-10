@@ -144,3 +144,8 @@ Hindi/Bengali keywords: all 120 business types now have both (Cloud kitchen was 
 ## Rule freshness check (2026-11-10)
 
 `scripts/rule_freshness.py` lists rules whose official source was not re-read within 60 days (warn) or 90 days (overdue; `--strict` exits 1, and CI runs it with `--strict`). The last-verified date comes from `backend/config/rule_verified.csv` (longest matching key prefix), else the baseline date 2026-11-08 when the pack was first seeded. Whoever re-reads a source adds a row there and a section here. First overdue date for the baseline: 2027-02-06.
+
+## Maharashtra pollution consent fees (2026-11-10, ninth pass)
+
+Read in Chrome: mpcb.gov.in/en/consent-fee-structure (MPCB "CONSENT FEE STRUCTURE", search listing dated 21 Jan 2026): the table of fees by capital investment, identical for Consent to Establish and Consent to Operate (below Rs 10 lakh Rs 500 up to Rs 1,25,000 for 75-100 crore, 0.02% above 100 crore), plus a separate table for urban local bodies under the Water Act and a mining add-on. Added as `pollution_consent:mumbai:fee` and `pollution_consent:pune:fee` (confidence 0.8, capped, unreviewed), with hi/bn rows and a test. The consent terms (1/2/3 years) appeared only in a third-party snippet, not on the page I read, so they are NOT in the rule. The urban-local-body table and the mining add-on were left out as irrelevant to a small shop.
+Dead ends: West Bengal Pollution Control Board: wbpcb.gov.in/consent-to-operate redirects to wbocmms.nic.in, which Chrome refused to let me read ("permission denied for this domain"); the 26 Mar 2018 fee circular there is therefore unread, so no WBPCB fee was added. The Wayback copy of the BBMP trade-licence FAQ froze the tab. Delhi (DPCC) not yet tried.

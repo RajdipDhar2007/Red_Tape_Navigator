@@ -198,6 +198,12 @@ LICENCES: dict[str, dict] = {
             "surat": (
                 "Gujarat Water (Prevention and Control of Pollution) (Amendment) Rules, 2018 (Gujarat Government Gazette Extraordinary of 17 October 2018, linked on the Gujarat Pollution Control Board's Consent Fees Structure page): the processing fee for consent to establish is Rs 2,000 for investment below Rs 0.25 crore, Rs 3,000 for 0.25 to 0.5 crore, Rs 6,000 for 0.5 to 1 crore and Rs 15,000 for 1 to 5 crore, rising to Rs 10,00,000 for Rs 5,000 crore and above. The yearly processing fee for consent to operate under the Water Act depends on water use: for example Rs 2,000 (red), Rs 1,800 (orange) and Rs 1,500 (green) below 10 kilolitres a day, and Rs 10,000, Rs 8,800 and Rs 7,500 for 100 to 500 kilolitres a day. Confirm the current table with the Board before paying"
             ),
+            "mumbai": (
+                "Maharashtra Pollution Control Board consent fee structure page (mpcb.gov.in, page dated 21 Jan 2026): the fee for consent to establish and for consent to operate is set by capital investment (land, building and machinery without depreciation) and is the same for both: below Rs 10 lakh Rs 500; Rs 10 to 60 lakh Rs 1,500; Rs 60 lakh to 1 crore Rs 5,000; Rs 1 to 5 crore Rs 15,000; Rs 5 to 10 crore Rs 25,000; Rs 10 to 25 crore Rs 50,000; Rs 25 to 50 crore Rs 75,000; Rs 50 to 75 crore Rs 1,00,000; Rs 75 to 100 crore Rs 1,25,000; above Rs 100 crore 0.02% of capital investment. Confirm the current amount on the MPCB site before paying"
+            ),
+            "pune": (
+                "Maharashtra Pollution Control Board consent fee structure page (mpcb.gov.in, page dated 21 Jan 2026): the fee for consent to establish and for consent to operate is set by capital investment (land, building and machinery without depreciation) and is the same for both: below Rs 10 lakh Rs 500; Rs 10 to 60 lakh Rs 1,500; Rs 60 lakh to 1 crore Rs 5,000; Rs 1 to 5 crore Rs 15,000; Rs 5 to 10 crore Rs 25,000; Rs 10 to 25 crore Rs 50,000; Rs 25 to 50 crore Rs 75,000; Rs 50 to 75 crore Rs 1,00,000; Rs 75 to 100 crore Rs 1,25,000; above Rs 100 crore 0.02% of capital investment. Confirm the current amount on the MPCB site before paying"
+            ),
         },
         "fee_by_city_conf": 0.8,
         "portal_login": True,

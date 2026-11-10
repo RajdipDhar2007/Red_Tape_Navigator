@@ -87,6 +87,16 @@ def test_pollution_consent_fees_for_karnataka_tamil_nadu_telangana_and_gujarat()
 
 
 
+def test_pollution_consent_fee_for_maharashtra_cities():
+    for city in ("mumbai", "pune"):
+        c = fee(f"pollution_consent:{city}:fee")
+        assert "Rs 1,500" in c.text and "0.02%" in c.text and "21 Jan 2026" in c.text
+        assert c.confidence < 0.9
+    from app.agent.planner import scope_for
+
+    assert scope_for("pollution_consent", "Pune") == "pune"
+
+
 def test_pollution_consent_keeps_the_national_entry_for_cities_outside_the_pack():
     from app.agent.planner import scope_for
 

@@ -1,3 +1,5 @@
 key_prefix,verified_on,note
 # A rule's last-verified date is the longest matching key_prefix row here; rules with no row use BASELINE_DATE in scripts/rule_freshness.py.
 # Add a row whenever someone re-reads the rule's official source (record the source in docs/RULES_VERIFICATION.md).
+pollution_consent:mumbai:fee,2026-11-10,mpcb.gov.in consent fee structure
+pollution_consent:pune:fee,2026-11-10,mpcb.gov.in consent fee structure
