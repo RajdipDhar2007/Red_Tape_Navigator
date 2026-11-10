@@ -185,7 +185,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 - **How:** official pages and documents were read in a browser or extracted locally (PyMuPDF, isolated Python) and recorded with their sources
   in `docs/RULES_VERIFICATION.md`; nothing is copied from memory.
-- `make verify-sources` now reports numeric versus qualitative claims; a reviewer worksheet is exported (`docs/RULES_REVIEW_EXPORT.csv`, 306 rules).
+- `make verify-sources` now reports numeric versus qualitative claims; a reviewer worksheet is exported (`docs/RULES_REVIEW_EXPORT.csv`, now 438 rules).
 - **Sourced licences** (`backend/app/kb/sourced_licences.py`): liquor retail (state-specific for all 9 cities: West Bengal, Maharashtra, Delhi,
   Karnataka e-auction from the 01.07.2026 Gazette, Tamil Nadu, Telangana, Gujarat), retail drug licence (Delhi checklist + Drugs Rules), pet shop
   (final Pet Shop Rules 2018), clinic/hospital registration, bio-medical waste, school recognition, college approval, coaching registration, BIS
@@ -243,7 +243,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 ## 6. Current status: real, simulated, untested
 
 Numbers as of the last update: **436 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 7 browser e2e tests, **9 cities**,
-**120 business types**, **16 licences** (2 state-specific by city), **306 seeded rules**, **3 languages**, **7 CI jobs** green.
+**120 business types**, **16 licences** (2 state-specific by city), **438 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
 | --- | --- |
@@ -305,13 +305,13 @@ The e2e suite needs ports 3000 and 8000 free (set `E2E_BACKEND_CMD` to your venv
 Run all of these before every push, and report real output:
 
 ```bash
-cd backend && ruff check . && mypy app && python -m pytest && python -m evals.run
+cd backend && ruff check . && mypy app && python -m pytest && python -m evals.run && python ../scripts/rule_freshness.py --strict
 cd ../frontend && npm run lint && npm run typecheck && npm test && npm run build
 cd frontend && npx playwright test          # needs the ports free
 ```
 
 CI (`.github/workflows/ci.yml`) runs on every push. A newer push cancels a run in progress, so push once per verified change and wait for the
-result (`gh run list`, `gh run view`). Test layers: unit and API tests (`backend/tests`, 19 test files), catalogue integrity
+result (`gh run list`, `gh run view`). Test layers: unit and API tests (`backend/tests`, 22 test files), catalogue integrity
 (`test_catalog_integrity.py`: every type, keyword, state entry and source allowlist), translation alignment (`test_i18n_content.py`),
 integration mocks (`test_digio.py`), browser e2e (`frontend/e2e`), evals (`backend/evals`).
 
@@ -340,7 +340,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | E | **Official forms** (**HUMAN** FSSAI permission) | Email `helpdesk-foscos@fssai.gov.in` for permission to reproduce Form A and Form B; then officers fetch the PDFs through the console (allowlisted URLs), you write the field-map JSON in `backend/app/forms/templates/`, an officer approves; keep the key-in sheet for FoSCoS and Udyam | `docs/INTEGRATIONS.md` (field-map procedure), `backend/app/forms/official.py` |
 | F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for all the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review). The officer console (`staff.*` strings) is already translated in `en`, `hi` and `bn`, pending the same native review | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
 | G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
-| H | **Business readiness** (**HUMAN** decisions) | Decide who pays (free for citizens funded by a department/CSC programme, subscription or per use), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
+| H | **Business readiness** (**HUMAN** decisions) | Decide who funds the running costs (the product is free for every user and never charges anyone; see `docs/BUSINESS_MODEL.md`), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
 | I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
 
 **Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence
@@ -416,7 +416,7 @@ backend/
     jobs/         worker (reminders, weekly form re-checks)
     kb/           catalog, sourced_licences, business_types, seed_loader, store, confidence
     scraping/     allowlist, guarded fetcher, sanitizer
-  migrations/     Alembic (0001 to 0004)      tests/  19 files      evals/  golden cases      config/sources.yaml  allowlist
+  migrations/     Alembic (0001 to 0006)      tests/  22 files      evals/  golden cases      config/sources.yaml  allowlist
 frontend/         Next.js App Router, next-intl messages (en/hi/bn), components, e2e (Playwright)
 infra/            Terraform skeleton            deploy/  Caddyfile      render.yaml  Render Blueprint
 docs/             see below                     scripts/ placeholder forms, key rotation, load test, rules export, source verification

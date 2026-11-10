@@ -38,10 +38,10 @@ costs and how it is funded.
 - The previous owner's personal machine preferences (drive letters, accounts) do not apply to your machine unless told.
 
 ## Snapshot at handoff (November 2026)
-Backend 429 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
+Backend 436 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
 7 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
-306 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
-against the real services. Four Alembic migrations (0001 to 0004).
+438 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
+against the real services. Six Alembic migrations (0001 to 0006). **The product is free to use and charges no one (owner decision, 2026-11-10): do not add billing, prices, payments or paywalls** (`docs/BUSINESS_MODEL.md`; `tests/test_free_forever.py` enforces it).
 
 ## Step 0: get the code and run it
 1. Ask the owner (GitHub user `RajdipDhar2007`) to add you as a collaborator on the PRIVATE repo
@@ -135,7 +135,7 @@ screen-reader tests. Penetration test or at least the `docs/SECURITY.md` checkli
 from `sessionStorage` to httpOnly cookies behind a BFF, consider MFA/OIDC, design CSC-operator delegation, decide LLM egress/residency with counsel.
 Pilot with 5-10 real shop owners (`docs/PILOT_PLAN.md`), collect feedback, fix, then launch.
 ### H. Business readiness (ask the owner; decisions, not code)
-Who pays and how (free for citizens funded by a department/CSC programme, subscription, per use)? Support channel and response times, an on-call
+Who funds the running costs (the product itself is free for everyone; see `docs/BUSINESS_MODEL.md`)? Support channel and response times, an on-call
 contact (`docs/RUNBOOK.md`), a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage),
 a custom domain, SPF/DKIM/DMARC, and a data-processing agreement with each provider. Write the answers into `docs/`, wire any configuration they imply,
 and put the cost table in the final report.
@@ -231,3 +231,11 @@ Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai;
 - PITFALL: before `npx playwright test`, kill every leftover `next start` and `uvicorn` process (PowerShell: Get-CimInstance Win32_Process, match the command line). A stale `next start` from an earlier test pass kept port 3000 after I rebuilt `.next`, served the old HTML with missing chunks, and all 5 e2e tests failed with "Application error: a client-side exception". Playwright reuses a server it finds on the port (`reuseExistingServer` is on outside CI).
 - Writing multi-line Unicode edit scripts: use the Write tool to create the .py file, not a bash heredoc (a long heredoc with quotes made bash fail with "unexpected EOF").
 
+
+### Session log: 2026-11-10 (freshness check, MPCB fees, billing built then removed)
+
+- Done: `scripts/rule_freshness.py` with `backend/config/rule_verified.csv` (warn at 60 days, overdue at 90; CI runs it with `--strict`); Maharashtra MPCB consent fee table for Mumbai and Pune (source mpcb.gov.in consent-fee-structure page dated 21 Jan 2026; confidence capped at 0.8); Hindi and Bengali keywords for all business types (test enforces it); MSG91 adapter checked against its docs (set `MSG91_TEXT_VAR` to the template variable name).
+- **Billing was built in test mode and then removed the same day** because the owner decided the site is free for everyone. Migration `0005` (billing tables) is followed by `0006` which drops them. Nothing about payments, invoices, GST invoicing, Razorpay, pricing or paywalls should come back; `docs/NEXT_SESSION_PROMPT.md` is marked superseded for those items.
+- Not readable (logged in `docs/RULES_VERIFICATION.md`, no rule added): Pune and Bengaluru trade-licence fees, West Bengal pollution fee circular (`wbocmms.nic.in` blocked in Chrome), Delhi DPCC fee table (scanned PDF froze Chrome twice), Digio docs (HTTP 500). Delhi white-category exemption and consent validity (5/10/15 years) are logged but not yet in a rule.
+- `docs/HUMAN_TODO.md` lists what only the owner can do and what to hand over, with indicative costs taken from secondary sources (confirm on official pages).
+- Next: the free-product roadmap in `docs/NEXT_SESSION_PROMPT.md` minus billing (accounts and teams, partner tools that stay free, admin console, support, SEO/PWA, security and deployment kits); remaining rule research once the owner supplies the unreadable pages.
