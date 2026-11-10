@@ -22,6 +22,7 @@ jobs:
       - run: mypy app
       - run: python -m pytest   # fails under 80% coverage (pyproject: fail_under = 80)
       - run: python -m evals.run  # golden cases, citation coverage, hallucination gate
+      - run: python ../scripts/rule_freshness.py --strict  # warns after 60 days, fails when a rule is over 90 days since its source was re-read
 
   backend-postgres:
     name: Backend on PostgreSQL + pgvector (migrations + tests)

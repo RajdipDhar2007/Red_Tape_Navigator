@@ -140,3 +140,7 @@ Read in Chrome: Pune Municipal Corporation (pmc.gov.in/en). The home page, sitem
 MSG91: docs.msg91.com/sms/send-sms (updated 29 Oct 2026) checked against `app/integrations/real/msg91.py`: URL, headers, body fields and success response match. The docs example calls the template variable `VAR1`; the key must equal the variable in the DLT template, so `MSG91_TEXT_VAR` must be set to it. Digio: documentation.digio.in returned HTTP 500 on 2026-11-10, so the earlier reading stands and the adapters are unchanged.
 
 Hindi/Bengali keywords: all 120 business types now have both (Cloud kitchen was the last); `tests/test_local_keywords.py` enforces it.
+
+## Rule freshness check (2026-11-10)
+
+`scripts/rule_freshness.py` lists rules whose official source was not re-read within 60 days (warn) or 90 days (overdue; `--strict` exits 1, and CI runs it with `--strict`). The last-verified date comes from `backend/config/rule_verified.csv` (longest matching key prefix), else the baseline date 2026-11-08 when the pack was first seeded. Whoever re-reads a source adds a row there and a section here. First overdue date for the baseline: 2027-02-06.
