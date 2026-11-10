@@ -38,10 +38,10 @@ costs and how it is funded.
 - The previous owner's personal machine preferences (drive letters, accounts) do not apply to your machine unless told.
 
 ## Snapshot at handoff (November 2026)
-Backend 436 tests passing (about 95.7% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
-7 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
+Backend 443 tests passing (about 95.8% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
+10 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
 438 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
-against the real services. Six Alembic migrations (0001 to 0006). **The product is free to use and charges no one (owner decision, 2026-11-10): do not add billing, prices, payments or paywalls** (`docs/BUSINESS_MODEL.md`; `tests/test_free_forever.py` enforces it).
+against the real services. Seven Alembic migrations (0001 to 0007). **The product is free to use and charges no one (owner decision, 2026-11-10): do not add billing, prices, payments or paywalls** (`docs/BUSINESS_MODEL.md`; `tests/test_free_forever.py` enforces it).
 
 ## Step 0: get the code and run it
 1. Ask the owner (GitHub user `RajdipDhar2007`) to add you as a collaborator on the PRIVATE repo
@@ -239,3 +239,13 @@ Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai;
 - Not readable (logged in `docs/RULES_VERIFICATION.md`, no rule added): Pune and Bengaluru trade-licence fees, West Bengal pollution fee circular (`wbocmms.nic.in` blocked in Chrome), Delhi DPCC fee table (scanned PDF froze Chrome twice), Digio docs (HTTP 500). Delhi white-category exemption and consent validity (5/10/15 years) are logged but not yet in a rule.
 - `docs/HUMAN_TODO.md` lists what only the owner can do and what to hand over, with indicative costs taken from secondary sources (confirm on official pages).
 - Next: the free-product roadmap in `docs/NEXT_SESSION_PROMPT.md` minus billing (accounts and teams, partner tools that stay free, admin console, support, SEO/PWA, security and deployment kits); remaining rule research once the owner supplies the unreadable pages.
+
+### Session log: 2026-11-10 (accounts and teams)
+
+- Migration `0007`: `users.email_verified_at`, `totp_secret` (Fernet-encrypted), `totp_enabled`, `totp_last_step`, `recovery_hashes`; tables `workspaces`, `workspace_members`, `workspace_invites`; `nav_sessions.workspace_id`.
+- Email confirmation: `POST /auth/verify-email/send` and `/auth/verify-email` (JWT bound to the address, 48 hours). Registration sends the mail in the background. Confirmation is required only to invite people and to accept an invitation; everything else stays open.
+- Two-factor: `app/core/totp.py` (stdlib RFC 6238, checked against the RFC test vectors). `POST /auth/2fa/setup|enable|disable`. Login answers 401 `{"code":"otp_required"}` after a correct password when 2FA is on; a wrong code counts as a failed attempt (lockout applies); a used step cannot be reused; recovery codes are single-use and stored hashed.
+- Teams (`app/api/workspaces.py`): roles owner/admin/member; invitations return a one-time token that the inviter shares (nothing is e-mailed on anyone's behalf); the invitee must be signed in with the invited address and have confirmed it. A session is shared into a team only by its owner (`workspace_id`), and `get_owned` lets team members open it; all other sessions stay private (404, not 403). Erasing an account hands a team to its longest-standing other member (admins first) or deletes it if empty.
+- Dev-database fix: `sqlite_upgrade.add_missing_columns` now honours column `server_default`. Before this a NOT NULL JSON column without a literal default was skipped, so an older local or e2e SQLite file made registration return 500. If you see that, delete `backend/data/e2e.db` or run the app once on current code.
+- UI: Teams page, invitation and email-confirmation pages, two-factor and email status on the account page, code field on login; English, Hindi and Bengali strings added (Hindi and Bengali pending native review). `frontend/e2e/accounts.spec.ts` computes TOTP codes itself.
+- Not done: password-less sign-in, trusted devices, per-team audit view, team-level rules or reminders, CSV import of clients for partners, real-authenticator-app test, Chrome walkthrough of the new pages in all three languages.

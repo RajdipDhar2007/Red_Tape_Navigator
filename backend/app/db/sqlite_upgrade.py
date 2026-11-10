@@ -14,6 +14,12 @@ from app.db.models import Base
 log = logging.getLogger(__name__)
 
 
+def _server_default_text(col) -> str | None:
+    arg = getattr(col.server_default, "arg", None)
+    text = getattr(arg, "text", arg)
+    return text if isinstance(text, str) else None
+
+
 def add_missing_columns(conn: Connection) -> list[str]:
     """ALTER TABLE ... ADD COLUMN for every model column missing from an existing table. Returns what was added."""
     if conn.dialect.name != "sqlite":
@@ -32,6 +38,8 @@ def add_missing_columns(conn: Connection) -> list[str]:
                 default = int(default)
             if isinstance(default, int | float | str):
                 clause = f" DEFAULT {default!r}" if isinstance(default, str) else f" DEFAULT {default}"
+            elif (sd := _server_default_text(col)) is not None:
+                clause = " DEFAULT '" + sd.replace("'", "''") + "'"  # a database-side default is enough for old rows
             elif col.nullable:
                 clause = ""
             else:

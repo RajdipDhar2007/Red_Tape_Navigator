@@ -8,11 +8,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import current_user
-from app.core import audit
+from app.core import audit, totp
 from app.core.config import get_settings
+from app.core.crypto import decrypt, encrypt
 from app.core.security import (
     create_reset_token,
     create_token,
+    create_verify_token,
     decode_token,
     hash_password,
     reset_token_matches,
@@ -35,6 +37,7 @@ class RegisterIn(BaseModel):
 class LoginIn(BaseModel):
     email: EmailStr
     password: str
+    otp: str | None = Field(default=None, max_length=32)  # authenticator code or a recovery code
 
 
 class RefreshIn(BaseModel):
@@ -56,7 +59,7 @@ async def _issue(db: AsyncSession, user: User) -> TokenOut:
 
 
 @router.post("/register", response_model=TokenOut, status_code=201)
-async def register(body: RegisterIn, db: AsyncSession = Depends(get_db)):
+async def register(body: RegisterIn, background: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     exists = (await db.execute(select(User).where(User.email == body.email.lower()))).scalar_one_or_none()
     if exists:
         raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
@@ -65,6 +68,7 @@ async def register(body: RegisterIn, db: AsyncSession = Depends(get_db)):
     db.add(user)
     await db.commit()
     await audit.record(db, user.id, "auth.register")
+    background.add_task(_send_verify_email, user.email, user.language, create_verify_token(user.id, user.email))
     return await _issue(db, user)
 
 
@@ -81,7 +85,12 @@ async def login(body: LoginIn, db: AsyncSession = Depends(get_db)):
         if until and until > now:  # locked: even the right password is refused until the window ends
             await audit.record(db, user.id, "auth.login_blocked_locked")
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, {"code": "account_locked", "message": f"Too many failed attempts. Try again in {max(1, int((until - now).total_seconds() // 60) + 1)} minutes, or reset your password."})
-    if not user or user.deleted_at or not valid:
+    otp_ok = True
+    if valid and user and not user.deleted_at and user.totp_enabled:
+        if not body.otp:  # right password, second factor still needed: not a failed attempt
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, {"code": "otp_required", "message": "Enter the 6-digit code from your authenticator app, or a recovery code."})
+        otp_ok = _consume_second_factor(user, body.otp)
+    if not user or user.deleted_at or not valid or not otp_ok:
         if user and not user.deleted_at:
             user.failed_logins = (user.failed_logins or 0) + 1
             if user.failed_logins >= s.lockout_threshold:
@@ -126,7 +135,8 @@ async def refresh(body: RefreshIn, db: AsyncSession = Depends(get_db)):
 
 @router.get("/me")
 async def me(user: User = Depends(current_user)):
-    return {"id": user.id, "email": user.email, "role": user.role, "language": user.language}
+    return {"id": user.id, "email": user.email, "role": user.role, "language": user.language,
+            "email_verified": user.email_verified_at is not None, "two_factor": bool(user.totp_enabled)}
 
 
 class ForgotIn(BaseModel):
@@ -160,6 +170,35 @@ _RESET_MAIL = {
         "আপনি অনুরোধ না করে থাকলে এই ইমেল উপেক্ষা করুন; আপনার পাসওয়ার্ড বদলায়নি।",
     ),
 }
+
+_VERIFY_MAIL = {
+    "en": ("Confirm your email for Red Tape Navigator", "Open this link to confirm your email address (valid 48 hours):\n{url}\n\nIf you did not create an account, ignore this email."),
+    "hi": ("Red Tape Navigator के लिए अपना ईमेल पुष्ट करें", "अपना ईमेल पता पुष्ट करने के लिए यह लिंक खोलें (48 घंटे तक मान्य):\n{url}\n\nयदि आपने खाता नहीं बनाया, तो इस ईमेल को अनदेखा करें।"),
+    "bn": ("Red Tape Navigator-এর জন্য আপনার ইমেল নিশ্চিত করুন", "আপনার ইমেল ঠিকানা নিশ্চিত করতে এই লিঙ্কটি খুলুন (৪৮ ঘণ্টা বৈধ):\n{url}\n\nআপনি অ্যাকাউন্ট না খুলে থাকলে এই ইমেল উপেক্ষা করুন।"),
+}
+
+
+async def _send_verify_email(email: str, language: str, token: str) -> None:
+    """Goes only to the address being verified, never to anyone else."""
+    s = get_settings()
+    subject, body = _VERIFY_MAIL.get(language, _VERIFY_MAIL["en"])
+    url = f"{s.web_base_url.rstrip('/')}/{language if language in _VERIFY_MAIL else 'en'}/verify-email?token={token}"
+    await get_email_sender().send(email, body.format(url=url), subject)
+
+
+def _consume_second_factor(user: User, code: str) -> bool:
+    """Accept a current authenticator code (once only) or an unused recovery code (burned on use). Mutates ``user``; caller commits."""
+    if user.totp_secret:
+        step = totp.verify(decrypt(user.totp_secret), code, user.totp_last_step or 0)
+        if step is not None:
+            user.totp_last_step = step
+            return True
+    h = totp.hash_recovery(code)
+    if h in (user.recovery_hashes or []):
+        user.recovery_hashes = [x for x in user.recovery_hashes if x != h]
+        return True
+    return False
+
 
 async def _send_reset_email(email: str, language: str, token: str) -> None:
     s = get_settings()
@@ -212,3 +251,80 @@ async def change_password(body: ChangePasswordIn, user: User = Depends(current_u
     await _revoke_all(db, user.id)
     await audit.record(db, user.id, "auth.password_changed")
     return await _issue(db, user)
+
+
+class TokenIn(BaseModel):
+    token: str = Field(min_length=20, max_length=2000)
+
+
+@router.post("/verify-email/send", status_code=202)
+async def resend_verification(background: BackgroundTasks, user: User = Depends(current_user)):
+    if user.email_verified_at is None:
+        background.add_task(_send_verify_email, user.email, user.language, create_verify_token(user.id, user.email))
+    return {"status": "ok"}
+
+
+@router.post("/verify-email")
+async def verify_email(body: TokenIn, db: AsyncSession = Depends(get_db)):
+    bad = HTTPException(status.HTTP_400_BAD_REQUEST, "Verification link is invalid or has expired")
+    try:
+        data = decode_token(body.token, "verify")
+    except jwt.PyJWTError as exc:
+        raise bad from exc
+    user = await db.get(User, data["sub"])
+    if user is None or user.deleted_at or user.email != data.get("em"):
+        raise bad
+    if user.email_verified_at is None:
+        user.email_verified_at = datetime.now(UTC)
+        await db.commit()
+        await audit.record(db, user.id, "auth.email_verified")
+    return {"status": "verified"}
+
+
+class CodeIn(BaseModel):
+    code: str = Field(min_length=6, max_length=32)
+
+
+class DisableIn(CodeIn):
+    password: str
+
+
+@router.post("/2fa/setup")
+async def two_factor_setup(user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    """Starts enrolment. Two-factor is not active until a code from the app is confirmed with /2fa/enable."""
+    if user.totp_enabled:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Two-factor sign-in is already on")
+    secret = totp.new_secret()
+    user.totp_secret = encrypt(secret)
+    await db.commit()
+    return {"secret": secret, "otpauth_uri": totp.otpauth_uri(secret, user.email)}
+
+
+@router.post("/2fa/enable")
+async def two_factor_enable(body: CodeIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    if user.totp_enabled or not user.totp_secret:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Start with /auth/2fa/setup")
+    step = totp.verify(decrypt(user.totp_secret), body.code, user.totp_last_step or 0)
+    if step is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "That code is not correct. Check the time on your phone and try again.")
+    codes = totp.new_recovery_codes()
+    user.totp_enabled, user.totp_last_step = True, step
+    user.recovery_hashes = [totp.hash_recovery(c) for c in codes]
+    await db.commit()
+    await audit.record(db, user.id, "auth.2fa_enabled")
+    return {"enabled": True, "recovery_codes": codes}  # shown once; only hashes are kept
+
+
+@router.post("/2fa/disable")
+async def two_factor_disable(body: DisableIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    if not user.totp_enabled:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Two-factor sign-in is not on")
+    uid = user.id  # read before a rollback expires the instance
+    if not await asyncio.to_thread(verify_password, body.password, user.password_hash) or not _consume_second_factor(user, body.code):
+        await db.rollback()
+        await audit.record(db, uid, "auth.2fa_disable_failed")
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Password or code is incorrect")
+    user.totp_enabled, user.totp_secret, user.totp_last_step, user.recovery_hashes = False, None, 0, []
+    await db.commit()
+    await audit.record(db, user.id, "auth.2fa_disabled")
+    return {"enabled": False}

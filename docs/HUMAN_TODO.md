@@ -69,9 +69,11 @@ Every rule I add needs a source link or pasted official text. Without one it sta
 
 ## Part 3. What is already built, and what is not
 
-**Built and tested:** rules catalogue (438 rules, English, Hindi, Bengali), freshness check in CI, interview and form prefill, migrations to `0006`. **There is no billing: the site is free to use and charges no one** (an earlier test-mode billing build was removed on 2026-11-10).
+**To try yourself:** sign up, open Your account, turn on two-factor with an authenticator app on your phone, then create a team. Tell me anything that feels wrong; a real phone has not been tried yet.
 
-**Not built yet:** email verification and two-factor login, teams, partner portal, admin console, help centre, SEO and PWA, document vault, calendar export, security threat model, deployment kit and final report.
+**Built and tested:** rules catalogue (438 rules, English, Hindi, Bengali), freshness check in CI, interview and form prefill, migrations to `0007`, email confirmation, two-factor sign-in (authenticator app) and teams with invitation links. **There is no billing: the site is free to use and charges no one** (an earlier test-mode billing build was removed on 2026-11-10).
+
+**Not built yet:** partner portal, admin console, help centre, SEO and PWA, document vault, calendar export, security threat model, deployment kit and final report.
 
 **Never done and not claimed:** live SMS, live eSign, native-speaker review, legal review, pentest, load test, a pilot.
 

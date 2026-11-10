@@ -24,13 +24,13 @@ def test_adds_missing_columns_keeps_rows_and_is_idempotent(tmp_path):
         Base.metadata.create_all(conn)
         first = add_missing_columns(conn)
         second = add_missing_columns(conn)
-    assert {"users.failed_logins", "users.locked_until"} <= set(first)
+    assert {"users.failed_logins", "users.locked_until", "users.recovery_hashes", "users.totp_enabled", "users.email_verified_at"} <= set(first)
     assert second == []
     with engine.connect() as conn:
         cols = {c["name"] for c in inspect(conn).get_columns("users")}
         assert {"failed_logins", "locked_until"} <= cols
-        row = conn.exec_driver_sql("SELECT email, failed_logins, locked_until FROM users").one()
-    assert tuple(row) == ("old@example.com", 0, None)  # existing account kept, counter defaults to zero
+        row = conn.exec_driver_sql("SELECT email, failed_logins, locked_until, recovery_hashes, totp_enabled FROM users").one()
+    assert tuple(row) == ("old@example.com", 0, None, "[]", 0)  # existing account kept, counter defaults to zero
 
 
 def test_does_nothing_for_a_current_database(tmp_path):

@@ -29,6 +29,11 @@ class User(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     failed_logins: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    totp_secret: Mapped[str | None] = mapped_column(Text, nullable=True)  # Fernet-encrypted base32 secret
+    totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
+    totp_last_step: Mapped[int] = mapped_column(Integer, default=0, server_default="0")  # blocks replay of a used code
+    recovery_hashes: Mapped[list] = mapped_column(JSON, default=list, server_default="[]")  # sha256 of unused one-time recovery codes
 
 
 class RefreshToken(Base):
@@ -82,6 +87,7 @@ class NavSession(Base):
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    workspace_id: Mapped[str | None] = mapped_column(ForeignKey("workspaces.id"), nullable=True, index=True)  # shared with that team
 
 
 class Answer(Base):
@@ -195,3 +201,36 @@ class WebhookEvent(Base):
     __tablename__ = "webhook_events"
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class Workspace(Base):
+    """A team (a family business, a CA firm, a CSC centre). Sessions are private until their owner shares them into a workspace."""
+
+    __tablename__ = "workspaces"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
+    name: Mapped[str] = mapped_column(String(80))
+    created_by: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class WorkspaceMember(Base):
+    __tablename__ = "workspace_members"
+    workspace_id: Mapped[str] = mapped_column(ForeignKey("workspaces.id"), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True, index=True)
+    role: Mapped[str] = mapped_column(String(10))  # owner | admin | member
+    joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class WorkspaceInvite(Base):
+    """The invite token is shown once to the inviter, who shares the link themselves. Only its hash is stored. Nothing is e-mailed."""
+
+    __tablename__ = "workspace_invites"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
+    workspace_id: Mapped[str] = mapped_column(ForeignKey("workspaces.id"), index=True)
+    email: Mapped[str] = mapped_column(String(255))
+    role: Mapped[str] = mapped_column(String(10))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    created_by: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

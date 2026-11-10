@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.db.models import NavSession, User
+from app.db.models import NavSession, User, WorkspaceMember
 from app.forms import filler, official
 from app.forms.context import build_context
 from app.forms.registry import get_template, required_keys_for
@@ -18,7 +18,12 @@ PRIVILEGED = {"admin", "reviewer"}
 
 async def get_owned(db: AsyncSession, user: User, sid: str) -> NavSession:
     ns = await db.get(NavSession, sid)
-    if ns is None or (ns.user_id != user.id and user.role not in PRIVILEGED):
+    if ns is None:
+        raise HTTPException(404, "Session not found")
+    allowed = ns.user_id == user.id or user.role in PRIVILEGED
+    if not allowed and ns.workspace_id:  # shared into a team the caller belongs to
+        allowed = await db.get(WorkspaceMember, (ns.workspace_id, user.id)) is not None
+    if not allowed:
         raise HTTPException(404, "Session not found")  # 404 not 403: do not reveal existence
     return ns
 

@@ -36,6 +36,15 @@ untrusted input to the rest of the system.
 Tokens are kept in `sessionStorage` in the demo UI (cleared when the tab closes). For production, front the API with a
 BFF that stores tokens in `HttpOnly; Secure; SameSite=Strict` cookies, or use the OIDC provider's session handling.
 
+Second factor (added 2026-11-10): optional TOTP (RFC 6238) with a Fernet-encrypted secret, a used time step can never be reused, recovery
+codes are random, single-use and stored only as SHA-256 hashes, and a wrong code counts towards the same lockout as a wrong password.
+Disabling it needs the password and a code. Known limits: no trusted-device memory, no rate limit on `/auth/2fa/disable` beyond the global
+limiter, and the dev UI keeps tokens in `sessionStorage` (see above).
+
+Teams: a session is visible to other people only when its owner shares it into a workspace; non-members get 404. Invitation tokens are
+random, shown once, stored hashed, bound to one email address that must be confirmed, and expire after 7 days. Nothing is e-mailed on a
+user's behalf.
+
 ## Reporting
 Report vulnerabilities privately to the repository owner. Do not include real Aadhaar/PAN numbers in reports.
 

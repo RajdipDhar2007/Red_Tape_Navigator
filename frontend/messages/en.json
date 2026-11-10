@@ -52,7 +52,9 @@
     "fair": "Fair",
     "strong": "Strong",
     "locked": "Too many failed attempts. Try again in a few minutes, or reset your password.",
-    "exists": "This email already has an account. Log in instead."
+    "exists": "This email already has an account. Log in instead.",
+    "otpLabel": "6-digit code from your authenticator app (or a recovery code)",
+    "otpNeeded": "Two-factor sign-in is on for this account. Enter your code to continue."
   },
   "consent": {
     "heading": "Your data, your choice",
@@ -244,7 +246,8 @@
   "nav": {
     "label": "Main navigation",
     "applications": "My applications",
-    "account": "Account"
+    "account": "Account",
+    "teams": "Teams"
   },
   "landing": {
     "badge": "Free guidance for citizens and small businesses",
@@ -316,7 +319,25 @@
     "save": "Change password",
     "saved": "Password changed. Your other devices were signed out.",
     "failed": "Could not change the password. Check your current password.",
-    "signin": "Please sign in to see your account."
+    "signin": "Please sign in to see your account.",
+    "verifiedYes": "Email confirmed",
+    "verifiedNo": "Email not confirmed yet. Confirming it lets you invite people to a team and accept invitations.",
+    "resend": "Send the confirmation email again",
+    "resent": "If your email is not confirmed yet, a new link is on its way.",
+    "tfHeading": "Two-factor sign-in",
+    "tfOff": "Off. Turn it on to ask for a code from an authenticator app each time you log in.",
+    "tfOn": "On. Logging in needs your password and a code from your authenticator app.",
+    "tfStart": "Turn on two-factor sign-in",
+    "tfScan": "Add this key to an authenticator app (for example Google Authenticator or Aegis), then type the 6-digit code it shows.",
+    "tfSecret": "Setup key",
+    "tfCode": "6-digit code",
+    "tfConfirm": "Confirm and turn on",
+    "tfBad": "That code is not correct. Check the time on your phone and try again.",
+    "tfRecoveryTitle": "Your recovery codes",
+    "tfRecoveryHelp": "Save these now, somewhere safe. Each works once if you lose your phone. We cannot show them again.",
+    "tfDisable": "Turn off two-factor sign-in",
+    "tfDisableFail": "The password or code is not correct.",
+    "teamsLink": "Manage your teams"
   },
   "legal": {
     "privacyTitle": "Privacy policy",
@@ -397,5 +418,51 @@
         "p": "Indian law applies to these terms."
       }
     }
+  },
+  "verify": {
+    "title": "Confirm your email",
+    "working": "Confirming…",
+    "done": "Thank you. Your email address is confirmed.",
+    "failed": "This confirmation link is invalid or has expired. Log in and ask for a new one from your account page.",
+    "home": "Go to the home page"
+  },
+  "teams": {
+    "title": "Teams",
+    "intro": "A team lets a family business, a CA firm or a CSC centre work on the same applications. Your applications stay private until you share one with a team.",
+    "signin": "Please sign in to manage your teams.",
+    "newName": "Team name",
+    "create": "Create team",
+    "none": "You are not in any team yet.",
+    "role_owner": "Owner",
+    "role_admin": "Admin",
+    "role_member": "Member",
+    "members": "Members",
+    "invite": "Invite someone",
+    "inviteEmail": "Their email address",
+    "inviteRole": "Role",
+    "inviteButton": "Create invitation link",
+    "needVerify": "Confirm your own email address first (see your account page) to invite people.",
+    "linkTitle": "Invitation link, shown once",
+    "linkHelp": "Send this link to them yourself. We do not email invitations. It works once, only for that email address, for 7 days.",
+    "pending": "Waiting for a reply",
+    "expired": "expired",
+    "revoke": "Cancel invitation",
+    "remove": "Remove",
+    "leave": "Leave team",
+    "delete": "Delete team",
+    "deleteNote": "Deleting a team does not delete anyone's applications; they become private again.",
+    "shared": "Applications shared with this team",
+    "noShared": "Nothing is shared yet. Open one of your applications and share it from here.",
+    "yourApps": "Share one of your applications",
+    "share": "Share",
+    "unshare": "Stop sharing",
+    "failed": "Something went wrong. Please try again.",
+    "acceptTitle": "Join a team",
+    "accepting": "Joining…",
+    "accepted": "You have joined the team.",
+    "acceptFailed": "This invitation is invalid, expired, or was sent to a different email address.",
+    "acceptVerify": "Confirm your email address from your account page, then open this link again.",
+    "acceptSignin": "Please log in with the email address that was invited, then open this link again.",
+    "open": "Open teams"
   }
 }

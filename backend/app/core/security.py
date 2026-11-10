@@ -54,6 +54,16 @@ def reset_token_matches(data: dict, password_hash: str) -> bool:
     return hmac.compare_digest(str(data.get("pw", "")), _pw_fingerprint(password_hash))
 
 
+def create_verify_token(user_id: str, email: str) -> str:
+    """E-mail ownership proof: bound to the address, so it is useless if the address is later changed."""
+    s = get_settings()
+    payload = {"sub": user_id, "typ": "verify", "em": email.lower(), "jti": uuid.uuid4().hex,
+               "exp": _now() + timedelta(hours=48), "iat": _now()}
+    if s.oidc_audience:
+        payload["aud"] = s.oidc_audience
+    return jwt.encode(payload, s.secret_key, algorithm="HS256")
+
+
 def decode_token(token: str, kind: str) -> dict:
     s = get_settings()
     kwargs = {"audience": s.oidc_audience} if s.oidc_audience else {"options": {"verify_aud": False}}

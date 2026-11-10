@@ -30,11 +30,13 @@ function AuthCard({ onDone }: { onDone: () => void }) {
   const [mode, setMode] = useState<"login" | "register" | "forgot">("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [needOtp, setNeedOtp] = useState(false);
   const [show, setShow] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
-  const ids = [useId(), useId()];
+  const ids = [useId(), useId(), useId()];
   const strength = passwordStrength(password);
 
   const submit = async () => {
@@ -50,11 +52,15 @@ function AuthCard({ onDone }: { onDone: () => void }) {
         email,
         password,
         language: locale,
+        ...(mode === "login" && needOtp ? { otp } : {}),
       });
       setTokens(tok.access_token, tok.refresh_token);
       onDone();
     } catch (e) {
-      if (e instanceof ApiError && e.status === 429) setErr(t("locked"));
+      if (e instanceof ApiError && e.status === 401 && e.code === "otp_required") {
+        setNeedOtp(true);
+        setErr(t("otpNeeded"));
+      } else if (e instanceof ApiError && e.status === 429) setErr(t("locked"));
       else if (e instanceof ApiError && e.status === 409) setErr(t("exists"));
       else setErr(mode === "forgot" ? t("failed") : t("failed"));
     } finally {
@@ -110,6 +116,12 @@ function AuthCard({ onDone }: { onDone: () => void }) {
                 <p className="mt-1 text-xs text-slate-600">{[t("tooShort"), t("weak"), t("fair"), t("strong")][strength]}</p>
               </div>
             )}
+          </div>
+        )}
+        {mode === "login" && needOtp && (
+          <div>
+            <label htmlFor={ids[2]}>{t("otpLabel")}</label>
+            <input id={ids[2]} className="input" inputMode="numeric" autoComplete="one-time-code" required value={otp} onChange={(e) => setOtp(e.target.value)} />
           </div>
         )}
         {err && (

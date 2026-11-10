@@ -57,6 +57,7 @@ export default function Header() {
         <nav aria-label={tn("label")} className="flex flex-wrap items-center gap-1.5">
           {me && link("/", tn("applications"))}
           {me && me.role !== "citizen" && link("/staff", ts("link"))}
+          {me && link("/teams", tn("teams"))}
           {me && link("/account", tn("account"))}
           <label className="ml-1 flex items-center gap-1.5 text-sm">
             <span className="sr-only">{t("language")}</span>

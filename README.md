@@ -69,7 +69,7 @@ and then fill the forms correctly.
 
 ## 2. How the product works (citizen workflow)
 
-1. **Sign up / log in** (email + password; password reset by email; lockout after repeated failures).
+1. **Sign up / log in** (email + password; password reset by email; lockout after repeated failures; email confirmation; optional two-factor sign-in with an authenticator app and one-time recovery codes; teams, see section 6).
 2. **Consent** (DPDP): a required "service" consent, optional "reminders", and a separate "identity providers" consent before data is
    shared with Digio.
 3. **Describe the goal** in plain language, in any of the three languages. Intake extracts the business type, city and state.
@@ -242,13 +242,17 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **436 backend tests** passing (about 95.7% coverage), 5 frontend unit tests, 7 browser e2e tests, **9 cities**,
+Numbers as of the last update: **443 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 10 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **438 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
 | --- | --- |
 | Intake, research, rules KB, interview, validators, encrypted memory, review, downloads, checklist, reminders | **Built and tested** |
 | Accounts, password reset by SMTP, officer console, audit check, privacy export/erase, retention purge | **Built and tested** (SMTP needs real credentials in production) |
+| Email confirmation (48-hour signed link, bound to the address) | **Built and tested**; the mail itself needs SMTP |
+| Two-factor sign-in (TOTP, RFC 6238, built on the standard library; codes cannot be replayed; 8 hashed one-time recovery codes; wrong codes count towards lockout) | **Built and tested**, including a browser test. Not yet tried with a real authenticator app |
+| Teams (workspaces; roles owner, admin, member; invitation links the inviter shares themselves; sessions are private until their owner shares one into a team; leaving, removing, deleting and account erasure handled) | **Built and tested**. Invitations are never e-mailed. Pages: `/teams`, `/invite`, `/verify-email`, and two-factor on `/account` |
+| Everything is free: no billing, prices or payments exist in the code (`docs/BUSINESS_MODEL.md`) | **By design**, enforced by `tests/test_free_forever.py` |
 | Rules content | **Seed data from official sources, all flagged "verify"**; none signed off by a reviewer yet; gaps listed in `docs/RULES_VERIFICATION.md` |
 | Official PDFs | **Watermarked placeholders** (3 forms) until FSSAI / departments permit the real forms |
 | Digio eSign and DigiLocker | **Built, unit-tested with mocks, never run against the real sandbox**; DigiLocker field mapping not implemented |
@@ -311,7 +315,7 @@ cd frontend && npx playwright test          # needs the ports free
 ```
 
 CI (`.github/workflows/ci.yml`) runs on every push. A newer push cancels a run in progress, so push once per verified change and wait for the
-result (`gh run list`, `gh run view`). Test layers: unit and API tests (`backend/tests`, 22 test files), catalogue integrity
+result (`gh run list`, `gh run view`). Test layers: unit and API tests (`backend/tests`, 23 test files), catalogue integrity
 (`test_catalog_integrity.py`: every type, keyword, state entry and source allowlist), translation alignment (`test_i18n_content.py`),
 integration mocks (`test_digio.py`), browser e2e (`frontend/e2e`), evals (`backend/evals`).
 
@@ -416,7 +420,7 @@ backend/
     jobs/         worker (reminders, weekly form re-checks)
     kb/           catalog, sourced_licences, business_types, seed_loader, store, confidence
     scraping/     allowlist, guarded fetcher, sanitizer
-  migrations/     Alembic (0001 to 0006)      tests/  22 files      evals/  golden cases      config/sources.yaml  allowlist
+  migrations/     Alembic (0001 to 0007)      tests/  23 files      evals/  golden cases      config/sources.yaml  allowlist
 frontend/         Next.js App Router, next-intl messages (en/hi/bn), components, e2e (Playwright)
 infra/            Terraform skeleton            deploy/  Caddyfile      render.yaml  Render Blueprint
 docs/             see below                     scripts/ placeholder forms, key rotation, load test, rules export, source verification
