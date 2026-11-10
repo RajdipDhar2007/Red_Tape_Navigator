@@ -267,6 +267,8 @@ Numbers as of the last update: **443 backend tests** passing (about 95.8% covera
 
 Prerequisites: Python 3.12+, Node 20+ (CI uses 22), Git. Docker is optional.
 
+**Windows shortcut:** after the one-time setup below (virtual environment and `npm install`), double-click `Start-Red-Tape-Navigator.bat`. It migrates the local database, loads the rules, starts the API and the website in two windows and opens http://localhost:3000/en. Close those two windows to stop the app.
+
 **Without Docker** (SQLite, no Redis, no LLM key needed):
 
 ```bash

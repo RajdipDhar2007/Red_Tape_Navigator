@@ -24,7 +24,7 @@ async def _verify(client, uid, email):
 
 
 def test_totp_matches_rfc6238_vectors_and_blocks_replay():
-    secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"  # ASCII "12345678901234567890", the RFC 6238 SHA-1 test key
+    secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"  # ASCII "12345678901234567890", the RFC 6238 SHA-1 test key  # gitleaks:allow (public test vector, not a secret)
     assert totp.code_at(secret, 59 // 30) == "287082"  # RFC 6238 appendix B, T=59 (last six digits of 94287082)
     assert totp.code_at(secret, 1111111109 // 30) == "081804"
     step = totp.verify(secret, "287082", 0, now=59)
