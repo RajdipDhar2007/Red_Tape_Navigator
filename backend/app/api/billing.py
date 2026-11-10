@@ -6,7 +6,7 @@ settled only by a verified provider webhook (or the dev-only mock endpoint, whic
 import json
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import current_user, require_roles
 from app.billing import plans
+from app.billing.invoice_pdf import render_invoice
 from app.billing.providers import get_provider, verify_razorpay_signature
 from app.billing.service import entitlements, settle_order, split_gst
 from app.core import audit
@@ -90,6 +91,15 @@ async def cancel(user: User = Depends(current_user), db: AsyncSession = Depends(
 async def my_invoices(user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     rows = (await db.execute(select(Invoice).where(Invoice.user_id == user.id).order_by(Invoice.seq.desc()))).scalars().all()
     return [_invoice_json(i) for i in rows]
+
+
+@router.get("/invoices/{number}/pdf")
+async def invoice_pdf(number: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    inv = (await db.execute(select(Invoice).where(Invoice.number == number, Invoice.user_id == user.id))).scalar_one_or_none()
+    if inv is None:
+        raise HTTPException(404, "Unknown invoice")
+    return Response(render_invoice(inv, get_settings(), user.email), media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{inv.number}.pdf"'})
 
 
 @router.post("/admin/refund/{number}")

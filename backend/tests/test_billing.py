@@ -190,3 +190,18 @@ async def test_form_download_is_a_paid_feature_enforced_on_the_server(client, au
         assert r.status_code == 402 and r.json()["detail"]["feature"] == "form_prefill"
     finally:
         config.get_settings.cache_clear()
+
+
+async def test_invoice_pdf_is_owner_only_and_marked_draft_without_gstin(client, auth, billing_on):
+    h, _ = auth
+    co = (await client.post("/billing/checkout", json={"plan": "plus"}, headers=h)).json()
+    inv = (await client.post(f"/billing/mock/pay/{co['order_id']}", headers=h)).json()
+    r = await client.get(f"/billing/invoices/{inv['number']}/pdf", headers=h)
+    assert r.status_code == 200 and r.content.startswith(b"%PDF")
+    import pymupdf
+
+    text = "".join(p.get_text() for p in pymupdf.open(stream=r.content, filetype="pdf"))
+    assert inv["number"] in text and "DRAFT" in text and "Rs 234.82" in text
+    other = await client.post("/auth/register", json={"email": "c@example.com", "password": "correct-horse-battery"})
+    h2 = {"Authorization": f"Bearer {other.json()['access_token']}"}
+    assert (await client.get(f"/billing/invoices/{inv['number']}/pdf", headers=h2)).status_code == 404
