@@ -121,6 +121,7 @@ Limits: only fillable (AcroForm) PDFs can be checked automatically; scanned or f
 Set `MSG91_AUTHKEY` and `MSG91_TEMPLATE_ID`; the factory then uses it for the `sms` channel in any mode.
 Indian SMS needs a TRAI DLT-approved template, so create one with a single variable and link it to a MSG91 flow.
 Verify against your MSG91 account in test mode before go-live (DLT errors 203/211 mean sender/template not approved).
+Docs check 2026-11-10 (docs.msg91.com/sms/send-sms, updated 29 Oct 2026): URL, headers, body and success response match the adapter. The docs' example names the variable `VAR1`; the key must equal the variable name in your DLT template exactly, so set `MSG91_TEXT_VAR` accordingly.
 Status: request shape is unit-tested against a mock transport; it has NOT been exercised against live MSG91 yet.
 
 ## Digio (DigiLocker KYC + Aadhaar eSign): implemented, sandbox-untested

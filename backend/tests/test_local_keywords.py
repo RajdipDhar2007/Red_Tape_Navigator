@@ -76,3 +76,18 @@ def test_local_keywords_for_remaining_types(goal, activity):
 def test_surat_is_a_known_city_in_gujarat(goal):
     p = parse_goal_rules(goal)
     assert p.city == "Surat" and p.state == "Gujarat" and p.city_known and p.activity == "bakery"
+
+
+def test_every_type_has_hindi_and_bengali_keywords():
+    import re
+
+    from app.kb.catalog import ACTIVITIES, ACTIVITY_KEYWORDS
+
+    missing = []
+    for key in ACTIVITIES:
+        if key == "general_business":  # the fallback bucket has no keywords by design
+            continue
+        words = ACTIVITY_KEYWORDS.get(key, [])
+        if not (any(re.search("[ऀ-ॿ]", w) for w in words) and any(re.search("[ঀ-৿]", w) for w in words)):
+            missing.append(key)
+    assert not missing, missing

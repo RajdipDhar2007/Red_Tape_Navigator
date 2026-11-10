@@ -5,6 +5,11 @@ dashboard that contains ONE variable (for example ``Red Tape Navigator reminder:
 and set MSG91_TEMPLATE_ID to that flow's id. The reminder text is passed in that variable (MSG91_TEXT_VAR, default
 ``var1``). Keep the text short; the DLT template's own length rules apply.
 
+Checked against docs.msg91.com/sms/send-sms (page updated 29 Oct 2026): POST /api/v5/flow, headers accept, authkey and
+content-type, body template_id, short_url, recipients[].mobiles plus one key per template variable; a 200 returns
+{"type": "success", "message": "<request id>"}. The docs' example names the variable VAR1; the key must match the variable
+name in YOUR template exactly (case included), so set MSG91_TEXT_VAR to it. Still unverified against a live account.
+
 Needs MSG91_AUTHKEY and MSG91_TEMPLATE_ID. Verify the request shape against your MSG91 account in sandbox/test mode
 before go-live (docs/INTEGRATIONS.md); the provider rejects unapproved templates with DLT errors 203/211.
 """

@@ -246,7 +246,7 @@ ACTIVITY_KEYWORDS: dict[str, list[str]] = {
     "hotel": ["hotel", "guest house", "guesthouse", "lodge", "lodging", "homestay", "home stay", "হোটেল", "গেস্ট হাউস", "लॉज", "होटल", "गेस्ट हाउस"],
     "cafe": ["cafe", "café", "cafee", "coffee shop", "coffee house", "কাফে", "कैफे"],
     "tea_stall": ["tea stall", "tea shop", "chai", "চায়ের দোকান", "चाय की दुकान", "चाय"],
-    "cloud_kitchen": ["cloud kitchen", "ghost kitchen", "delivery kitchen"],
+    "cloud_kitchen": ["cloud kitchen", "ghost kitchen", "delivery kitchen", "क्लाउड किचन", "घोस्ट किचन", "ক্লাউড কিচেন", "ঘোস্ট কিচেন"],
     "sweet_shop": ["sweet shop", "mithai", "sweets", "মিষ্টির দোকান", "मिठाई"],
     "home_food": ["home kitchen", "home-based food", "tiffin", "home food", "homemade food", "টিফিন", "टिफिन"],
     "grocery_store": ["grocery", "grocary", "grosery", "kirana", "general store", "provision store", "supermarket", "departmental store", "মুদির দোকান", "किराना"],
