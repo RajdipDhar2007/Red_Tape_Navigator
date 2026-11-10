@@ -55,3 +55,8 @@ Only the owner can do the logins and secrets. In order:
 - [ ] Pilot with 5-10 shop owners (docs/PILOT_PLAN.md).
 
 ## 8. Final docs, CI green, final report: NOT STARTED
+
+## 9. Billing (added 2026-11-10): code done in test mode, WAITING ON OWNER for live use
+- [x] Plans, checkout, Razorpay adapter and webhook, invoices, server-side paywall, migration 0005, 11 tests. Off by default (`BILLING_ENABLED=false`).
+- [ ] Owner: Razorpay account and test keys, company name/address/GSTIN/SAC, accountant's GST rate, final prices in `backend/config/pricing.yaml`, counsel's refund and cancellation policy (docs/OWNER_ACTIONS.md).
+- [ ] Me: invoice PDF, billing page in the web app, plan-limit enforcement, a run against Razorpay test mode once keys exist.

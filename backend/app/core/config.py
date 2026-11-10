@@ -49,6 +49,18 @@ class Settings(BaseSettings):
     digio_webhook_secret: str = ""
     digio_webhook_ips: str = ""  # comma list; enforced only when TRUST_PROXY=true (see api/webhooks.py)
     digio_digilocker_template: str = "DIGILOCKER_AADHAAR_PAN"
+    # Billing (off by default: with BILLING_ENABLED=false every user gets every feature, nothing is charged)
+    billing_enabled: bool = False
+    billing_provider: str = "mock"  # mock | razorpay (TEST keys until the owner decides otherwise)
+    razorpay_key_id: str = ""
+    razorpay_key_secret: str = ""
+    razorpay_webhook_secret: str = ""
+    company_name: str = ""
+    company_address: str = ""
+    company_gstin: str = ""
+    invoice_sac_code: str = ""  # owner/accountant decides; no default is asserted here
+    invoice_gst_percent: int = 18  # owner-config; confirm with the accountant
+    invoice_prefix: str = "RTN"
     reset_token_minutes: int = 30
     lockout_threshold: int = 5
     lockout_minutes: int = 15
@@ -103,6 +115,13 @@ def get_settings() -> Settings:
 def production_problems(s: Settings) -> list[str]:
     """Everything that must not be true when APP_ENV=prod. Reported together so one deploy fixes all of it."""
     problems: list[str] = []
+    if s.billing_enabled:
+        if s.billing_provider != "razorpay":
+            problems.append("BILLING_PROVIDER must be razorpay when billing is enabled in production")
+        elif not (s.razorpay_key_id and s.razorpay_key_secret and s.razorpay_webhook_secret):
+            problems.append("RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET and RAZORPAY_WEBHOOK_SECRET are required when billing is enabled")
+        if not (s.company_name and s.company_address):
+            problems.append("COMPANY_NAME and COMPANY_ADDRESS are required on invoices when billing is enabled")
     if s.secret_key.startswith(("dev-only", "change-me")) or len(s.secret_key) < 32:
         problems.append("SECRET_KEY must be a real secret of at least 32 characters")
     if not s.field_encryption_key:

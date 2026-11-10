@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from sqlalchemy import func, select, text
 
-from app.api import admin, auth, consent, privacy, sessions, webhooks
+from app.api import admin, auth, billing, consent, privacy, sessions, webhooks
 from app.core import metrics
 from app.core.config import get_settings
 from app.core.errors import capture_exception, init_error_tracking
@@ -51,7 +51,7 @@ def create_app() -> FastAPI:
         allow_headers=["Authorization", "Content-Type", "Accept-Language", "X-Request-ID"],
         expose_headers=["X-Request-ID", "Content-Disposition"],
     )
-    for r in (auth.router, consent.router, sessions.router, privacy.router, admin.router, webhooks.router):
+    for r in (auth.router, consent.router, sessions.router, privacy.router, admin.router, webhooks.router, billing.router, billing.hook):
         app.include_router(r)
 
     @app.exception_handler(Exception)
