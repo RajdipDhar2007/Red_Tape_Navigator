@@ -228,7 +228,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 | --- | --- |
 | Backend | Python 3.12+ (3.13 works), FastAPI, Uvicorn, Pydantic v2, SQLAlchemy 2 (async), Alembic, asyncpg / aiosqlite, ARQ worker, Redis, httpx |
 | Database | PostgreSQL with pgvector (production), SQLite (local dev and tests) |
-| AI | Anthropic API (optional, model name from env, never hard-coded); deterministic rules-first mode needs no key |
+| AI | Optional and free to run: a local Ollama model (`OLLAMA_MODEL`) or Google Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`), through one provider switch in `app/agent/llm.py` (`LLM_PROVIDER`); model names come from env, never hard-coded; deterministic rules-first mode needs no model at all |
 | PDFs and scraping | PyMuPDF, pypdf, reportlab, trafilatura, Playwright (optional JS rendering), PyYAML allowlist |
 | Security | passlib/bcrypt, PyJWT, cryptography (Fernet / MultiFernet), structlog with PII redaction, in-process sliding-window rate limiter in `core/middleware.py` |
 | Observability | Prometheus metrics, OpenTelemetry, optional Sentry, JSON logs with request ids |
@@ -242,7 +242,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **443 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 10 browser e2e tests, **9 cities**,
+Numbers as of the last update: **449 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 10 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **438 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -342,7 +342,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | A | **Production deployment** (**HUMAN** logins and secrets) | Generate `SECRET_KEY` and `FIELD_ENCRYPTION_KEY` (back up the key), set up SMTP, Render Blueprint, Vercel (Root Directory `frontend`), set `CORS_ORIGINS` / `WEB_BASE_URL`, create the first officer in the Render shell, enable Postgres backups and an uptime monitor on `/ready`; then verify signup, a full session, reset email, reminders; run the load test | `render.yaml`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `backend/scripts/create_admin.py`, SES/Brevo/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
 | B | **Digio sandbox then production** (**HUMAN** gets credentials) | Set `DIGIO_*` in Render, set the webhook URL and secret in Digio's enterprise dashboard, run the sandbox checklist in `docs/INTEGRATIONS.md`, fix any request-shape differences, **implement the DigiLocker result mapping from a real `detail_response=true` response** (answer keys with `source="document"`, encrypt sensitive values), then production credentials and IPs | `real/digio.py`, `api/webhooks.py`, `httpx.MockTransport` tests, Digio docs read in a browser |
 | C | **MSG91 SMS live** (**HUMAN** DLT KYC) | Complete DLT registration on an operator portal (Airtel / Vi / BSNL / STPL / Tata), register a 6-character header and the template `Red Tape Navigator reminder: {#var#}`, link it to a MSG91 Flow, put `MSG91_AUTHKEY` / `MSG91_TEMPLATE_ID` in Render, send a real test SMS, fix the adapter if the live shape differs (DLT errors 203/211 mean not approved) | `real/msg91.py`, MSG91 dashboard |
-| D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`, officer console `/en/staff` |
+| D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `OLLAMA_MODEL` (local, free) or `GEMINI_API_KEY` + `GEMINI_MODEL`, officer console `/en/staff` |
 | E | **Official forms** (**HUMAN** FSSAI permission) | Email `helpdesk-foscos@fssai.gov.in` for permission to reproduce Form A and Form B; then officers fetch the PDFs through the console (allowlisted URLs), you write the field-map JSON in `backend/app/forms/templates/`, an officer approves; keep the key-in sheet for FoSCoS and Udyam | `docs/INTEGRATIONS.md` (field-map procedure), `backend/app/forms/official.py` |
 | F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for all the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review). The officer console (`staff.*` strings) is already translated in `en`, `hi` and `bn`, pending the same native review | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
 | G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
@@ -375,7 +375,7 @@ Everything is environment-driven; see [`.env.example`](.env.example) and [`.env.
 | Email | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_STARTTLS` |
 | SMS | `MSG91_AUTHKEY`, `MSG91_TEMPLATE_ID`, `MSG91_TEXT_VAR` |
 | Digio | `DIGIO_CLIENT_ID`, `DIGIO_CLIENT_SECRET`, `DIGIO_ENV` (`sandbox` / `production`), `DIGIO_WEBHOOK_SECRET`, `DIGIO_WEBHOOK_IPS`, `DIGIO_DIGILOCKER_TEMPLATE` |
-| AI (optional) | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` |
+| AI (optional) | `LLM_PROVIDER` (`auto`/`ollama`/`gemini`/`none`), `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `GEMINI_API_KEY`, `GEMINI_MODEL` |
 | Ops | `SENTRY_DSN`, `METRICS_TOKEN`, `RATE_LIMIT_PER_MINUTE`, `AUTH_RATE_LIMIT_PER_MINUTE`, `INTEGRATIONS_MODE` |
 | Frontend | `NEXT_PUBLIC_API_URL` (baked in at build), `NEXT_PUBLIC_LEGAL_REVIEWED`, `NEXT_PUBLIC_EMBLEM_URL` |
 

@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     field_encryption_key: str = ""
     database_url: str = "sqlite+aiosqlite:///./data/rtn.db"
     redis_url: str = ""
+    llm_provider: str = "auto"  # auto | ollama | gemini | anthropic | none
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = ""
+    gemini_api_key: str = ""
+    gemini_model: str = ""
     anthropic_api_key: str = ""
     anthropic_model: str = ""
     oidc_issuer: str = ""
