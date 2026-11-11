@@ -438,3 +438,10 @@ Documentation: [Launch checklist](docs/LAUNCH_CHECKLIST.md) (status of every go-
 ---
 
 *Thank you for continuing this work. Please leave the project better documented than you found it.*
+
+---
+
+## License
+
+**Proprietary, all rights reserved.** Copyright (c) 2026 Team Onyx. This repository is publicly visible but is **not** open source: only Team Onyx
+members (and people the owner approves in writing) may use, copy, modify or distribute it. See [LICENSE](LICENSE).

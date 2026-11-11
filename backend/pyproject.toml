@@ -3,6 +3,8 @@ name = "red-tape-navigator"
 version = "0.1.0"
 description = "Agentic assistant for navigating Indian government bureaucracy"
 requires-python = ">=3.12"
+license = { file = "../LICENSE" }
+classifiers = ["License :: Other/Proprietary License"]
 dependencies = [
   "fastapi>=0.115",
   "uvicorn[standard]>=0.30",
