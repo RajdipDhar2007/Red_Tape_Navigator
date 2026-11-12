@@ -40,7 +40,7 @@ costs and how it is funded.
 ## Snapshot at handoff (November 2026)
 Backend 443 tests passing (about 95.8% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
 10 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
-438 seeded rules, 3 languages (the backend text is translated too). Not deployed. Digio, MSG91 and all live integrations are built but untested
+438 seeded rules, 3 languages (the backend text is translated too). Not deployed (ready to apply: `docs/DEPLOY_NOW.md`). Digio, MSG91 and all live integrations are built but untested
 against the real services. Seven Alembic migrations (0001 to 0007). **The product is free to use and charges no one (owner decision, 2026-11-10): do not add billing, prices, payments or paywalls** (`docs/BUSINESS_MODEL.md`; `tests/test_free_forever.py` enforces it).
 
 ## Step 0: get the code and run it
@@ -75,7 +75,7 @@ against the real services. Seven Alembic migrations (0001 to 0007). **The produc
 | Translation of backend text | `backend/app/i18n_content/` (`data_hi.py`, `data_bn.py`), `backend/app/core/localize.py`, `frontend/lib/api.ts` |
 | Interface strings | `frontend/messages/{en,hi,bn}.json`, `frontend/components/` |
 | Production config checks | `backend/app/core/config.py` (`production_problems`) |
-| Deployment | `render.yaml`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `docker-compose.prod.yml`, `backend/scripts/create_admin.py` |
+| Deployment | `render.yaml` (free trial), `render.production.yaml` (launch), `docs/DEPLOY_NOW.md`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh`, `docker-compose.prod.yml`, `backend/scripts/create_admin.py`, `backend/app/services/bootstrap.py`, `backend/app/jobs/inprocess.py` |
 | Tests | `backend/tests/` (19 files), `backend/evals/`, `frontend/e2e/` |
 
 ## What is DONE (all on `main`)
@@ -249,3 +249,31 @@ Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai;
 - Dev-database fix: `sqlite_upgrade.add_missing_columns` now honours column `server_default`. Before this a NOT NULL JSON column without a literal default was skipped, so an older local or e2e SQLite file made registration return 500. If you see that, delete `backend/data/e2e.db` or run the app once on current code.
 - UI: Teams page, invitation and email-confirmation pages, two-factor and email status on the account page, code field on login; English, Hindi and Bengali strings added (Hindi and Bengali pending native review). `frontend/e2e/accounts.spec.ts` computes TOTP codes itself.
 - Not done: password-less sign-in, trusted devices, per-team audit view, team-level rules or reminders, CSV import of clients for partners, real-authenticator-app test, Chrome walkthrough of the new pages in all three languages.
+
+### Session log: 2026-11-12 (deployment readiness, final report)
+
+Owner instruction: finish everything pending, make the app ready to deploy, commit and push. The owner offered their Chrome and accounts.
+- Checked in Chrome: GitHub is signed in; Render and Vercel are not, and GitHub showed a first-time "Authorize Vercel" screen, so no hosting account exists.
+  Creating accounts is the owner's step, so nothing was deployed. `docs/DEPLOY_NOW.md` is the 30-minute path.
+- `render.yaml` used plan names (`starter`, `basic-256mb`) and `autoDeploy` that Render's current Blueprint specification no longer lists. It is now a
+  zero-cost trial (`plan: free`, one API + PostgreSQL, `RUN_SCHEDULER=true`, `SMTP_PORT=2525` because free instances block 25/465/587). The paid
+  set-up moved to `render.production.yaml` (`0.5c-512mb`, `0.1c-256mb`, Key Value `256mb`, environment group `rtn-shared`).
+- New backend pieces: `app/jobs/inprocess.py` (the worker's four jobs inside the API; last run read from the audit log), `app/services/bootstrap.py`
+  (first officer from `BOOTSTRAP_ADMIN_*`, never overwrites a password), config accepts standard-base64 Fernet keys (Render `generateValue`) and
+  `sslmode=` in PostgreSQL URLs, `GET /sessions/{sid}/reminders` and `/reminders.ics`.
+- New frontend pieces: `app/robots.ts`, `app/sitemap.ts`, `app/manifest.ts`, `app/icon.svg`, metadata with language alternates, "Add to my calendar" button.
+- New scripts: `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh` (a step in the CI compose job).
+- New tests (`tests/test_deploy_ready.py`): Blueprint variables must exist in `Settings` and carry no committed secret; every route in the OpenAPI table
+  must answer 401 without sign-in unless it is on the public list. Total 459 backend tests.
+- Docs: `docs/DEPLOY_NOW.md`, `docs/THREAT_MODEL.md`, `docs/FINAL_REPORT.md`; checklist, README, runbook and owner lists updated.
+- Gmail: two DRAFTS created, not sent (FSSAI permission; Digio sandbox). Digio's address is not known; the draft says to add it or use their form.
+- Fixed a breakage from commit `ba69bc7`: `license = { file = "../LICENSE" }` in `backend/pyproject.toml` made `pip install -e .` fail
+  (setuptools refuses a licence file outside the package folder), which breaks the CI backend and e2e jobs. It is now a `text` licence field.
+- The in-process scheduler marks the two weekly jobs (`refresh_rules`, `forms`) as deferred on a brand-new deployment, so they do not re-fetch every
+  official source at first boot; reminders and the retention purge run about 20 seconds after start.
+- Gotcha: newer FastAPI keeps included routers lazy, so `app.routes` does not list their paths; use `app.openapi()["paths"]` to walk routes.
+- Gotcha: the GitHub Actions runs for commit `ba69bc7` sat in "queued" for over 11 hours with no jobs. If a run never starts, check the account's
+  Actions status and billing page before assuming the code is at fault.
+- Not done: cookie-based sessions (needs one domain for site and API; design in `docs/THREAT_MODEL.md`), the rule gaps in README section 10,
+  partner portal, help centre, document vault. Next: the owner deploys, then run `verify_deploy.py --journey` and the hosted load test.
+

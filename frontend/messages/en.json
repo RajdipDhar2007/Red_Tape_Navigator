@@ -177,6 +177,7 @@
     "channel": "Reminder channel",
     "remind": "Set reminders",
     "scheduled": "Reminders scheduled",
+    "calendar": "Add to my calendar (.ics)",
     "need": "Reminders need your consent first.",
     "portal": "Open official portal",
     "step": "Step",

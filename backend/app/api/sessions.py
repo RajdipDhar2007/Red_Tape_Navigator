@@ -1,5 +1,5 @@
 import re
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
@@ -13,7 +13,7 @@ from app.api.consent import has_consent
 from app.api.deps import current_user
 from app.core import audit
 from app.core.config import get_settings
-from app.db.models import ExternalRequest, NavSession, User
+from app.db.models import ExternalRequest, NavSession, Reminder, User
 from app.db.session import get_db
 from app.followup.checklist import submission_checklist
 from app.followup.reminders import schedule_after_submission
@@ -493,3 +493,56 @@ async def i_submitted(sid: str, body: SubmittedIn, user: User = Depends(current_
     rows = await schedule_after_submission(db, session_id=ns.id, user_id=user.id, licences=body.licences, channel=body.channel, destination=dest, language=ns.language)
     await audit.record(db, user.id, "followup.scheduled", {"count": len(rows), "channel": body.channel}, ns.id)
     return {"scheduled": [{"title": r.title, "due_at": r.due_at.isoformat(), "kind": r.kind} for r in rows]}
+
+
+def _ics_text(value: str) -> str:
+    """RFC 5545 TEXT escaping; control characters are dropped so a title can never inject a calendar property."""
+    value = "".join(ch for ch in value if ch == "\n" or ch >= " ")
+    return value.replace("\\", "\\\\").replace(";", r"\;").replace(",", r"\,").replace("\n", r"\n")
+
+
+def _ics_fold(line: str) -> str:
+    """Fold at 75 octets (RFC 5545 3.1) without splitting a multi-byte character."""
+    out, cur, size = [], "", 0
+    for ch in line:
+        n = len(ch.encode())
+        if size + n > 75:
+            out.append(cur)
+            cur, size = " ", 1
+        cur += ch
+        size += n
+    out.append(cur)
+    return "\r\n".join(out)
+
+
+async def _reminders_for(db: AsyncSession, ns: NavSession) -> list[Reminder]:
+    rows = (await db.execute(select(Reminder).where(Reminder.session_id == ns.id).order_by(Reminder.due_at))).scalars().all()
+    return list(rows)
+
+
+@router.get("/{sid}/reminders")
+async def list_reminders(sid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    return {"reminders": [{"title": r.title, "due_at": r.due_at.isoformat(), "kind": r.kind, "channel": r.channel, "sent": r.sent}
+                          for r in await _reminders_for(db, ns)]}
+
+
+@router.get("/{sid}/reminders.ics")
+async def reminders_calendar(sid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    """The citizen's own reminders as an iCalendar file (all-day events) for any calendar app. Nothing is sent anywhere."""
+    ns = await svc.get_owned(db, user, sid)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Red Tape Navigator//Reminders//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"]
+    for r in await _reminders_for(db, ns):
+        day = r.due_at.date()
+        lines += [
+            "BEGIN:VEVENT", f"UID:{r.id}@red-tape-navigator", f"DTSTAMP:{stamp}",
+            f"DTSTART;VALUE=DATE:{day.strftime('%Y%m%d')}", f"DTEND;VALUE=DATE:{(day + timedelta(days=1)).strftime('%Y%m%d')}",
+            f"SUMMARY:{_ics_text(r.title)}", f"DESCRIPTION:{_ics_text(DISCLAIMER)}", "TRANSP:TRANSPARENT",
+            "BEGIN:VALARM", "ACTION:DISPLAY", f"DESCRIPTION:{_ics_text(r.title)}", "TRIGGER:PT9H", "END:VALARM",
+            "END:VEVENT",
+        ]
+    lines.append("END:VCALENDAR")
+    await audit.record(db, user.id, "followup.calendar_export", {}, ns.id)
+    return Response("\r\n".join(_ics_fold(x) for x in lines) + "\r\n", media_type="text/calendar; charset=utf-8",
+                    headers={"Content-Disposition": 'attachment; filename="red-tape-navigator-reminders.ics"', "Cache-Control": "no-store"})

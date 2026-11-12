@@ -64,6 +64,16 @@ export default function DoneView({ session }: { session: Session }) {
     return () => clearInterval(timer);
   }, [pending.map(([f, r]) => `${f}:${r.status}`).join(","), sid]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const calendar = async () => {
+    const blob = await apiBlob(`/sessions/${sid}/reminders.ics`);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "red-tape-navigator-reminders.ics";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const downloadSigned = async (fid: string, rid: string) => {
     const blob = await apiBlob(`/sessions/${sid}/esign/${rid}/signed.pdf`);
     const url = URL.createObjectURL(blob);
@@ -200,6 +210,9 @@ export default function DoneView({ session }: { session: Session }) {
                 </li>
               ))}
             </ul>
+            <button className="btn-secondary mt-2" onClick={() => void calendar()}>
+              {t("calendar")}
+            </button>
           </div>
         )}
       </div>

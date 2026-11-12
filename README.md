@@ -146,7 +146,7 @@ catalog.py (licences, 9 cities)  +  sourced_licences.py (read from official docu
 ### 3.5 Deployment pipeline
 
 `git push main` -> GitHub Actions CI (7 jobs, section 8) -> manual deploy (autoDeploy is off on purpose):
-Render Blueprint (`render.yaml`: `rtn-api`, `rtn-worker`, Postgres, Redis; the container entrypoint runs `alembic upgrade head` and loads the
+Render Blueprints (`render.yaml`: zero-cost trial with one `rtn-api` and Postgres; `render.production.yaml`: `rtn-api`, `rtn-worker`, Postgres, Redis; the container entrypoint runs `alembic upgrade head` and loads the
 rules pack) + Vercel (frontend, Root Directory `frontend`). Alternative: `docker-compose.prod.yml` + Caddy on a VPS. See
 [`docs/DEPLOYMENT_VERCEL_RENDER.md`](docs/DEPLOYMENT_VERCEL_RENDER.md).
 
@@ -167,7 +167,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 - Real SMTP email, password reset (single-use 30-minute links), change password, account lockout, privacy export/erase, retention purge.
 - Production config validation that refuses an unsafe start; officer bootstrap (`backend/scripts/create_admin.py`, inside the image).
-- Deployment files: `render.yaml`, Vercel guide, `docker-compose.prod.yml` + Caddy, asyncpg URL normalisation for Render.
+- Deployment files: `render.yaml` (free trial) and `render.production.yaml` (launch), `docs/DEPLOY_NOW.md`, `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh`, Vercel guide, `docker-compose.prod.yml` + Caddy, asyncpg URL normalisation for Render.
 - UI redesign (tricolour mark, saffron/navy/green palette), a hydration fix, accessibility basics, privacy/terms pages (en/hi/bn) that read
   retention period, hosting region and grievance contact live from the API.
 - MSG91 SMS adapter (Flow API), unit-tested with a mocked transport.
@@ -242,7 +242,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **449 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 10 browser e2e tests, **9 cities**,
+Numbers as of the last update: **459 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 10 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **438 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -260,7 +260,11 @@ Numbers as of the last update: **449 backend tests** passing (about 95.8% covera
 | UMANG, WhatsApp | **Mocked and labelled** (no real adapters) |
 | Hindi / Bengali | **Complete in code and tests; not yet reviewed by native speakers** |
 | Privacy / terms pages | **Built**, shown as "draft, pending legal review" until `NEXT_PUBLIC_LEGAL_REVIEWED=true` |
-| Production deployment | **Not deployed** (files and guides are ready; needs the owner's logins and secrets) |
+| Reminders as a calendar file (`GET /sessions/{id}/reminders.ics`, button after reminders are set) | **Built and tested** |
+| Scheduled jobs inside the API (`RUN_SCHEDULER=true`, no worker or Redis needed on one instance); first officer from `BOOTSTRAP_ADMIN_*` | **Built and tested** |
+| `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates | **Built**; private pages are excluded from search engines |
+| Backup-and-restore drill (`scripts/backup_restore_drill.sh`) | **Runs in CI** on every push against PostgreSQL |
+| Production deployment | **Not deployed.** Ready to apply: `docs/DEPLOY_NOW.md` (free trial, about 30 minutes). Needs the owner to create the Render, Vercel and email-sender accounts; the Blueprints have not been applied on a real account yet |
 | Load test, backup-restore test, pentest, real-device test, pilot | **Not done** |
 
 ## 7. Quick start
@@ -339,7 +343,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 
 | # | Pending item | How to do it | What to use |
 | --- | --- | --- | --- |
-| A | **Production deployment** (**HUMAN** logins and secrets) | Generate `SECRET_KEY` and `FIELD_ENCRYPTION_KEY` (back up the key), set up SMTP, Render Blueprint, Vercel (Root Directory `frontend`), set `CORS_ORIGINS` / `WEB_BASE_URL`, create the first officer in the Render shell, enable Postgres backups and an uptime monitor on `/ready`; then verify signup, a full session, reset email, reminders; run the load test | `render.yaml`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `backend/scripts/create_admin.py`, SES/Brevo/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
+| A | **Production deployment** (**HUMAN** sign-ups) | Follow `docs/DEPLOY_NOW.md`: create the email-sender, Render and Vercel accounts, apply `render.yaml`, type nine values (Render generates `SECRET_KEY` and `FIELD_ENCRYPTION_KEY`; copy the encryption key to a password manager), set `CORS_ORIGINS` / `WEB_BASE_URL`, then run `scripts/verify_deploy.py --journey`, test the reset email, add an uptime monitor on `/ready`, and upgrade the free database before day 30. For launch use `render.production.yaml` and run the load test | `render.yaml`, `render.production.yaml`, `docs/DEPLOY_NOW.md`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `scripts/verify_deploy.py`, Brevo/SES/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
 | B | **Digio sandbox then production** (**HUMAN** gets credentials) | Set `DIGIO_*` in Render, set the webhook URL and secret in Digio's enterprise dashboard, run the sandbox checklist in `docs/INTEGRATIONS.md`, fix any request-shape differences, **implement the DigiLocker result mapping from a real `detail_response=true` response** (answer keys with `source="document"`, encrypt sensitive values), then production credentials and IPs | `real/digio.py`, `api/webhooks.py`, `httpx.MockTransport` tests, Digio docs read in a browser |
 | C | **MSG91 SMS live** (**HUMAN** DLT KYC) | Complete DLT registration on an operator portal (Airtel / Vi / BSNL / STPL / Tata), register a 6-character header and the template `Red Tape Navigator reminder: {#var#}`, link it to a MSG91 Flow, put `MSG91_AUTHKEY` / `MSG91_TEMPLATE_ID` in Render, send a real test SMS, fix the adapter if the live shape differs (DLT errors 203/211 mean not approved) | `real/msg91.py`, MSG91 dashboard |
 | D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `OLLAMA_MODEL` (local, free) or `GEMINI_API_KEY` + `GEMINI_MODEL`, officer console `/en/staff` |
@@ -376,8 +380,8 @@ Everything is environment-driven; see [`.env.example`](.env.example) and [`.env.
 | SMS | `MSG91_AUTHKEY`, `MSG91_TEMPLATE_ID`, `MSG91_TEXT_VAR` |
 | Digio | `DIGIO_CLIENT_ID`, `DIGIO_CLIENT_SECRET`, `DIGIO_ENV` (`sandbox` / `production`), `DIGIO_WEBHOOK_SECRET`, `DIGIO_WEBHOOK_IPS`, `DIGIO_DIGILOCKER_TEMPLATE` |
 | AI (optional) | `LLM_PROVIDER` (`auto`/`ollama`/`gemini`/`none`), `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `GEMINI_API_KEY`, `GEMINI_MODEL` |
-| Ops | `SENTRY_DSN`, `METRICS_TOKEN`, `RATE_LIMIT_PER_MINUTE`, `AUTH_RATE_LIMIT_PER_MINUTE`, `INTEGRATIONS_MODE` |
-| Frontend | `NEXT_PUBLIC_API_URL` (baked in at build), `NEXT_PUBLIC_LEGAL_REVIEWED`, `NEXT_PUBLIC_EMBLEM_URL` |
+| Ops | `SENTRY_DSN`, `METRICS_TOKEN`, `RATE_LIMIT_PER_MINUTE`, `AUTH_RATE_LIMIT_PER_MINUTE`, `INTEGRATIONS_MODE`, `RUN_SCHEDULER` (run the scheduled jobs inside a single API instance instead of the worker), `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (first officer on hosts without a shell; delete after first sign-in) |
+| Frontend | `NEXT_PUBLIC_API_URL` (baked in at build), `NEXT_PUBLIC_SITE_URL` (public address for the sitemap and canonical links; on Vercel it is detected), `NEXT_PUBLIC_LEGAL_REVIEWED`, `NEXT_PUBLIC_EMBLEM_URL` |
 
 Production refuses to start with dev secrets, localhost CORS, SQLite, missing SMTP or grievance contact, `DEMO_MODE=true`, or Digio credentials
 without a webhook secret.
@@ -424,7 +428,7 @@ backend/
     scraping/     allowlist, guarded fetcher, sanitizer
   migrations/     Alembic (0001 to 0007)      tests/  23 files      evals/  golden cases      config/sources.yaml  allowlist
 frontend/         Next.js App Router, next-intl messages (en/hi/bn), components, e2e (Playwright)
-infra/            Terraform skeleton            deploy/  Caddyfile      render.yaml  Render Blueprint
+infra/            Terraform skeleton            deploy/  Caddyfile      render.yaml, render.production.yaml  Render Blueprints
 docs/             see below                     scripts/ placeholder forms, key rotation, load test, rules export, source verification
 ```
 

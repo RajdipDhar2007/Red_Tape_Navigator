@@ -51,6 +51,7 @@ pg_dump --format=custom --no-owner "$DATABASE_URL_SYNC" > rtn-$(date +%F).dump
 createdb rtn_restore && pg_restore --no-owner -d rtn_restore rtn-2026-01-01.dump
 psql rtn_restore -c "select count(*) from claims; select count(*) from audit_log;"
 ```
+* On the Docker Compose stack run the whole drill with one command: `sh scripts/backup_restore_drill.sh` (CI runs it on every push).
 * Test a restore at least monthly. The audit chain must still verify after restore: `GET /admin/audit/verify`.
 * Backups contain encrypted sensitive fields; keep the encryption key **separately** from the backup, and keep old keys
   until backups encrypted with them have expired.
@@ -62,7 +63,13 @@ psql rtn_restore -c "select count(*) from claims; select count(*) from audit_log
   `python scripts/rotate_encryption_key.py`; later drop `<old>` and redeploy.
 * `SECRET_KEY`: changing it invalidates all sessions (users log in again).
 
-## Routine jobs (Arq worker)
+## Routine jobs (Arq worker, or inside the API)
+With `RUN_SCHEDULER=true` (the free-trial Blueprint) the same four jobs run inside the single API instance and no worker or Redis is needed.
+Each run writes an audit entry `job.<name>` with `ok: true/false`; the last entry decides when the job is next due, so restarts do not repeat work.
+Never set `RUN_SCHEDULER=true` on more than one instance.
+On a brand-new deployment the two weekly jobs wait one week before their first run (audit detail `deferred: true`); an admin can run them
+at once with `POST /admin/refresh` and `POST /admin/forms/refresh`.
+
 Weekly `refresh_rules` (re-fetch sources, flag changes), daily `purge_job` (retention), half-hourly `reminders_job`.
 Check the worker is running; each job logs its result.
 

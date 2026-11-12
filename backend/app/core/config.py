@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     reset_token_minutes: int = 30
     lockout_threshold: int = 5
     lockout_minutes: int = 15
+    # Single-instance hosting without a separate worker/Redis: run the scheduled jobs inside the API process.
+    run_scheduler: bool = False
+    # First officer account, created/promoted at start when both are set (for hosts without a shell). Remove after first sign-in.
+    bootstrap_admin_email: str = ""
+    bootstrap_admin_password: str = ""
 
     @field_validator("database_url", mode="after")
     @classmethod
@@ -64,8 +69,27 @@ class Settings(BaseSettings):
         """Managed hosts (Render, Heroku-style) hand out postgres:// or postgresql:// URLs; SQLAlchemy needs asyncpg."""
         for plain in ("postgres://", "postgresql://"):
             if v.startswith(plain):
-                return "postgresql+asyncpg://" + v[len(plain):]
+                v = "postgresql+asyncpg://" + v[len(plain):]
+                break
+        if v.startswith("postgresql+asyncpg://") and "?" in v:
+            # libpq-style options (Neon, Supabase, Render external URLs) are not understood by asyncpg
+            base, _, query = v.partition("?")
+            kept = []
+            for part in query.split("&"):
+                key, _, val = part.partition("=")
+                if key == "sslmode":
+                    if val != "disable":
+                        kept.append("ssl=require")
+                elif key not in ("channel_binding", "options"):
+                    kept.append(part)
+            v = base + ("?" + "&".join(kept) if kept else "")
         return v
+
+    @field_validator("field_encryption_key", mode="after")
+    @classmethod
+    def _urlsafe_key(cls, v: str) -> str:
+        """Hosts that generate secrets (Render generateValue) emit standard base64; Fernet wants the url-safe alphabet."""
+        return v.replace("+", "-").replace("/", "_")
 
     @property
     def digio_configured(self) -> bool:
@@ -130,6 +154,10 @@ def production_problems(s: Settings) -> list[str]:
         problems.append("DIGIO_ENV must be sandbox or production")
     if s.digio_configured and s.digio_env == "production" and s.digio_webhook_ips and not s.trust_proxy:
         problems.append("TRUST_PROXY must be true for DIGIO_WEBHOOK_IPS to be enforced behind Render's proxy")
+    if bool(s.bootstrap_admin_email) != bool(s.bootstrap_admin_password):
+        problems.append("BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD must be set together (or both left empty)")
+    elif s.bootstrap_admin_password and len(s.bootstrap_admin_password) < 12:
+        problems.append("BOOTSTRAP_ADMIN_PASSWORD must be at least 12 characters")
     if s.demo_mode:
         problems.append("DEMO_MODE must be false (it exposes demo accounts and simulated integrations)")
     return problems

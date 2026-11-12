@@ -148,6 +148,8 @@ jobs:
           python scripts/smoke_demo.py http://localhost:8000
           curl -fsS http://localhost:3000/en | grep -q "Red Tape Navigator"
           curl -fsS http://localhost:3000/bn | grep -q 'lang="bn"'
+      - name: Backup and restore drill (dump, restore into a scratch database, compare)
+        run: sh scripts/backup_restore_drill.sh
       - name: Worker is up (scheduled jobs)
         run: docker compose ps worker --format '{{.State}}' | grep -q running
       - if: failure()

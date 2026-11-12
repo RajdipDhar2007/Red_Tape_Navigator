@@ -1,0 +1,103 @@
+# Render Blueprint for a REAL LAUNCH of the backend (API + background worker + PostgreSQL + Redis). Paid plans.
+# In Render choose New > Blueprint, pick this repo, and set "Blueprint path" to render.production.yaml.
+# The zero-cost trial is render.yaml. The web frontend is deployed on Vercel (docs/DEPLOYMENT_VERCEL_RENDER.md).
+#
+# Render does not offer an India region. "singapore" is the closest. If your data-residency obligations require data to stay
+# in India, host the backend on an Indian cloud region instead (see docs/COMPLIANCE.md) and keep DATA_REGION truthful.
+#
+# Values marked sync:false are entered once in the Render dashboard (never committed). Render does not allow sync:false inside
+# an environment group, so those few values are typed on rtn-api and again on rtn-worker (identical values).
+
+envVarGroups:
+  # Shared by the API and the worker so both always use the same keys.
+  - name: rtn-shared
+    envVars:
+      - { key: APP_ENV, value: prod }
+      - { key: DEMO_MODE, value: "false" }
+      - { key: TRUST_PROXY, value: "true" }
+      - { key: DATA_REGION, value: ap-singapore }
+      - { key: RETENTION_DAYS, value: "90" }
+      - { key: SMTP_PORT, value: "587" }
+      - { key: MSG91_TEXT_VAR, value: var1 }
+      - { key: LLM_PROVIDER, value: auto }
+      - { key: SECRET_KEY, generateValue: true }
+      # Generated once by Render. COPY IT into a password manager: losing it makes stored Aadhaar/PAN answers unreadable.
+      - { key: FIELD_ENCRYPTION_KEY, generateValue: true }
+      - { key: METRICS_TOKEN, generateValue: true }
+
+databases:
+  - name: rtn-db
+    region: singapore
+    plan: 0.1c-256mb          # smallest paid plan (backups, no expiry); size up before launch (docs/LOAD_TEST.md)
+    diskSizeGB: 1             # storage is billed per GB and can only grow; the default would be 15 GB
+    postgresMajorVersion: "16"
+    databaseName: rtn
+    user: rtn
+    # Render Postgres supports the pgvector extension the migrations use (CREATE EXTENSION vector).
+
+services:
+  - type: keyvalue
+    name: rtn-redis
+    region: singapore
+    plan: 256mb
+    ipAllowList: []   # internal connections only
+    maxmemoryPolicy: noeviction
+
+  - type: web
+    name: rtn-api
+    runtime: docker
+    region: singapore
+    plan: 0.5c-512mb
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    autoDeployTrigger: "off"   # deploy deliberately after tests pass
+    envVars:
+      - fromGroup: rtn-shared
+      - { key: DATABASE_URL, fromDatabase: { name: rtn-db, property: connectionString } }
+      - { key: REDIS_URL, fromService: { type: keyvalue, name: rtn-redis, property: connectionString } }
+      - { key: CORS_ORIGINS, sync: false }       # https://<your-vercel-domain>
+      - { key: WEB_BASE_URL, sync: false }       # https://<your-vercel-domain>
+      - { key: GRIEVANCE_CONTACT, sync: false }
+      - { key: SMTP_HOST, sync: false }
+      - { key: SMTP_USERNAME, sync: false }
+      - { key: SMTP_PASSWORD, sync: false }
+      - { key: SMTP_FROM, sync: false }
+      - { key: MSG91_AUTHKEY, sync: false }
+      - { key: MSG91_TEMPLATE_ID, sync: false }
+      # Digio (eSign + DigiLocker). Leave the first two empty to keep e-sign switched off.
+      - { key: DIGIO_CLIENT_ID, sync: false }
+      - { key: DIGIO_CLIENT_SECRET, sync: false }
+      - { key: DIGIO_ENV, value: sandbox }   # switch to production only after sandbox testing
+      - { key: DIGIO_WEBHOOK_SECRET, sync: false }
+      - { key: DIGIO_WEBHOOK_IPS, value: "35.154.20.28" }   # sandbox; production: 13.126.198.236,52.66.66.81
+      - { key: DIGIO_DIGILOCKER_TEMPLATE, value: DIGILOCKER_AADHAAR_PAN }
+      - { key: GEMINI_API_KEY, sync: false }
+      - { key: GEMINI_MODEL, sync: false }
+      - { key: SENTRY_DSN, sync: false }
+
+  - type: worker
+    name: rtn-worker
+    runtime: docker
+    region: singapore
+    plan: 0.5c-512mb
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    dockerCommand: arq app.jobs.worker.WorkerSettings
+    autoDeployTrigger: "off"
+    envVars:
+      - fromGroup: rtn-shared
+      - { key: RUN_MIGRATIONS, value: "false" }
+      - { key: SEED_ON_START, value: "false" }
+      - { key: DATABASE_URL, fromDatabase: { name: rtn-db, property: connectionString } }
+      - { key: REDIS_URL, fromService: { type: keyvalue, name: rtn-redis, property: connectionString } }
+      # Same values as on rtn-api.
+      - { key: CORS_ORIGINS, sync: false }
+      - { key: WEB_BASE_URL, sync: false }
+      - { key: GRIEVANCE_CONTACT, sync: false }
+      - { key: SMTP_HOST, sync: false }
+      - { key: SMTP_USERNAME, sync: false }
+      - { key: SMTP_PASSWORD, sync: false }
+      - { key: SMTP_FROM, sync: false }
+      - { key: MSG91_AUTHKEY, sync: false }
+      - { key: MSG91_TEMPLATE_ID, sync: false }

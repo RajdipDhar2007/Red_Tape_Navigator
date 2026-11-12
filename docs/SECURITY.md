@@ -1,5 +1,7 @@
 # Security design and OWASP Top 10 (2021) review
 
+Who attacks, what stops them and what is still open: `docs/THREAT_MODEL.md`.
+
 ## Trust boundaries
 Browser ⇄ API (JWT) ⇄ DB / Redis. **Scraped web content is untrusted data** crossing into the LLM. The LLM output is
 untrusted input to the rest of the system.

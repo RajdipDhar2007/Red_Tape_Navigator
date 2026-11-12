@@ -1,3 +1,5 @@
+import asyncio
+import contextlib
 import hmac
 from contextlib import asynccontextmanager
 
@@ -31,7 +33,21 @@ async def lifespan(_: FastAPI):
         async with get_engine().begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
             await conn.run_sync(add_missing_columns)  # an old local .db file must not break login after an upgrade
+    if s.bootstrap_admin_email and s.bootstrap_admin_password:
+        from app.services.bootstrap import ensure_admin
+
+        async with maker()() as db:
+            await ensure_admin(db, s)
+    scheduler: asyncio.Task | None = None
+    if s.run_scheduler:
+        from app.jobs.inprocess import run_forever
+
+        scheduler = asyncio.create_task(run_forever())
     yield
+    if scheduler is not None:
+        scheduler.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await scheduler
 
 
 def create_app() -> FastAPI:

@@ -13,8 +13,8 @@ Last updated 2026-11-10. This is the full list. The short version is `docs/OWNER
 
 | # | What | Why it blocks launch | How you know it is done |
 |---|------|----------------------|--------------------------|
-| 1 | Generate keys: `make keygen`. Back up `FIELD_ENCRYPTION_KEY` in two safe places. | Losing it makes stored Aadhaar/PAN answers unreadable. | Key saved offline. |
-| 2 | Hosting: Render (API, worker, Postgres, Redis) via `render.yaml`, Vercel (root `frontend`). Steps: `docs/DEPLOYMENT_VERCEL_RENDER.md`. | Nothing is deployed yet. | A public HTTPS URL loads `/en`. |
+| 1 | Keys: Render now generates them. After the Blueprint is applied, copy `FIELD_ENCRYPTION_KEY` from the Render dashboard to two safe places. (`make keygen` is only for the Docker Compose route.) | Losing it makes stored Aadhaar/PAN answers unreadable. | Key saved offline. |
+| 2 | Hosting: follow `docs/DEPLOY_NOW.md` (free trial: Brevo, Render via `render.yaml`, Vercel root `frontend`; about 30 minutes, no card). Launch set-up: `render.production.yaml`, `docs/DEPLOYMENT_VERCEL_RENDER.md`. | Nothing is deployed yet. | A public HTTPS URL loads `/en`. |
 | 3 | A domain name, pointed at Vercel and Render. | Needed for email, SEO and cookies. | `https://yourdomain` works. |
 | 4 | Email sending: SMTP or SES account, verified sender domain, SPF, DKIM, DMARC. | Reminders, verification and support mail. | A test mail reaches a Gmail inbox, not spam. |
 | 5 | Grievance officer name and email for the DPDP notice, as `GRIEVANCE_CONTACT`. | Production refuses to start without it. | App starts in prod mode. |
@@ -73,7 +73,9 @@ Every rule I add needs a source link or pasted official text. Without one it sta
 
 **Built and tested:** rules catalogue (438 rules, English, Hindi, Bengali), freshness check in CI, interview and form prefill, migrations to `0007`, email confirmation, two-factor sign-in (authenticator app) and teams with invitation links. **There is no billing: the site is free to use and charges no one** (an earlier test-mode billing build was removed on 2026-11-10).
 
-**Not built yet:** partner portal, admin console, help centre, SEO and PWA, document vault, calendar export, security threat model, deployment kit and final report.
+**Built on 2026-11-12:** calendar export of reminders, robots/sitemap/manifest, threat model, one-file hosting set-up with a 30-minute guide, live-deployment checker, backup drill, final report (`docs/FINAL_REPORT.md`).
+
+**Not built yet:** partner portal, help centre, document vault, per-licence landing pages. None blocks a launch.
 
 **Never done and not claimed:** live SMS, live eSign, native-speaker review, legal review, pentest, load test, a pilot.
 
@@ -87,7 +89,7 @@ Checked 2026-11-10 from web searches. Most figures come from vendor blogs and co
 |------|-------------------------|-----|
 | TRAI DLT (needed before any SMS) | Business PAN, proof of business (registration certificate), authorised person's ID and mobile, a letter of authorisation for the sender. Exact list varies by operator. Not checked on an official page. | About Rs 5,900 including GST, one time, on the first operator portal (Jio is best supported). Sources disagree on BSNL and Vi. Airtel not found. Later portals are said to be free. |
 | MSG91 account and SMS credits | Not checked. Usually your DLT entity ID, sender ID and approved template. | Not checked. |
-| Hosting: Render | Card for billing, GitHub access. | Roughly US$7 per month for an API service, US$6 and up for Postgres, US$10 for Redis (Key Value). Roughly US$23 per month in total before bandwidth. Workspace plans: Hobby $0, Pro $25. |
+| Hosting: Render | GitHub access. A card only for the paid plans. | Trial: US$0 (`render.yaml`; the free database is deleted after 30 days). Launch: API US$7, worker US$7, Postgres US$6 plus US$0.30 per GB, Key Value US$10, about US$30 a month (read from render.com/pricing on 2026-11-12). Details: `docs/FINAL_REPORT.md`. |
 | Hosting: Vercel | Card for billing. | Pro is about US$20 per user per month, including a usage credit. The free Hobby plan is not meant for commercial use; check Vercel's terms. |
 | Domain name | Not checked. | Not checked. |
 | Digio sandbox and production | Not checked. Request it through digio.in. | Not checked. |

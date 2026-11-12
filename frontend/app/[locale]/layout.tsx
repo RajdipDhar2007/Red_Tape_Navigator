@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Noto_Sans_Bengali, Noto_Sans_Devanagari, Poppins } from "next/font/google";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,6 +6,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import Header from "@/components/Header";
+import { siteUrl } from "@/lib/site";
 import "../globals.css";
 
 // Headings: Poppins. Body: DM Sans. Devanagari / Bengali glyphs fall back to Noto Sans so Hindi and Bengali read cleanly.
@@ -21,8 +22,20 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "app" });
-  return { title: t("title"), description: t("tagline") };
+  const base = siteUrl();
+  return {
+    metadataBase: new URL(base),
+    title: t("title"),
+    description: t("tagline"),
+    applicationName: "Red Tape Navigator",
+    // Each page lists its own language versions; search engines then show the right one to each reader.
+    alternates: { languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])) },
+    openGraph: { type: "website", siteName: "Red Tape Navigator", title: t("title"), description: t("tagline"), locale, url: `/${locale}` },
+    twitter: { card: "summary", title: t("title"), description: t("tagline") },
+  };
 }
+
+export const viewport: Viewport = { themeColor: "#183274" };
 
 export default async function LocaleLayout({
   children,
