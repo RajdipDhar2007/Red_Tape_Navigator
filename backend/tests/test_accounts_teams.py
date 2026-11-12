@@ -90,9 +90,166 @@ async def test_wrong_codes_count_toward_lockout(client):
     from app.core.config import get_settings
 
     for _ in range(get_settings().lockout_threshold):
-        await client.post("/auth/login", json={**login, "otp": "111111"})
+        r = await client.post("/auth/login", json={**login, "otp": "111111"})
+        assert r.status_code == 401 and r.json()["detail"] == "Invalid credentials"
     locked = await client.post("/auth/login", json={**login, "otp": "111111"})
-    assert locked.status_code == 429
+    assert locked.status_code == 429 and locked.json()["detail"]["code"] == "account_locked"
+
+
+async def test_2fa_enable_and_disable_bruteforce_lockout_and_reset(client):
+    from datetime import UTC, datetime, timedelta
+
+    from app.core.config import get_settings
+
+    threshold = get_settings().lockout_threshold
+    h, uid = await _register(client, "bf2fa@example.com")
+    secret = (await client.post("/auth/2fa/setup", headers=h)).json()["secret"]
+
+    # Partial failures on /auth/2fa/enable increment failed_logins, then a valid code resets it
+    r_bad = await client.post("/auth/2fa/enable", json={"code": "000000"}, headers=h)
+    assert r_bad.status_code == 400
+    async with maker()() as db:
+        u = await db.get(User, uid)
+        assert u.failed_logins == 1
+
+    # Exceeding threshold on /auth/2fa/enable locks the account
+    for _ in range(threshold - 1):
+        assert (await client.post("/auth/2fa/enable", json={"code": "000000"}, headers=h)).status_code == 400
+    step0 = int(time.time() // 30)
+    locked_en = await client.post("/auth/2fa/enable", json={"code": totp.code_at(secret, step0)}, headers=h)
+    assert locked_en.status_code == 429 and locked_en.json()["detail"]["code"] == "account_locked"
+
+    # Expire lockout window, record 1 failure, then succeed on /auth/2fa/enable -> resets failed_logins to 0
+    async with maker()() as db:
+        u = await db.get(User, uid)
+        u.locked_until = datetime.now(UTC) - timedelta(seconds=1)
+        await db.commit()
+    assert (await client.post("/auth/2fa/enable", json={"code": "000000"}, headers=h)).status_code == 400
+    en = await client.post("/auth/2fa/enable", json={"code": totp.code_at(secret, step0)}, headers=h)
+    assert en.status_code == 200
+    recovery_codes = en.json()["recovery_codes"]
+    async with maker()() as db:
+        u = await db.get(User, uid)
+        assert u.failed_logins == 0 and u.locked_until is None
+
+    # Repeated invalid second-factor codes on /auth/2fa/disable increment failed_logins and trigger lockout,
+    # and error message is identical whether TOTP code or recovery code failed.
+    bad_totp = await client.post("/auth/2fa/disable", json={"password": PW, "code": "000000"}, headers=h)
+    bad_rec = await client.post("/auth/2fa/disable", json={"password": PW, "code": "0000-0000-0000"}, headers=h)
+    assert bad_totp.status_code == 403 and bad_rec.status_code == 403
+    assert bad_totp.json()["detail"] == bad_rec.json()["detail"] == "Password or code is incorrect"
+    for _ in range(threshold - 2):
+        assert (await client.post("/auth/2fa/disable", json={"password": PW, "code": "000000"}, headers=h)).status_code == 403
+
+    locked_dis = await client.post("/auth/2fa/disable", json={"password": PW, "code": recovery_codes[0]}, headers=h)
+    assert locked_dis.status_code == 429 and locked_dis.json()["detail"]["code"] == "account_locked"
+    # Recovery code was NOT burned while locked
+    async with maker()() as db:
+        u = await db.get(User, uid)
+        u.locked_until = datetime.now(UTC) - timedelta(seconds=1)
+        u.failed_logins = 2
+        await db.commit()
+    ok_dis = await client.post("/auth/2fa/disable", json={"password": PW, "code": recovery_codes[0]}, headers=h)
+    assert ok_dis.status_code == 200
+    async with maker()() as db:
+        u = await db.get(User, uid)
+        assert u.failed_logins == 0 and u.locked_until is None
+
+
+async def test_key_rotation_rotates_totp_secret_and_preserves_null_totp(client, monkeypatch, capsys):
+    import importlib.util
+    from pathlib import Path
+
+    from cryptography.fernet import Fernet
+
+    from app.core import config
+
+    old_key = Fernet.generate_key().decode()
+    new_key = Fernet.generate_key().decode()
+
+    def use_keys(val: str) -> None:
+        monkeypatch.setenv("FIELD_ENCRYPTION_KEY", val)
+        config.get_settings.cache_clear()
+
+    try:
+        use_keys(old_key)
+        h1, uid1 = await _register(client, "rot1@example.com")
+        _, uid2 = await _register(client, "rot2@example.com")  # totp_secret remains NULL
+
+        secret = (await client.post("/auth/2fa/setup", headers=h1)).json()["secret"]
+        step0 = int(time.time() // 30)
+        en = await client.post("/auth/2fa/enable", json={"code": totp.code_at(secret, step0)}, headers=h1)
+        assert en.status_code == 200
+
+        sid = await _session(client, h1)
+        await client.post(f"/sessions/{sid}/research", json={}, headers=h1)
+        await client.post(f"/sessions/{sid}/interview", json={"answers": {"pan": "ABCPE1234F"}}, headers=h1)
+
+        # Deploy with "<new>,<old>" and run rotation script
+        use_keys(f"{new_key},{old_key}")
+        spec = importlib.util.spec_from_file_location(
+            "rotate_encryption_key",
+            Path(__file__).resolve().parents[2] / "scripts" / "rotate_encryption_key.py",
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        capsys.readouterr()
+        assert await mod.main() == 0
+        out = capsys.readouterr().out
+        assert "re-encrypted 2 values" in out
+        assert secret not in out and old_key not in out and new_key not in out and "ABCPE1234F" not in out
+
+        # Retire old key completely
+        use_keys(new_key)
+        async with maker()() as db:
+            u2 = await db.get(User, uid2)
+            assert u2.totp_secret is None
+
+        # User 1 can still log in with TOTP after old key is removed
+        ok = await client.post(
+            "/auth/login",
+            json={"email": "rot1@example.com", "password": PW, "otp": totp.code_at(secret, step0 + 1)},
+        )
+        assert ok.status_code == 200
+        exp = (await client.get("/privacy/export", headers=h1)).json()
+        assert exp["sessions"][0]["answers"]["pan"]["value"] == "ABCPE1234F"
+    finally:
+        monkeypatch.delenv("FIELD_ENCRYPTION_KEY", raising=False)
+        config.get_settings.cache_clear()
+
+
+async def test_corrupted_totp_secret_does_not_500_and_allows_recovery_code(client, caplog):
+    from cryptography.fernet import Fernet
+
+    h, uid = await _register(client, "corrupt@example.com")
+    secret = (await client.post("/auth/2fa/setup", headers=h)).json()["secret"]
+    step0 = int(time.time() // 30)
+    codes = (await client.post("/auth/2fa/enable", json={"code": totp.code_at(secret, step0)}, headers=h)).json()["recovery_codes"]
+
+    # Corrupt totp_secret with ciphertext from an unknown key
+    foreign_cipher = Fernet(Fernet.generate_key()).encrypt(secret.encode()).decode()
+    async with maker()() as db:
+        u = await db.get(User, uid)
+        u.totp_secret = foreign_cipher
+        await db.commit()
+
+    login = {"email": "corrupt@example.com", "password": PW}
+    with caplog.at_level("WARNING"):
+        bad_totp = await client.post("/auth/login", json={**login, "otp": totp.code_at(secret, step0 + 1)})
+        assert bad_totp.status_code == 401
+        bad_rec = await client.post("/auth/login", json={**login, "otp": "0000-0000-0000"})
+        assert bad_rec.status_code == 401
+        # Valid recovery code still works even when totp_secret cannot be decrypted
+        good_rec = await client.post("/auth/login", json={**login, "otp": codes[0]})
+        assert good_rec.status_code == 200
+
+    assert "totp_secret_decrypt_failed" in caplog.text
+    assert secret not in caplog.text and foreign_cipher not in caplog.text
+
+    # Disabling 2FA with another valid recovery code also works when totp_secret is corrupted
+    h_new = {"Authorization": f"Bearer {good_rec.json()['access_token']}"}
+    off = await client.post("/auth/2fa/disable", json={"password": PW, "code": codes[1]}, headers=h_new)
+    assert off.status_code == 200
 
 
 async def test_workspace_lifecycle_invites_roles_and_sharing(client):

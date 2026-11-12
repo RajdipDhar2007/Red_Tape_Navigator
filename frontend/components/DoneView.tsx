@@ -1,15 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { api, apiBlob, ApiError, post } from "@/lib/api";
+import { api, apiBlob, ApiError, del, post } from "@/lib/api";
 import type { ChecklistItem, Session } from "@/lib/types";
 import Confetti from "./fx/Confetti";
 import KeyInSheet from "./KeyInSheet";
 
 type Esign = { request_id: string; status: string; mock: boolean; label?: string; signing_url?: string | null };
+type ReminderRow = {
+  id: string;
+  title: string;
+  due_at: string;
+  kind?: string;
+  channel?: string;
+  sent?: boolean;
+  status?: "scheduled" | "dispatched";
+  delivery_mode?: "live" | "mock";
+};
+type RemindersResponse = {
+  items: ReminderRow[];
+  channels: Record<string, "live" | "mock">;
+};
 
-export default function DoneView({ session }: { session: Session }) {
+export default function DoneView({
+  session,
+  onBackToReview,
+}: {
+  session: Session;
+  onBackToReview?: () => void;
+}) {
   const t = useTranslations("done");
   const ta = useTranslations("app");
   const sid = session.id;
@@ -18,25 +38,49 @@ export default function DoneView({ session }: { session: Session }) {
   const [needShare, setNeedShare] = useState<string | null>(null);
   const [chosen, setChosen] = useState<string[]>([]);
   const [channel, setChannel] = useState("email");
-  const [sched, setSched] = useState<{ title: string; due_at: string }[] | null>(null);
+  const [sched, setSched] = useState<ReminderRow[] | null>(null);
+  const [channels, setChannels] = useState<Record<string, "live" | "mock">>({});
   const [msg, setMsg] = useState<string | null>(null);
+  const [statusNote, setStatusNote] = useState<string | null>(null);
   const forms = [...new Set((session.plan.steps ?? []).map((s) => s.form).filter((f): f is string => !!f))];
 
   const [burst, setBurst] = useState(0);
   useEffect(() => setBurst(1), []);
 
-  useEffect(() => {
-    void api<{ items: ChecklistItem[] }>(`/sessions/${sid}/submission-checklist`).then((r) => setItems(r.items));
+  const loadReminders = useCallback(() => {
+    void api<RemindersResponse>(`/sessions/${sid}/reminders`)
+      .then((res) => {
+        if (res && Array.isArray(res.items)) {
+          setSched(res.items.length > 0 ? res.items : null);
+        }
+        if (res && res.channels) {
+          setChannels(res.channels);
+        }
+      })
+      .catch(() => {
+        /* ignore if endpoint not mocked in unit test */
+      });
   }, [sid]);
 
+  useEffect(() => {
+    void api<{ items: ChecklistItem[] }>(`/sessions/${sid}/submission-checklist`)
+      .then((r) => setItems(r.items))
+      .catch(() => setMsg(ta("error")));
+    loadReminders();
+  }, [sid, ta, loadReminders]);
+
   const download = async (fid: string) => {
-    const blob = await apiBlob(`/sessions/${sid}/forms/${fid}/download`);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${fid}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const blob = await apiBlob(`/sessions/${sid}/forms/${fid}/download`);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${fid}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setMsg(ta("error"));
+    }
   };
 
   const sign = async (fid: string, consent = false) => {
@@ -75,31 +119,60 @@ export default function DoneView({ session }: { session: Session }) {
   };
 
   const downloadSigned = async (fid: string, rid: string) => {
-    const blob = await apiBlob(`/sessions/${sid}/esign/${rid}/signed.pdf`);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${fid}-signed.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const blob = await apiBlob(`/sessions/${sid}/esign/${rid}/signed.pdf`);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${fid}-signed.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setMsg(ta("error"));
+    }
   };
 
   const remind = async () => {
+    setStatusNote(null);
     try {
-      const r = await post<{ scheduled: { title: string; due_at: string }[] }>(`/sessions/${sid}/submitted`, { licences: chosen, channel });
+      const r = await post<{ scheduled: ReminderRow[] }>(`/sessions/${sid}/submitted`, { licences: chosen, channel });
       setSched(r.scheduled);
       setMsg(null);
     } catch (e) {
-      setMsg(e instanceof ApiError && e.code === "consent_required" ? t("need") : ta("error"));
+      setMsg(e instanceof ApiError && e.code === "consent_required" ? t("need") : e instanceof ApiError ? e.message : ta("error"));
     }
   };
+
+  const cancelReminder = async (rid: string) => {
+    setMsg(null);
+    setStatusNote(null);
+    try {
+      await del(`/sessions/${sid}/reminders/${rid}`);
+      setSched((prev) => {
+        const next = (prev ?? []).filter((x) => x.id !== rid);
+        return next.length > 0 ? next : null;
+      });
+      setStatusNote(t("reminderCancelled"));
+    } catch {
+      setMsg(ta("error"));
+    }
+  };
+
+  const channelMode = channels[channel];
 
   return (
     <section aria-labelledby="done-h" className="space-y-4 animate-fade-up">
       <Confetti burst={burst} />
-      <h2 id="done-h" className="text-xl font-semibold">
-        {t("heading")}
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="done-h" className="text-xl font-semibold">
+          {t("heading")}
+        </h2>
+        {onBackToReview && (
+          <button type="button" className="btn-secondary !py-1.5 text-sm" onClick={onBackToReview}>
+            ← {t("backToReview")}
+          </button>
+        )}
+      </div>
       <p role="note" className="rounded border border-brand-600 bg-brand-50 p-3 font-medium">
         {t("important")}
       </p>
@@ -196,17 +269,45 @@ export default function DoneView({ session }: { session: Session }) {
             <option value="sms">SMS</option>
           </select>
         </label>
+        {channelMode && (
+          <p className={`rounded-lg p-2 text-xs ${channelMode === "live" ? "bg-green-50 text-green-950" : "bg-amber-50 text-amber-950"}`}>
+            {channelMode === "live" ? t("channelLive") : t("channelMock")}
+          </p>
+        )}
         <button className="btn" disabled={!chosen.length} onClick={() => void remind()}>
           {t("remind")}
         </button>
-        {msg && <p role="alert">{msg}</p>}
+        {msg && <p role="alert" className="text-red-800">{msg}</p>}
+        {statusNote && <p role="status" className="text-sm text-indgreen-800">{statusNote}</p>}
         {sched && (
-          <div role="status">
+          <div role="status" className="space-y-2">
             <p className="font-medium">{t("scheduled")}</p>
-            <ul className="list-disc pl-5 text-sm">
-              {sched.map((s) => (
-                <li key={s.title}>
-                  {s.title} — {new Date(s.due_at).toLocaleDateString()}
+            <ul className="space-y-2 text-sm">
+              {sched.map((s, idx) => (
+                <li key={s.id ?? `${s.title}-${idx}`} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div>
+                    <span className="font-medium">{s.title}</span> — {new Date(s.due_at).toLocaleDateString()}
+                    <div className="mt-1 flex flex-wrap gap-1.5 text-xs">
+                      {s.channel && <span className="badge bg-slate-200 text-slate-800">{s.channel.toUpperCase()}</span>}
+                      <span className={`badge ${s.sent ? "bg-green-100 text-green-900" : "bg-navy-100 text-navy-900"}`}>
+                        {s.sent ? t("statusDispatched") : t("statusScheduled")}
+                      </span>
+                      {s.delivery_mode && (
+                        <span className={`badge ${s.delivery_mode === "live" ? "bg-indgreen-100 text-indgreen-800" : "bg-amber-100 text-amber-900"}`}>
+                          {s.delivery_mode === "live" ? t("modeLiveBadge") : t("modeMockBadge")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {s.id && !s.sent && (
+                    <button
+                      type="button"
+                      className="btn-ghost text-red-800 !min-h-0 px-2 py-1 text-xs"
+                      onClick={() => void cancelReminder(s.id)}
+                    >
+                      {t("cancelReminder")}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

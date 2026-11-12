@@ -66,7 +66,7 @@ Development work that is still open, in order of value:
 2. Rule gaps listed in `README.md` section 10 (pages that would not load or exist only as scans). Each needs the official text.
 3. DigiLocker field import, after the first real sandbox response.
 4. Nonce-based Content-Security-Policy; operator-delegation design; shared rate limiting for more than one instance.
-5. Not built from the earlier wish list: a partner portal for professionals, a document vault, per-licence landing pages, a support-ticket inbox. None blocks a launch. The full backlog is `docs/LAUNCH_CHECKLIST.md` section 7a.
+5. Not built from the earlier wish list: a partner portal for professionals, per-licence landing pages, a support-ticket inbox. None blocks a launch. The full backlog is `docs/LAUNCH_CHECKLIST.md` section 7a.
 
 ## 5. Monthly running costs
 

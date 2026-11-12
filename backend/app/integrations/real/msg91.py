@@ -37,11 +37,26 @@ def to_msisdn(number: str) -> str | None:
 
 class Msg91Sms:
     channel = "sms"
+    mock = False
 
-    def __init__(self, authkey: str, template_id: str, text_var: str = "var1", url: str = FLOW_URL):
-        self.authkey, self.template_id, self.text_var, self.url = authkey, template_id, text_var, url
+    def __init__(
+        self,
+        authkey: str,
+        template_id: str,
+        text_var: str = "var1",
+        url: str = FLOW_URL,
+        *,
+        timeout: float = 15.0,
+    ):
+        self.authkey = (authkey or "").strip()
+        self.template_id = (template_id or "").strip()
+        self.text_var = (text_var or "var1").strip() or "var1"
+        self.url = url
+        self.timeout = timeout
 
     async def send(self, to: str, text: str, subject: str = "Red Tape Navigator") -> AdapterResult:
+        if not (self.authkey and self.template_id):
+            return AdapterResult(False, {"error": "not_configured"}, False, "SMS provider not configured")
         msisdn = to_msisdn(to)
         if not msisdn:
             return AdapterResult(False, {"error": "invalid_mobile_number"}, False, "SMS not sent: invalid mobile number")
@@ -52,12 +67,14 @@ class Msg91Sms:
         }
         r: httpx.Response | None = None
         data: dict = {}
+        last_exc: BaseException | None = None
         for attempt in range(2):  # one retry, only for network errors and 5xx/429; the provider may rate-limit
             try:
-                async with httpx.AsyncClient(timeout=15) as c:
+                async with httpx.AsyncClient(timeout=self.timeout) as c:
                     r = await c.post(self.url, json=body, headers={"authkey": self.authkey, "accept": "application/json"})
                 data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
             except (httpx.HTTPError, ValueError) as exc:
+                last_exc = exc
                 log.warning("msg91 request failed: %s (attempt %d)", type(exc).__name__, attempt + 1)
                 r = None
                 continue
@@ -65,7 +82,10 @@ class Msg91Sms:
                 continue
             break
         if r is None:
-            return AdapterResult(False, {"error": "provider_unreachable"}, False, "SMS provider unreachable")
+            err_data: dict[str, str] = {"error": "provider_unreachable"}
+            if isinstance(last_exc, httpx.TimeoutException):
+                err_data["reason"] = "timeout"
+            return AdapterResult(False, err_data, False, "SMS provider unreachable")
         if not isinstance(data, dict):
             data = {}
         ok = r.status_code == 200 and str(data.get("type", "")).lower() == "success"

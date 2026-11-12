@@ -185,7 +185,7 @@ class ExternalRequest(Base):
     __tablename__ = "external_requests"
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
     user_id: Mapped[str] = mapped_column(String(32), index=True)
-    session_id: Mapped[str] = mapped_column(ForeignKey("nav_sessions.id"), index=True)
+    session_id: Mapped[str] = mapped_column(ForeignKey("nav_sessions.id", ondelete="CASCADE"), index=True)
     provider: Mapped[str] = mapped_column(String(16))  # digio | mock
     kind: Mapped[str] = mapped_column(String(16))  # esign | digilocker
     external_id: Mapped[str] = mapped_column(String(64), index=True)  # provider's document / request id
@@ -234,3 +234,23 @@ class WorkspaceInvite(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class Document(Base):
+    """User-owned document metadata in the Document Vault. Raw bytes live in object storage, never in PostgreSQL."""
+
+    __tablename__ = "documents"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    workspace_id: Mapped[str | None] = mapped_column(ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True, index=True)
+    session_id: Mapped[str | None] = mapped_column(ForeignKey("nav_sessions.id", ondelete="SET NULL"), nullable=True, index=True)
+    original_filename: Mapped[str] = mapped_column(String(255))
+    stored_object_key: Mapped[str] = mapped_column(String(512), unique=True, index=True)
+    content_type: Mapped[str] = mapped_column(String(100))
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    checksum: Mapped[str] = mapped_column(String(64), index=True)
+    category: Mapped[str] = mapped_column(String(32), default="general", server_default="general")
+    scan_status: Mapped[str] = mapped_column(String(32), default="disabled", server_default="disabled")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)

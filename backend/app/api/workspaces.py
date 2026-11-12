@@ -7,12 +7,12 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import current_user
 from app.core import audit
-from app.db.models import NavSession, User, Workspace, WorkspaceInvite, WorkspaceMember
+from app.db.models import Document, NavSession, User, Workspace, WorkspaceInvite, WorkspaceMember
 from app.db.session import get_db
 
 router = APIRouter(prefix="/workspaces", tags=["workspaces"])
@@ -110,6 +110,7 @@ async def delete_workspace(wid: str, user: User = Depends(current_user), db: Asy
         raise HTTPException(403, "Only the owner can delete a workspace")
     for ns in (await db.execute(select(NavSession).where(NavSession.workspace_id == wid))).scalars():
         ns.workspace_id = None  # sessions go back to being private to their owners; none is deleted
+    await db.execute(update(Document).where(Document.workspace_id == wid).values(workspace_id=None))
     await db.execute(delete(WorkspaceInvite).where(WorkspaceInvite.workspace_id == wid))
     await db.execute(delete(WorkspaceMember).where(WorkspaceMember.workspace_id == wid))
     await db.execute(delete(Workspace).where(Workspace.id == wid))
@@ -207,6 +208,7 @@ async def remove_member(wid: str, uid: str, user: User = Depends(current_user), 
         raise HTTPException(403, "You cannot remove this member")
     for ns in (await db.execute(select(NavSession).where(NavSession.workspace_id == wid, NavSession.user_id == uid))).scalars():
         ns.workspace_id = None  # their sessions stop being shared; they are theirs, not the team's
+    await db.execute(update(Document).where(Document.workspace_id == wid, Document.user_id == uid).values(workspace_id=None))
     await db.delete(target)
     await db.commit()
     await audit.record(db, user.id, "workspace.member_removed", {"workspace": wid, "self": uid == user.id})

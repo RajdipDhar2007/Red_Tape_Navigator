@@ -54,3 +54,8 @@ services:
       # First officer account (free instances have no shell). Sign in once, change the password in the app, then delete both.
       - { key: BOOTSTRAP_ADMIN_EMAIL, sync: false }
       - { key: BOOTSTRAP_ADMIN_PASSWORD, sync: false }   # 12 characters or more
+      # Document Vault. Free instances have an ephemeral disk, so uploads vanish on redeploy: set STORAGE_BACKEND=s3 (S3/R2) before relying on it.
+      - { key: STORAGE_BACKEND, value: local }
+      - { key: STORAGE_LOCAL_DIR, value: /app/data/vault }
+      - { key: MAX_UPLOAD_BYTES, value: "5242880" }
+      - { key: DOCUMENT_SCAN_MODE, value: disabled }

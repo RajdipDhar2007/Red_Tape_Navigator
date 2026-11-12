@@ -3,12 +3,12 @@ import { expect, test } from "@playwright/test";
 test("help page: linked from the footer, nine answers, available in Bengali and Hindi", async ({ page }) => {
   await page.goto("/en");
   await page.getByRole("contentinfo").getByRole("link", { name: "Help", exact: true }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Help and common questions" })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2 })).toHaveCount(9);
+  await expect(page.getByRole("heading", { level: 1, name: "Help & Support Centre" })).toBeVisible();
+  await expect(page.locator('section[aria-labelledby^="faq-"]')).toHaveCount(9);
   await page.goto("/bn/help");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("সহায়তা ও সাধারণ প্রশ্ন");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("সহায়তা ও সমর্থন কেন্দ্র");
   await page.goto("/hi/help");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("सहायता और आम सवाल");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("सहायता और समर्थन केंद्र");
 });
 
 test("search engines: public pages are listed, private pages are excluded, the app is installable", async ({ request }) => {
@@ -19,6 +19,8 @@ test("search engines: public pages are listed, private pages are excluded, the a
   const sitemap = await (await request.get("/sitemap.xml")).text();
   for (const path of ["/en<", "/bn/help<", "/hi/privacy<", "/en/terms<"]) expect(sitemap).toContain(path);
   expect(sitemap).not.toContain("/account");
+  expect(robots).toContain("Disallow: /en/documents");
+  expect(sitemap).not.toContain("/documents");
   const manifest = await (await request.get("/manifest.webmanifest")).json();
   expect(manifest.name).toBe("Red Tape Navigator");
   expect(manifest.icons[0].src).toBe("/icon.svg");

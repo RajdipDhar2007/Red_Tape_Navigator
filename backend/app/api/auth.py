@@ -1,7 +1,9 @@
 import asyncio
+import logging
 from datetime import UTC, datetime, timedelta
 
 import jwt
+from cryptography.fernet import InvalidToken
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
@@ -11,6 +13,7 @@ from app.api.deps import current_user
 from app.core import audit, totp
 from app.core.config import get_settings
 from app.core.crypto import decrypt, encrypt
+from app.core.logging import get_logger
 from app.core.security import (
     create_reset_token,
     create_token,
@@ -25,6 +28,8 @@ from app.db.session import get_db
 from app.integrations.factory import get_email_sender
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+_log = get_logger("auth")
+_std_log = logging.getLogger(__name__)
 _DUMMY_HASH = hash_password("timing-equalisation-only")
 
 
@@ -72,19 +77,38 @@ async def register(body: RegisterIn, background: BackgroundTasks, db: AsyncSessi
     return await _issue(db, user)
 
 
+async def _enforce_not_locked(db: AsyncSession, user: User, now: datetime | None = None) -> None:
+    now = now or datetime.now(UTC)
+    until = user.locked_until if user.locked_until is None or user.locked_until.tzinfo else user.locked_until.replace(tzinfo=UTC)
+    if until and until > now:  # locked: even the right password or 2FA code is refused until the window ends
+        await audit.record(db, user.id, "auth.login_blocked_locked")
+        minutes = max(1, int((until - now).total_seconds() // 60) + 1)
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            {"code": "account_locked", "message": f"Too many failed attempts. Try again in {minutes} minutes, or reset your password."},
+        )
+
+
+async def _record_failed_attempt(db: AsyncSession, user: User, now: datetime | None = None) -> None:
+    now = now or datetime.now(UTC)
+    s = get_settings()
+    user.failed_logins = (user.failed_logins or 0) + 1
+    if user.failed_logins >= s.lockout_threshold:
+        user.locked_until = now + timedelta(minutes=s.lockout_minutes)
+        user.failed_logins = 0
+        await audit.record(db, user.id, "auth.account_locked")
+    await db.commit()
+
+
 @router.post("/login", response_model=TokenOut)
 async def login(body: LoginIn, db: AsyncSession = Depends(get_db)):
     user = (await db.execute(select(User).where(User.email == body.email.lower()))).scalar_one_or_none()
     # always run one bcrypt verification so response time does not reveal whether the email exists
     stored = user.password_hash if user and not user.deleted_at else _DUMMY_HASH
     valid = await asyncio.to_thread(verify_password, body.password, stored)
-    s = get_settings()
     now = datetime.now(UTC)
     if user and not user.deleted_at:
-        until = user.locked_until if user.locked_until is None or user.locked_until.tzinfo else user.locked_until.replace(tzinfo=UTC)
-        if until and until > now:  # locked: even the right password is refused until the window ends
-            await audit.record(db, user.id, "auth.login_blocked_locked")
-            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, {"code": "account_locked", "message": f"Too many failed attempts. Try again in {max(1, int((until - now).total_seconds() // 60) + 1)} minutes, or reset your password."})
+        await _enforce_not_locked(db, user, now)
     otp_ok = True
     if valid and user and not user.deleted_at and user.totp_enabled:
         if not body.otp:  # right password, second factor still needed: not a failed attempt
@@ -92,12 +116,7 @@ async def login(body: LoginIn, db: AsyncSession = Depends(get_db)):
         otp_ok = _consume_second_factor(user, body.otp)
     if not user or user.deleted_at or not valid or not otp_ok:
         if user and not user.deleted_at:
-            user.failed_logins = (user.failed_logins or 0) + 1
-            if user.failed_logins >= s.lockout_threshold:
-                user.locked_until = now + timedelta(minutes=s.lockout_minutes)
-                user.failed_logins = 0
-                await audit.record(db, user.id, "auth.account_locked")
-            await db.commit()
+            await _record_failed_attempt(db, user, now)
         await audit.record(db, "anonymous", "auth.login_failed")
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid credentials")
     user.failed_logins, user.locked_until = 0, None
@@ -189,7 +208,13 @@ async def _send_verify_email(email: str, language: str, token: str) -> None:
 def _consume_second_factor(user: User, code: str) -> bool:
     """Accept a current authenticator code (once only) or an unused recovery code (burned on use). Mutates ``user``; caller commits."""
     if user.totp_secret:
-        step = totp.verify(decrypt(user.totp_secret), code, user.totp_last_step or 0)
+        try:
+            secret = decrypt(user.totp_secret)
+            step = totp.verify(secret, code, user.totp_last_step or 0)
+        except (InvalidToken, ValueError):
+            _log.warning("totp_secret_decrypt_failed", user_id=user.id)
+            _std_log.warning("totp_secret_decrypt_failed user_id=%s", user.id)
+            step = None
         if step is not None:
             user.totp_last_step = step
             return True
@@ -304,12 +329,22 @@ async def two_factor_setup(user: User = Depends(current_user), db: AsyncSession 
 async def two_factor_enable(body: CodeIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     if user.totp_enabled or not user.totp_secret:
         raise HTTPException(status.HTTP_409_CONFLICT, "Start with /auth/2fa/setup")
-    step = totp.verify(decrypt(user.totp_secret), body.code, user.totp_last_step or 0)
+    await _enforce_not_locked(db, user)
+    try:
+        secret = decrypt(user.totp_secret)
+        step = totp.verify(secret, body.code, user.totp_last_step or 0)
+    except (InvalidToken, ValueError):
+        _log.warning("totp_secret_decrypt_failed", user_id=user.id)
+        _std_log.warning("totp_secret_decrypt_failed user_id=%s", user.id)
+        raise HTTPException(status.HTTP_409_CONFLICT, "Start with /auth/2fa/setup") from None
     if step is None:
+        await _record_failed_attempt(db, user)
+        await audit.record(db, user.id, "auth.2fa_enable_failed")
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "That code is not correct. Check the time on your phone and try again.")
     codes = totp.new_recovery_codes()
     user.totp_enabled, user.totp_last_step = True, step
     user.recovery_hashes = [totp.hash_recovery(c) for c in codes]
+    user.failed_logins, user.locked_until = 0, None
     await db.commit()
     await audit.record(db, user.id, "auth.2fa_enabled")
     return {"enabled": True, "recovery_codes": codes}  # shown once; only hashes are kept
@@ -319,12 +354,15 @@ async def two_factor_enable(body: CodeIn, user: User = Depends(current_user), db
 async def two_factor_disable(body: DisableIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     if not user.totp_enabled:
         raise HTTPException(status.HTTP_409_CONFLICT, "Two-factor sign-in is not on")
-    uid = user.id  # read before a rollback expires the instance
-    if not await asyncio.to_thread(verify_password, body.password, user.password_hash) or not _consume_second_factor(user, body.code):
-        await db.rollback()
-        await audit.record(db, uid, "auth.2fa_disable_failed")
+    await _enforce_not_locked(db, user)
+    pw_ok = await asyncio.to_thread(verify_password, body.password, user.password_hash)
+    code_ok = _consume_second_factor(user, body.code) if pw_ok else False
+    if not pw_ok or not code_ok:
+        await _record_failed_attempt(db, user)
+        await audit.record(db, user.id, "auth.2fa_disable_failed")
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Password or code is incorrect")
     user.totp_enabled, user.totp_secret, user.totp_last_step, user.recovery_hashes = False, None, 0, []
+    user.failed_logins, user.locked_until = 0, None
     await db.commit()
     await audit.record(db, user.id, "auth.2fa_disabled")
     return {"enabled": False}

@@ -20,6 +20,12 @@ envVarGroups:
       - { key: SMTP_PORT, value: "587" }
       - { key: MSG91_TEXT_VAR, value: var1 }
       - { key: LLM_PROVIDER, value: auto }
+      # Document Vault. Render disks are ephemeral: before launch set STORAGE_BACKEND=s3 and add STORAGE_BUCKET, STORAGE_REGION,
+      # STORAGE_ENDPOINT_URL (R2/MinIO), STORAGE_ACCESS_KEY_ID and STORAGE_SECRET_ACCESS_KEY on BOTH rtn-api and rtn-worker.
+      - { key: STORAGE_BACKEND, value: local }
+      - { key: STORAGE_LOCAL_DIR, value: /app/data/vault }
+      - { key: MAX_UPLOAD_BYTES, value: "5242880" }
+      - { key: DOCUMENT_SCAN_MODE, value: disabled }
       - { key: SECRET_KEY, generateValue: true }
       # Generated once by Render. COPY IT into a password manager: losing it makes stored Aadhaar/PAN answers unreadable.
       - { key: FIELD_ENCRYPTION_KEY, generateValue: true }

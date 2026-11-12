@@ -3,6 +3,7 @@ import tempfile
 
 _tmp = tempfile.mkdtemp()
 os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL") or f"sqlite+aiosqlite:///{_tmp}/test.db".replace("\\", "/")
+os.environ["STORAGE_LOCAL_DIR"] = f"{_tmp}/vault".replace("\\", "/")
 os.environ["ANTHROPIC_API_KEY"] = ""
 os.environ["APP_ENV"] = "test"
 

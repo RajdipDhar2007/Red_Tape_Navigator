@@ -41,6 +41,16 @@ type Item = {
   reason: string;
   claim: { key: string; text: string; source_url: string; confidence: number; fetched_at: string } | null;
 };
+type ReadinessProvider = {
+  configured?: boolean;
+  ok?: boolean;
+  mode: string;
+};
+type ReadinessData = {
+  environment: string;
+  demo_mode: boolean;
+  providers: Record<string, ReadinessProvider>;
+};
 
 function Tile({ label, value }: { label: string; value: string | number }) {
   return (
@@ -199,27 +209,36 @@ function QueueRow({ item, onDone }: { item: Item; onDone: () => void }) {
 
 export default function StaffConsole() {
   const t = useTranslations("staff");
+  const tp = useTranslations("privacy");
   const [state, setState] = useState<"loading" | "denied" | "ready" | "error">("loading");
+  const [role, setRole] = useState<string>("reviewer");
   const [stats, setStats] = useState<Stats | null>(null);
   const [queue, setQueue] = useState<Item[]>([]);
   const [chain, setChain] = useState<boolean | null>(null);
   const [forms, setForms] = useState<FormRow[]>([]);
+  const [readiness, setReadiness] = useState<ReadinessData | null>(null);
+  const [confirmPurge, setConfirmPurge] = useState(false);
+  const [purging, setPurging] = useState(false);
+  const [purgeMsg, setPurgeMsg] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!hasToken()) return setState("denied");
     try {
       const me = await api<{ role: string }>("/auth/me");
       if (me.role === "citizen") return setState("denied");
-      const [s, q, a, fm] = await Promise.all([
+      setRole(me.role);
+      const [s, q, a, fm, rd] = await Promise.all([
         api<Stats>("/admin/stats"),
         api<Item[]>("/admin/review-queue"),
         api<{ chain_valid: boolean }>("/admin/audit/verify"),
         api<FormRow[]>("/admin/forms"),
+        api<ReadinessData>("/admin/readiness").catch(() => null),
       ]);
       setForms(fm);
       setStats(s);
       setQueue(q);
       setChain(a.chain_valid);
+      if (rd && rd.providers) setReadiness(rd);
       setState("ready");
     } catch (e) {
       setState(e instanceof ApiError && (e.status === 401 || e.status === 403) ? "denied" : "error");
@@ -230,13 +249,56 @@ export default function StaffConsole() {
     void load();
   }, [load]);
 
+  const runPurge = async () => {
+    setPurging(true);
+    setPurgeMsg(null);
+    try {
+      const res = await post<{ purged_sessions: number }>("/admin/purge");
+      setPurgeMsg(t("purgeDone", { count: res.purged_sessions }));
+      setConfirmPurge(false);
+      await load();
+    } catch {
+      setPurgeMsg(t("error"));
+    } finally {
+      setPurging(false);
+    }
+  };
+
   if (state === "loading") return <p role="status">{t("loading")}</p>;
   if (state === "denied") return <p role="alert">{t("denied")}</p>;
   if (state === "error" || !stats) return <p role="alert">{t("error")}</p>;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        {role === "admin" && !confirmPurge && (
+          <button type="button" className="btn-secondary text-sm" onClick={() => setConfirmPurge(true)}>
+            {t("purgeBtn")}
+          </button>
+        )}
+      </div>
+
+      {confirmPurge && (
+        <div role="alert" className="card flex flex-wrap items-center justify-between gap-3 border-l-4 border-l-amber-500">
+          <p className="font-medium text-navy-900">{t("purgeConfirm")}</p>
+          <div className="flex gap-2">
+            <button type="button" className="btn text-sm" disabled={purging} onClick={() => void runPurge()}>
+              {t("purgeConfirmBtn")}
+            </button>
+            <button type="button" className="btn-ghost text-sm" disabled={purging} onClick={() => setConfirmPurge(false)}>
+              {tp("cancel")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {purgeMsg && (
+        <p role="status" className="rounded-lg bg-indgreen-50 p-3 text-sm font-medium text-indgreen-900">
+          {purgeMsg}
+        </p>
+      )}
+
       <section aria-label={t("overview")} className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Tile label={t("citizens")} value={stats.users.by_role.citizen ?? 0} />
         <Tile label={t("sessions")} value={stats.sessions.total} />
@@ -247,6 +309,35 @@ export default function StaffConsole() {
         <Tile label={t("consentsGranted")} value={stats.consents.granted} />
         <Tile label={t("auditChain")} value={chain ? t("intact") : t("broken")} />
       </section>
+
+      {readiness && (
+        <section aria-labelledby="readiness-h" className="card space-y-3">
+          <div>
+            <h2 id="readiness-h" className="text-xl font-semibold">
+              {t("readinessHeading")}
+            </h2>
+            <p className="text-sm text-slate-700">{t("readinessIntro")}</p>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {Object.entries(readiness.providers).map(([name, info]) => {
+              const isLive = info.ok === true || info.configured === true;
+              const isFallback = !isLive && (info.mode.includes("mock") || info.mode.includes("fallback") || info.mode.includes("memory") || info.mode.includes("local"));
+              return (
+                <li key={name} className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                  <div>
+                    <p className="font-semibold text-navy-900">{name.replace(/_/g, " ")}</p>
+                    <p className="text-xs text-slate-600">{info.mode}</p>
+                  </div>
+                  <span className={`badge ${isLive ? "bg-green-200 text-green-950" : isFallback ? "bg-amber-200 text-amber-950" : "bg-slate-200 text-slate-800"}`}>
+                    {isLive ? t("statusLive") : isFallback ? t("statusMock") : t("statusDisabled")}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
       <div className="grid gap-3 md:grid-cols-2">
         <Breakdown title={t("byActivity")} data={stats.sessions.by_activity} />
         <Breakdown title={t("byState")} data={stats.sessions.by_state} />

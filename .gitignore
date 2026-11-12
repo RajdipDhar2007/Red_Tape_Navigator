@@ -29,3 +29,7 @@ data/
 backend/evals/report.json
 *.db
 *.sqlite3
+*.dump
+*.sql
+*.bak
+backups/

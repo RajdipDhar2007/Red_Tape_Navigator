@@ -62,26 +62,34 @@ def normalise_kyc_status(value: str | None) -> str:
 class DigioClient:
     def __init__(self, client_id: str, client_secret: str, env: str = "sandbox", base_url: str = "",
                  transport: httpx.AsyncBaseTransport | None = None):
-        self.base = (base_url or BASE_URLS.get(env, BASE_URLS["sandbox"])).rstrip("/")
-        self._auth = (client_id, client_secret)
+        self.env = env if env in BASE_URLS else "sandbox"
+        self.base = (base_url or BASE_URLS[self.env]).rstrip("/")
+        self._auth = ((client_id or "").strip(), (client_secret or "").strip())
         self._transport = transport
 
     async def call(self, method: str, path: str, *, timeout: float = 30, retry: bool = False, **kw) -> tuple[httpx.Response | None, dict]:
         """Returns (response, parsed json or {}). Never raises for network/HTTP errors; response is None if unreachable.
         ``retry`` allows ONE more attempt after a network error or a 5xx reply; use it only for read-only calls."""
+        if not (self._auth[0] and self._auth[1]):
+            return None, {"error": "not_configured"}
         r: httpx.Response | None = None
+        last_exc: BaseException | None = None
         for attempt in range(2 if retry else 1):
             try:
                 async with httpx.AsyncClient(timeout=timeout, auth=self._auth, transport=self._transport) as c:
                     r = await c.request(method, self.base + path, **kw)
             except httpx.HTTPError as exc:
+                last_exc = exc
                 log.warning("digio unreachable: %s %s (attempt %d)", type(exc).__name__, path.split("?")[0], attempt + 1)
                 r = None
                 continue
             if r.status_code < 500:
                 break
         if r is None:
-            return None, {}
+            meta: dict = {}
+            if isinstance(last_exc, httpx.TimeoutException):
+                meta["reason"] = "timeout"
+            return None, meta
         data: dict = {}
         if r.headers.get("content-type", "").startswith("application/json"):
             try:
@@ -94,11 +102,16 @@ class DigioClient:
 
 def _failure(r: httpx.Response | None, data: dict, what: str) -> AdapterResult:
     if r is None:
-        return AdapterResult(False, {"error": "provider_unreachable"}, False, "Signing provider unreachable. Try again later.")
+        err = "not_configured" if data.get("error") == "not_configured" else "provider_unreachable"
+        info: dict = {"error": err}
+        if data.get("reason"):
+            info["reason"] = data["reason"]
+        return AdapterResult(False, info, False, "Signing provider unreachable. Try again later.")
     code = str(data.get("code") or data.get("error_code") or "")
     log.warning("digio %s failed: status=%s code=%s", what, r.status_code, code)  # no identifiers, no bodies
     label = FRIENDLY_ERRORS.get(code, "The provider could not complete the request. Try again later.")
-    return AdapterResult(False, {"error": "provider_rejected", "http_status": r.status_code, "code": code}, False, label)
+    err_kind = "malformed_response" if code == "malformed_response" else "provider_rejected"
+    return AdapterResult(False, {"error": err_kind, "http_status": r.status_code, "code": code}, False, label)
 
 
 class DigioESign:
@@ -120,19 +133,25 @@ class DigioESign:
         }
         files = {"file": (file_name, pdf, "application/pdf"), "request": (None, json.dumps(request), "text/plain")}
         r, data = await self.c.call("POST", "/v2/client/document/upload", files=files, timeout=60)
-        if r is None or r.status_code != 200 or not data.get("id"):
-            return _failure(r, data, "esign.create")
-        parties = data.get("signing_parties") or []
-        url = next((p.get("authentication_url") for p in parties if isinstance(p, dict) and p.get("authentication_url")), None)
-        return AdapterResult(True, {"document_id": data["id"], "status": normalise_doc_status(data.get("agreement_status")),
+        doc_id = data.get("id")
+        if r is None or r.status_code != 200 or not isinstance(doc_id, str) or not doc_id.strip():
+            return _failure(r, {"code": "malformed_response"} if (r is not None and r.status_code == 200) else data, "esign.create")
+        raw_parties = data.get("signing_parties")
+        parties = [p for p in raw_parties if isinstance(p, dict)] if isinstance(raw_parties, list) else []
+        url = next((p.get("authentication_url") for p in parties if isinstance(p.get("authentication_url"), str) and p.get("authentication_url")), None)
+        return AdapterResult(True, {"document_id": doc_id, "status": normalise_doc_status(data.get("agreement_status")),
                                     "signing_url": url, "legally_valid": False}, False, None)
 
     async def get_status(self, document_id: str) -> AdapterResult:
         r, data = await self.c.call("GET", f"/v2/client/document/{document_id}", retry=True)
         if r is None or r.status_code != 200:
             return _failure(r, data, "esign.status")
-        parties = [p for p in (data.get("signing_parties") or []) if isinstance(p, dict)]
-        status = normalise_doc_status(data.get("agreement_status"))
+        raw_parties = data.get("signing_parties")
+        parties = [p for p in raw_parties if isinstance(p, dict)] if isinstance(raw_parties, list) else []
+        raw_agreement = data.get("agreement_status")
+        if not (isinstance(raw_agreement, str) and raw_agreement.strip()) and not parties:
+            return _failure(r, {"code": "malformed_response"}, "esign.status")
+        status = normalise_doc_status(raw_agreement if isinstance(raw_agreement, str) else None)
         if status == STATUS_PENDING and parties and all(p.get("status") in ("failed", "cancelled", "removed") for p in parties):
             status = STATUS_FAILED
         return AdapterResult(True, {"document_id": document_id, "status": status}, False, None)
@@ -155,14 +174,18 @@ class DigioDigiLocker:
                 "reference_id": reference_id, "transaction_id": reference_id, "notify_customer": True,
                 "expire_in_days": self.expire_in_days, "generate_access_token": False}
         r, data = await self.c.call("POST", "/client/kyc/v2/request/with_template", json={k: v for k, v in body.items() if v is not None})
-        if r is None or r.status_code != 200 or not data.get("id"):
-            return _failure(r, data, "digilocker.start")
+        req_id = data.get("id")
+        if r is None or r.status_code != 200 or not isinstance(req_id, str) or not req_id.strip():
+            return _failure(r, {"code": "malformed_response"} if (r is not None and r.status_code == 200) else data, "digilocker.start")
         # notify_customer makes Digio send the citizen the consent link by email/SMS; the result arrives by webhook/status.
-        return AdapterResult(True, {"request_id": data["id"], "status": normalise_kyc_status(data.get("status")), "fields": {}}, False, None)
+        return AdapterResult(True, {"request_id": req_id, "status": normalise_kyc_status(data.get("status")), "fields": {}}, False, None)
 
     async def get_status(self, request_id: str) -> AdapterResult:
         r, data = await self.c.call("POST", f"/client/kyc/v2/{request_id}/response", retry=True)
         if r is None or r.status_code != 200:
             return _failure(r, data, "digilocker.status")
+        raw_status = data.get("status")
+        if not isinstance(raw_status, str) or not raw_status.strip():
+            return _failure(r, {"code": "malformed_response"}, "digilocker.status")
         # Field mapping of the returned Aadhaar/PAN data is NOT implemented until verified in the sandbox.
-        return AdapterResult(True, {"request_id": request_id, "status": normalise_kyc_status(data.get("status")), "fields": {}}, False, None)
+        return AdapterResult(True, {"request_id": request_id, "status": normalise_kyc_status(raw_status), "fields": {}}, False, None)

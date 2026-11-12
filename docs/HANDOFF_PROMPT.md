@@ -279,7 +279,7 @@ Owner instruction: finish everything pending, make the app ready to deploy, comm
 - Gotcha: the GitHub Actions runs for commit `ba69bc7` sat in "queued" for over 11 hours with no jobs. If a run never starts, check the account's
   Actions status and billing page before assuming the code is at fault.
 - Not done: cookie-based sessions (needs one domain for site and API; design in `docs/THREAT_MODEL.md`), the rule gaps in README section 10,
-  partner portal, document vault. Next: the owner deploys, then run `verify_deploy.py --journey` and the hosted load test.
+  partner portal. (The document vault was added later: see README phase 5.) Next: the owner deploys, then run `verify_deploy.py --journey` and the hosted load test.
 
 ### Session log: 2026-11-12 (continued: deployment started with the owner)
 

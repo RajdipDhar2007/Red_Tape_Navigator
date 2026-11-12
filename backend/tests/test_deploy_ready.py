@@ -124,7 +124,7 @@ async def test_reminders_list_and_calendar_export(client, auth):
         await db.commit()
         sid = ns.id
 
-    listed = (await client.get(f"/sessions/{sid}/reminders", headers=headers)).json()["reminders"]
+    listed = (await client.get(f"/sessions/{sid}/reminders", headers=headers)).json()["items"]
     assert [r["kind"] for r in listed] == ["status", "renewal"] and listed[0]["sent"] is False
 
     r = await client.get(f"/sessions/{sid}/reminders.ics", headers=headers)
@@ -199,7 +199,7 @@ async def test_every_private_route_refuses_anonymous_callers(client):
     from app.main import app
 
     public = {
-        "/health", "/ready", "/metrics", "/auth/register", "/auth/login", "/auth/refresh", "/auth/forgot", "/auth/reset",
+        "/health", "/health/live", "/ready", "/health/ready", "/metrics", "/auth/register", "/auth/login", "/auth/refresh", "/auth/forgot", "/auth/reset",
         "/auth/verify-email", "/consent/notice", "/privacy/policy", "/webhooks/digio",
     }
     checked = 0

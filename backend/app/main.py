@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from sqlalchemy import func, select, text
 
-from app.api import admin, auth, consent, privacy, sessions, webhooks, workspaces
+from app.api import admin, auth, consent, documents, privacy, sessions, webhooks, workspaces
 from app.core import metrics
 from app.core.config import get_settings
 from app.core.errors import capture_exception, init_error_tracking
@@ -67,7 +67,7 @@ def create_app() -> FastAPI:
         allow_headers=["Authorization", "Content-Type", "Accept-Language", "X-Request-ID"],
         expose_headers=["X-Request-ID", "Content-Disposition"],
     )
-    for r in (auth.router, consent.router, sessions.router, privacy.router, admin.router, webhooks.router, workspaces.router):
+    for r in (auth.router, consent.router, sessions.router, documents.router, privacy.router, admin.router, webhooks.router, workspaces.router):
         app.include_router(r)
 
     @app.exception_handler(Exception)
@@ -76,21 +76,52 @@ def create_app() -> FastAPI:
         return JSONResponse({"detail": "Internal error"}, status_code=500)  # never leak internals
 
     @app.get("/health", tags=["ops"])
+    @app.get("/health/live", tags=["ops"])
     async def health():
         """Liveness: the process is up."""
-        return {"status": "ok", "disclaimer": DISCLAIMER}
+        return {"status": "ok", "live": True, "disclaimer": DISCLAIMER}
 
     @app.get("/ready", tags=["ops"])
+    @app.get("/health/ready", tags=["ops"])
     async def ready():
         """Readiness: database reachable and rules KB loaded."""
+        s = get_settings()
         try:
             async with maker()() as db:
                 await db.execute(text("SELECT 1"))
                 claims = (await db.execute(select(func.count()).select_from(Claim))).scalar_one()
         except Exception:  # noqa: BLE001
-            return JSONResponse({"status": "unavailable", "database": False}, status_code=503)
-        return {"status": "ready", "database": True, "kb_claims": claims, "demo_mode": get_settings().demo_mode,
-                "data_region": get_settings().data_region}
+            return JSONResponse({"status": "unavailable", "ready": False, "database": False}, status_code=503)
+
+        redis_status = "unconfigured"
+        if s.redis_url.strip():
+            try:
+                import redis.asyncio as redis_async
+
+                r = redis_async.from_url(s.redis_url, socket_connect_timeout=1.0, socket_timeout=1.0)
+                try:
+                    redis_status = "ok" if await r.ping() else "degraded"
+                finally:
+                    await r.aclose()
+            except Exception:  # noqa: BLE001
+                redis_status = "degraded"
+
+        storage_warning = (
+            "local_storage_requires_persistent_volume_or_s3"
+            if (s.storage_backend == "local" and s.is_prod)
+            else None
+        )
+        return {
+            "status": "ready",
+            "ready": True,
+            "database": True,
+            "redis": redis_status,
+            "storage_backend": s.storage_backend,
+            "storage_warning": storage_warning,
+            "kb_claims": claims,
+            "demo_mode": s.demo_mode,
+            "data_region": s.data_region,
+        }
 
     @app.get("/metrics", tags=["ops"], include_in_schema=False)
     async def prometheus(request: Request):

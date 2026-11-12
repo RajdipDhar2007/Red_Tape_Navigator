@@ -7,9 +7,49 @@ from cryptography.fernet import Fernet, MultiFernet
 
 from app.core.config import get_settings
 
-SENSITIVE_KEYS = {"aadhaar", "pan", "aadhaar_number", "pan_number"}
+SENSITIVE_KEYS = {
+    "aadhaar",
+    "pan",
+    "aadhaar_number",
+    "pan_number",
+    "bank_account_number",
+    "bank_ifsc",
+    "ifsc",
+    "totp_secret",
+    "password",
+    "new_password",
+    "current_password",
+    "smtp_password",
+    "postgres_password",
+    "secret",
+    "secret_key",
+    "field_encryption_key",
+    "api_key",
+    "anthropic_api_key",
+    "msg91_authkey",
+    "digio_client_secret",
+    "digio_webhook_secret",
+    "storage_secret_access_key",
+    "metrics_token",
+    "sentry_dsn",
+    "token",
+    "access_token",
+    "refresh_token",
+    "reset_token",
+    "authorization",
+    "cookie",
+    "otp",
+    "recovery_code",
+    "recovery_hashes",
+    "content_bytes",
+    "file_bytes",
+    "raw_bytes",
+    "pdf",
+}
 _AADHAAR = re.compile(r"\b\d{4}\s?\d{4}\s?\d{4}\b")
 _PAN = re.compile(r"\b[A-Z]{5}\d{4}[A-Z]\b")
+_JWT = re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b")
+_DB_URI_CRED = re.compile(r"(postgres(?:ql)?(?:\+\w+)?://[^:\s/]+:)([^@\s]+)(@)", re.IGNORECASE)
 
 
 def _fernet() -> Fernet | MultiFernet:
@@ -43,15 +83,19 @@ def mask(value: str) -> str:
 
 def redact_text(text: str) -> str:
     text = _AADHAAR.sub("[AADHAAR-REDACTED]", text)
-    return _PAN.sub("[PAN-REDACTED]", text)
+    text = _PAN.sub("[PAN-REDACTED]", text)
+    text = _JWT.sub("[JWT-REDACTED]", text)
+    return _DB_URI_CRED.sub(r"\1[REDACTED]\3", text)
 
 
 def redact(obj):
     """Recursively redact sensitive keys/values for logs and audit detail."""
     if isinstance(obj, dict):
-        return {k: ("[REDACTED]" if k.lower() in SENSITIVE_KEYS else redact(v)) for k, v in obj.items()}
+        return {k: ("[REDACTED]" if str(k).lower() in SENSITIVE_KEYS else redact(v)) for k, v in obj.items()}
     if isinstance(obj, list):
         return [redact(v) for v in obj]
+    if isinstance(obj, (bytes, bytearray)):
+        return "[BINARY-REDACTED]"
     if isinstance(obj, str):
         return redact_text(obj)
     return obj

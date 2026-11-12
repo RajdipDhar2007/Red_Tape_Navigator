@@ -62,6 +62,16 @@ class Settings(BaseSettings):
     # First officer account, created/promoted at start when both are set (for hosts without a shell). Remove after first sign-in.
     bootstrap_admin_email: str = ""
     bootstrap_admin_password: str = ""
+    storage_backend: str = "local"  # local | s3
+    storage_local_dir: str = "./data/vault"
+    storage_bucket: str = ""
+    storage_region: str = "ap-south-1"
+    storage_endpoint_url: str = ""
+    storage_access_key_id: str = ""
+    storage_secret_access_key: str = ""
+    max_upload_bytes: int = 5_242_880  # 5 MB
+    document_scan_mode: str = "disabled"  # disabled | external
+    document_scan_url: str = ""
 
     @field_validator("database_url", mode="after")
     @classmethod
@@ -148,6 +158,12 @@ def production_problems(s: Settings) -> list[str]:
         problems.append("SMTP_HOST and SMTP_FROM are required (password-reset and reminder email)")
     if not s.grievance_contact:
         problems.append("GRIEVANCE_CONTACT is required (DPDP grievance officer shown to citizens)")
+    if bool(s.anthropic_api_key.strip()) != bool(s.anthropic_model.strip()):
+        problems.append("ANTHROPIC_API_KEY and ANTHROPIC_MODEL must both be set when enabling the Anthropic LLM provider")
+    if bool(s.msg91_authkey.strip()) != bool(s.msg91_template_id.strip()):
+        problems.append("MSG91_AUTHKEY and MSG91_TEMPLATE_ID must both be set when enabling MSG91 SMS")
+    if bool(s.digio_client_id.strip()) != bool(s.digio_client_secret.strip()):
+        problems.append("DIGIO_CLIENT_ID and DIGIO_CLIENT_SECRET must both be set when enabling Digio")
     if s.digio_configured and not s.digio_webhook_secret:
         problems.append("DIGIO_WEBHOOK_SECRET is required when Digio credentials are set (webhook checksum)")
     if s.digio_configured and s.digio_env not in ("sandbox", "production"):
@@ -158,6 +174,18 @@ def production_problems(s: Settings) -> list[str]:
         problems.append("BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD must be set together (or both left empty)")
     elif s.bootstrap_admin_password and len(s.bootstrap_admin_password) < 12:
         problems.append("BOOTSTRAP_ADMIN_PASSWORD must be at least 12 characters")
+    if s.storage_backend not in ("local", "s3"):
+        problems.append("STORAGE_BACKEND must be local or s3")
+    if s.storage_backend == "s3" and not (
+        s.storage_bucket and s.storage_region and s.storage_access_key_id and s.storage_secret_access_key
+    ):
+        problems.append(
+            "STORAGE_BUCKET, STORAGE_REGION, STORAGE_ACCESS_KEY_ID and STORAGE_SECRET_ACCESS_KEY are required when STORAGE_BACKEND=s3"
+        )
+    if s.document_scan_mode not in ("disabled", "external"):
+        problems.append("DOCUMENT_SCAN_MODE must be disabled or external")
+    if s.document_scan_mode == "external" and not s.document_scan_url.startswith(("https://", "http://")):
+        problems.append("DOCUMENT_SCAN_URL is required when DOCUMENT_SCAN_MODE=external")
     if s.demo_mode:
         problems.append("DEMO_MODE must be false (it exposes demo accounts and simulated integrations)")
     return problems

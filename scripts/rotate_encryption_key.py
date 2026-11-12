@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 from sqlalchemy import select  # noqa: E402
 
 from app.core.crypto import rotate  # noqa: E402
-from app.db.models import Answer  # noqa: E402
+from app.db.models import Answer, User  # noqa: E402
 from app.db.session import maker  # noqa: E402
 
 
@@ -25,6 +25,10 @@ async def main() -> int:
         for a in (await db.execute(select(Answer).where(Answer.sensitive.is_(True)))).scalars():
             a.value = rotate(a.value)
             n += 1
+        for u in (await db.execute(select(User).where(User.totp_secret.is_not(None)))).scalars():
+            if u.totp_secret:
+                u.totp_secret = rotate(u.totp_secret)
+                n += 1
         await db.commit()
     print(f"re-encrypted {n} values")
     return 0

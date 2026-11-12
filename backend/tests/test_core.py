@@ -1,5 +1,8 @@
+import asyncio
+from types import SimpleNamespace
+
 import pytest
-from sqlalchemy import update
+from sqlalchemy import select, update
 
 from app.core import audit
 from app.core.crypto import decrypt, encrypt, mask, redact
@@ -11,8 +14,19 @@ def test_crypto_roundtrip_and_redaction():
     assert decrypt(encrypt("ABCDE1234F")) == "ABCDE1234F"
     assert encrypt("x") != "x"
     assert mask("123456789012") == "********9012"
-    out = redact({"pan": "ABCDE1234F", "note": "aadhaar 1234 5678 9012 and ABCDE1234F"})
+    out = redact({
+        "pan": "ABCDE1234F",
+        "bank_account_number": "123456789012",
+        "bank_ifsc": "SBIN0001234",
+        "ifsc": "SBIN0001234",
+        "totp_secret": "GEZDGNBVGY3TQOJQ",
+        "note": "aadhaar 1234 5678 9012 and ABCDE1234F",
+    })
     assert out["pan"] == "[REDACTED]"
+    assert out["bank_account_number"] == "[REDACTED]"
+    assert out["bank_ifsc"] == "[REDACTED]"
+    assert out["ifsc"] == "[REDACTED]"
+    assert out["totp_secret"] == "[REDACTED]"
     assert "1234 5678 9012" not in out["note"] and "ABCDE1234F" not in out["note"]
 
 
@@ -63,6 +77,52 @@ async def test_audit_chain_and_immutability(client, auth):
         await db.execute(update(AuditLog).where(AuditLog.seq == row.seq).values(action="tampered"))
         await db.commit()
         assert not await audit.verify_chain(db)
+
+
+async def test_audit_chain_concurrent_writes_do_not_fork(client):
+    async def _write_event(idx: int) -> AuditLog:
+        async with maker()() as db:
+            return await audit.record(db, f"actor-{idx}", "concurrent.write", {"index": idx, "pan": "ABCDE1234F"})
+
+    results = await asyncio.gather(*(_write_event(i) for i in range(16)))
+    assert len(results) == 16
+
+    async with maker()() as db:
+        assert await audit.verify_chain(db)
+        rows = (await db.execute(select(AuditLog).order_by(AuditLog.seq))).scalars().all()
+        concurrent_rows = [r for r in rows if r.action == "concurrent.write"]
+        assert len(concurrent_rows) == 16
+        assert {r.detail["index"] for r in concurrent_rows} == set(range(16))
+        assert all(r.detail["pan"] == "[REDACTED]" for r in concurrent_rows)
+        # Every row in the entire audit table must have a distinct prev_hash (no chain fork)
+        prev_hashes = [r.prev_hash for r in rows]
+        assert len(prev_hashes) == len(set(prev_hashes))
+
+
+async def test_audit_record_acquires_pg_advisory_lock_on_postgresql(client, monkeypatch):
+    executed_sql: list[str] = []
+
+    async with maker()() as db:
+        orig_connection = db.connection
+        orig_execute = db.execute
+
+        async def fake_connection(*args, **kwargs):
+            await orig_connection(*args, **kwargs)
+            return SimpleNamespace(dialect=SimpleNamespace(name="postgresql"))
+
+        async def fake_execute(statement, *args, **kwargs):
+            sql_text = str(statement)
+            executed_sql.append(sql_text)
+            if "pg_advisory_xact_lock" in sql_text:
+                return SimpleNamespace()
+            return await orig_execute(statement, *args, **kwargs)
+
+        monkeypatch.setattr(db, "connection", fake_connection)
+        monkeypatch.setattr(db, "execute", fake_execute)
+
+        await audit.record(db, "pg-worker", "pg.locked", {"ok": True})
+        assert any("pg_advisory_xact_lock" in s for s in executed_sql)
+        assert await audit.verify_chain(db)
 
 
 def test_encryption_key_rotation(monkeypatch):

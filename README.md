@@ -9,6 +9,14 @@ shows everything for review. **The citizen reviews, signs and submits. The syste
 
 ---
 
+## Hackathon and team
+
+- **Project:** Red Tape Navigator
+- **Team:** Onyx (HackNPitch, Jadavpur University). Category: Software / AI and civic tech.
+- **Members:** Raktim Chakraborty (team leader), Anish Goswami, Rajdip Dhar, Imon Patra.
+
+---
+
 ## READ THIS FIRST: a request to the next contributor
 
 This README and [`docs/HANDOFF_PROMPT.md`](docs/HANDOFF_PROMPT.md) are the project's memory. Please follow them:
@@ -222,6 +230,16 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 - Every rule shows a review tag: "Awaiting expert review" until a reviewer verifies it in the officer console, then "Expert-reviewed".
 - Every effect is skipped when the visitor's system asks for reduced motion; the strings exist in `en`, `hi` and `bn`.
 
+### Phase 5: hardening, document vault and provider readiness (merged from Anish Goswami's work)
+
+- **Document Vault** (`backend/app/api/documents.py`, `core/storage.py`, `core/scanner.py`, migration 0009, `/documents` page): private upload of
+  PDF/PNG/JPEG up to 5 MB with magic-byte checks, per-owner isolation, optional external malware scan, and local or S3-compatible storage
+  (`STORAGE_BACKEND=local|s3`). Local storage is ephemeral on Render free instances: use `s3` before relying on it.
+- Hardening: PII redaction before text reaches a language model, resilient SMTP/MSG91/Digio adapters, audit-log and crypto improvements,
+  migration 0008 (cascade on external requests), DPDP erasure now covers vault files, reminders can be listed with channel status and cancelled.
+- Help centre with search and categories (`/help`, en/hi/bn) that shows the live grievance contact; backup/restore tool `scripts/db_backup_restore.py`
+  with non-production safeguards; disaster-recovery runbook (`docs/RUNBOOK.md`); a code audit in `docs/FINAL_PROJECT_AUDIT.md`.
+
 ## 5. Technology and tools used
 
 | Area | Used |
@@ -352,7 +370,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for all the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review). The officer console (`staff.*` strings) is already translated in `en`, `hi` and `bn`, pending the same native review | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
 | G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
 | H | **Business readiness** (**HUMAN** decisions) | Decide who funds the running costs (the product is free for every user and never charges anyone; see `docs/BUSINESS_MODEL.md`), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
-| J | **Development backlog** | Cookie-based sessions (needs one domain for site and API), nonce-based CSP, DigiLocker field import, FSSAI field maps, operator delegation design, shared rate limiting, partner portal, document vault, per-licence landing pages, support inbox | `docs/LAUNCH_CHECKLIST.md` section 7a, `docs/THREAT_MODEL.md` |
+| J | **Development backlog** | Cookie-based sessions (needs one domain for site and API), nonce-based CSP, DigiLocker field import, FSSAI field maps, operator delegation design, shared rate limiting, partner portal, per-licence landing pages, support inbox | `docs/LAUNCH_CHECKLIST.md` section 7a, `docs/THREAT_MODEL.md` |
 | I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
 
 **Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence

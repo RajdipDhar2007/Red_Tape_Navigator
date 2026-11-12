@@ -51,13 +51,21 @@ def checksum_ok(secret: str, body: bytes, header: str) -> bool:
 def _targets(event: str, payload: dict) -> tuple[list[str], str | None, dict]:
     """(external ids / our reference ids to look up, new status or None, safe metadata)."""
     if event in _SIGN_EVENTS:
-        doc = payload.get("document") or {}
-        meta = {k: doc[k] for k in ("error_code",) if doc.get(k)}
-        return [str(doc.get("id", ""))], _SIGN_EVENTS[event], meta
+        raw_doc = payload.get("document")
+        doc = raw_doc if isinstance(raw_doc, dict) else {}
+        meta = {k: str(doc[k])[:120] for k in ("error_code",) if doc.get(k)}
+        doc_id = doc.get("id")
+        return ([str(doc_id)] if isinstance(doc_id, (str, int)) and not isinstance(doc_id, bool) and str(doc_id) else []), _SIGN_EVENTS[event], meta
     if event in _KYC_EVENTS:
-        dl = payload.get("DIGILOCKER_REQUEST") or {}
-        kyc = payload.get("KYC_REQUEST") or {}
-        ids = [str(x) for x in (dl.get("kyc_request_id"), kyc.get("id"), dl.get("id"), dl.get("reference_id"), kyc.get("reference_id")) if x]
+        raw_dl = payload.get("DIGILOCKER_REQUEST")
+        raw_kyc = payload.get("KYC_REQUEST")
+        dl = raw_dl if isinstance(raw_dl, dict) else {}
+        kyc = raw_kyc if isinstance(raw_kyc, dict) else {}
+        ids = [
+            str(x)
+            for x in (dl.get("kyc_request_id"), kyc.get("id"), dl.get("id"), dl.get("reference_id"), kyc.get("reference_id"))
+            if isinstance(x, (str, int)) and not isinstance(x, bool) and str(x)
+        ]
         return ids, _KYC_EVENTS[event], {}
     return [], None, {}
 
@@ -76,8 +84,18 @@ async def digio(request: Request, db: AsyncSession = Depends(get_db)):
         raise HTTPException(401, "Invalid checksum")
     try:
         msg = json.loads(body)
-        event = str(msg["event"]).lower()
-        wid = str(msg["id"])
+        if not isinstance(msg, dict):
+            raise TypeError("envelope is not an object")
+        raw_event = msg["event"]
+        raw_id = msg["id"]
+        if not isinstance(raw_event, str) or not raw_event.strip():
+            raise ValueError("invalid event")
+        if not isinstance(raw_id, (str, int)) or isinstance(raw_id, bool):
+            raise ValueError("invalid id")
+        wid = str(raw_id).strip()
+        if not (1 <= len(wid) <= 120):
+            raise ValueError("id length out of bounds")
+        event = raw_event.strip().lower()
     except (ValueError, KeyError, TypeError):
         log.warning("digio webhook: authentic but unparseable payload")
         return {"ok": True}
@@ -89,7 +107,9 @@ async def digio(request: Request, db: AsyncSession = Depends(get_db)):
         await db.rollback()
         return {"ok": True, "duplicate": True}
 
-    ids, status, meta = _targets(event, msg.get("payload") if isinstance(msg.get("payload"), dict) else {})
+    raw_payload = msg.get("payload")
+    payload_dict: dict = raw_payload if isinstance(raw_payload, dict) else {}
+    ids, status, meta = _targets(event, payload_dict)
     ids = [i for i in ids if i]
     row = None
     if ids and status:

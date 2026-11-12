@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { api, ApiError, hasToken, post, setTokens } from "@/lib/api";
+import { api, ApiError, del, hasToken, post, setTokens } from "@/lib/api";
 import Icon, { type IconName } from "./Icon";
 import { ChakraWheel } from "./LogoMark";
 import CountUp from "./fx/CountUp";
@@ -12,7 +12,7 @@ import Reveal from "./fx/Reveal";
 import VoiceInput from "./VoiceInput";
 
 type Consent = { purpose: string; granted: boolean }[];
-type AppRow = { id: string; goal: string; created_at: string; reviewed: boolean; city: string | null; steps: number };
+type AppRow = { id: string; goal: string; created_at: string; reviewed: boolean; stage?: string; city: string | null; steps: number };
 
 /** 0 = too weak to submit, 1 = weak, 2 = fair, 3 = strong. Length matters most; variety and obvious patterns adjust it. */
 export function passwordStrength(p: string): 0 | 1 | 2 | 3 {
@@ -347,12 +347,16 @@ function Momentum({ apps }: { apps: AppRow[] }) {
 function Dashboard() {
   const t = useTranslations("dash");
   const tg = useTranslations("goal");
+  const tp = useTranslations("privacy");
+  const tt = useTranslations("tracker");
   const locale = useLocale();
   const router = useRouter();
   const [goal, setGoal] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [apps, setApps] = useState<AppRow[] | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const id = useId();
   const [ph, setPh] = useState(0);
 
@@ -421,6 +425,23 @@ function Dashboard() {
 
       {apps && apps.length > 0 && <Momentum apps={apps} />}
 
+      <section className="card flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-navy-700 animate-fade-up" aria-labelledby="vault-dash-h">
+        <div className="flex items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-navy-50 text-navy-700">
+            <Icon name="lock" />
+          </span>
+          <div>
+            <h2 id="vault-dash-h" className="text-lg font-bold text-navy-900">
+              {t("documentsTitle")}
+            </h2>
+            <p className="text-sm text-slate-700">{t("documentsHelp")}</p>
+          </div>
+        </div>
+        <Link href="/documents" className="btn-secondary">
+          {t("documentsOpen")} <Icon name="arrow" size={16} />
+        </Link>
+      </section>
+
       <section aria-labelledby="mine-h">
         <h2 id="mine-h" className="mb-3 text-xl font-bold">
           {t("mineTitle")}
@@ -434,9 +455,16 @@ function Dashboard() {
             {apps.map((a, i) => (
               <li key={a.id} className="card card-hover flex flex-col justify-between gap-3 animate-fade-up" style={{ animationDelay: `${i * 50}ms` }}>
                 <div>
-                  <span className={`badge ${a.reviewed ? "bg-indgreen-100 text-indgreen-800" : "bg-saffron-100 text-saffron-700"}`}>
-                    {a.reviewed ? t("statusDone") : t("statusProgress")}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className={`badge ${a.reviewed ? "bg-indgreen-100 text-indgreen-800" : "bg-saffron-100 text-saffron-700"}`}>
+                      {a.reviewed ? t("statusDone") : t("statusProgress")}
+                    </span>
+                    {a.stage && ["goal", "research", "checklist", "interview", "review", "submit"].includes(a.stage) && (
+                      <span className="badge bg-navy-50 text-navy-800">
+                        {tt(a.stage)}
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-2 line-clamp-2 font-semibold text-navy-900">{a.goal}</p>
                   <p className="mt-1 text-sm text-slate-600">
                     {new Date(a.created_at).toLocaleDateString()}
@@ -444,9 +472,56 @@ function Dashboard() {
                     {a.steps ? ` · ${t("steps", { n: a.steps })}` : ""}
                   </p>
                 </div>
-                <Link href={`/session/${a.id}`} className="btn-secondary self-start">
-                  {a.reviewed ? t("open") : t("continue")} <Icon name="arrow" size={16} />
-                </Link>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Link href={`/session/${a.id}`} className="btn-secondary self-start">
+                    {a.reviewed ? t("open") : t("continue")} <Icon name="arrow" size={16} />
+                  </Link>
+                  {confirmDeleteId !== a.id && (
+                    <button
+                      type="button"
+                      className="btn-ghost text-red-800 !min-h-0 py-1.5 text-sm"
+                      onClick={() => setConfirmDeleteId(a.id)}
+                    >
+                      {tp("deleteSessionBtn")}
+                    </button>
+                  )}
+                </div>
+                {confirmDeleteId === a.id && (
+                  <div className="rounded-lg bg-red-50 p-2.5 text-sm text-red-900">
+                    <p className="mb-2">{tp("deleteSessionWarn")}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="btn bg-red-700 hover:bg-red-800 text-white !min-h-0 py-1 text-xs"
+                        disabled={deletingId === a.id}
+                        onClick={() => {
+                          setDeletingId(a.id);
+                          void del(`/privacy/sessions/${a.id}`)
+                            .then(() => {
+                              setApps((prev) => (prev ? prev.filter((x) => x.id !== a.id) : []));
+                              setConfirmDeleteId(null);
+                            })
+                            .catch(() => {
+                              setErr(tp("sessionDeleteError"));
+                            })
+                            .finally(() => {
+                              setDeletingId(null);
+                            });
+                        }}
+                      >
+                        {tp("deleteSessionConfirm")}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-ghost !min-h-0 py-1 text-xs"
+                        disabled={deletingId === a.id}
+                        onClick={() => setConfirmDeleteId(null)}
+                      >
+                        {tp("cancel")}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
