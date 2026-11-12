@@ -30,11 +30,7 @@ export default function CitationLine({ source_url, fetched_at, content_hash, con
         <span className="badge ml-2 bg-indgreen-100 text-indgreen-800" title={t("reviewedHelp")}>
           {t("reviewedBadge")}
         </span>
-      ) : (
-        <span className="badge ml-2 bg-slate-200 text-slate-800" title={t("pendingHelp")}>
-          {t("pending")}
-        </span>
-      )}
+      ) : null}
     </p>
   );
 }

@@ -51,6 +51,7 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 | 4. [Who we are building this for](#-who-we-are-building-this-for) | 10. [Screenshots](#-screenshots-of-the-running-app) | 16. [Pending work and roadmap](#-pending-work-and-roadmap) |
 | 5. [How the Indian government context shaped us](#-how-the-indian-government-context-shaped-the-design) | 11. [Technology and tools](#-technology-and-tools-we-used) | 17. [Our vision](#-our-vision) |
 | 6. [Our approach and plan](#-our-approach-and-plan) | 12. [Architecture and pipelines](#-architecture-and-pipelines) | 18. [Quick start](#-quick-start) · [Docs](#-documentation-index) · [License](#-license) |
+| **+** [Where the agentic AI is](#-where-the-agentic-ai-is) | | |
 
 ---
 
@@ -232,6 +233,38 @@ A bureaucracy agent that invents a fee or files a wrong form is worse than no ag
 
 ---
 
+## 🤖 Where the agentic AI is
+
+Red Tape Navigator is an **agent**, not a chatbot. You give it a **goal** ("open a small bakery in Kolkata"); it then decides what to do, uses tools to do it, remembers what you told it, checks its own work, and stops at a human checkpoint. The language model is one optional tool inside that loop, not the whole product.
+
+```mermaid
+flowchart LR
+  G([Goal in plain language]) --> U[1. Understand<br/>Intake agent]
+  U --> P[2. Plan<br/>Planner orders the licences]
+  P --> R[3. Research<br/>Fetch and read official pages]
+  R --> I[4. Interview<br/>Ask only what is missing, remember it]
+  I --> F[5. Act<br/>Fill the forms]
+  F --> C{6. Human checkpoint<br/>Review, consent, sign}
+  C -->|edit| I
+  C -->|approved| S([Citizen submits on the portal])
+  S --> W[7. Follow up<br/>Reminders and weekly re-checks]
+  W -.->|rules changed| R
+```
+
+| Agentic ability | How we implemented it | Where |
+|---|---|---|
+| **Goal understanding** | Turns free text into a business type, city and state. It is rules-first (keywords, typos, regulated-sector checks); an optional model fills gaps, and its answer is validated against our catalogue so it cannot invent a business type. | `backend/app/agent/intake.py` |
+| **Planning** | Breaks the goal into an ordered, dependency-aware list of licences (for example Udyam, then FSSAI, then trade licence). | `backend/app/agent/planner.py` |
+| **Tool use** | Calls tools on its own: a guarded web fetcher for official pages, a page reader that extracts claims, a PDF form filler, an e-Sign adapter, email and SMS adapters. | `backend/app/scraping/`, `backend/app/forms/`, `backend/app/integrations/` |
+| **Memory** | Remembers every answer, encrypts the sensitive ones, and never asks the same question twice. | `backend/app/interview/` |
+| **Self-checking** | Keeps a model-extracted fact only if its quote appears word for word on the official page; validates every answer; an evaluation set in CI fails the build if the agent invents a fact. | `backend/app/agent/research.py`, `backend/evals/` |
+| **Proactive follow-up** | Without being asked, it schedules status checks and renewal reminders, and re-checks rules every week. | `backend/app/jobs/`, `backend/app/followup/` |
+| **Bounded autonomy** | It may research, ask, fill and remind. It may **not** submit: no interface has a submit method, and a test fails if one is added. | `backend/app/integrations/interfaces.py` |
+
+**Which model?** One switch (`LLM_PROVIDER`) selects a local Ollama model or Google Gemini. Personal data is redacted before any model call, a circuit breaker keeps a slow model from blocking the user, and if no model is available the agent still works in its deterministic rules-only mode.
+
+---
+
 ## 🔄 The workflow, step by step
 
 <table>
@@ -264,7 +297,7 @@ Email and password, optional two-factor sign-in with an authenticator app, and a
 
 ### 3. Research and the step-by-step plan
 
-The agent builds an **ordered, dependency-aware plan** (for example Udyam, then FSSAI, then trade licence) with authority, fee, timeline and documents for each step. **Every line shows its source, the date it was checked, a confidence score and a content hash**, plus a review tag: "Awaiting expert review" or "Expert-reviewed".
+The agent builds an **ordered, dependency-aware plan** (for example Udyam, then FSSAI, then trade licence) with authority, fee, timeline and documents for each step. **Every line shows its source, the date it was checked, a confidence score and a content hash**.
 
 </td>
 <td width="50%" valign="top">

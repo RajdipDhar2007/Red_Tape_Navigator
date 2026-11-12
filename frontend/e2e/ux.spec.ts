@@ -34,11 +34,8 @@ test("checklist: ticking steps moves the progress ring, marks the next step, and
   await expect(page.getByRole("button", { name: new RegExp(`^${en.checklist.markDone}`) }).first()).toHaveAttribute("aria-pressed", "true");
 });
 
-test("checklist: every rule shows a review tag and the share link carries only licence names", async ({ page }) => {
+test("checklist: the share link carries only licence names", async ({ page }) => {
   await startPlan(page, "I want to open a small bakery in Kolkata");
-
-  // no rule has been reviewed by a person yet, so each one says so
-  await expect(page.getByText(en.checklist.pending).first()).toBeVisible();
 
   const share = page.getByRole("link", { name: en.checklist.share });
   const href = (await share.getAttribute("href")) ?? "";

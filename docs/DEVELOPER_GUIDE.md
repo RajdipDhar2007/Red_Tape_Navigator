@@ -229,7 +229,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 - Interview: slide-in chat bubbles, a typing indicator, an animated progress bar and milestone cheers. Dashboard: a progress ring and
   badges derived from the citizen's own plans.
 - The plan can be printed or saved as PDF (print stylesheet), copied, or shared to WhatsApp (licence names only, never answers or identifiers).
-- Every rule shows a review tag: "Awaiting expert review" until a reviewer verifies it in the officer console, then "Expert-reviewed".
+- A rule shows an "Expert-reviewed" badge once a reviewer verifies it in the officer console; there is no label on rules that are still waiting for review (the "Verify with the authority" badge covers low-confidence ones).
 - Every effect is skipped when the visitor's system asks for reduced motion; the strings exist in `en`, `hi` and `bn`.
 
 ### Phase 5: hardening, document vault and provider readiness (merged from Anish Goswami's work)

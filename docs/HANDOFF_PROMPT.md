@@ -228,7 +228,7 @@ Next: trade-licence fees for Pune, Ahmedabad, Mumbai, Delhi, Bengaluru, Chennai;
 ### Session log: 2026-11-09 (fourth pass: pollution fees, review label, fire validity, clinic laws)
 
 - New rule mechanisms: `fee_by_city` on pollution_consent (city-scoped, with `NATIONAL_FALLBACK` for other cities), `timeline_by_city` (Delhi fire certificate validity), clinical_registration `by_city` entries.
-- UI: every citation now shows "Awaiting expert review" (confidence under 0.9) or "Expert-reviewed" (0.9 or more, set when a reviewer verifies it), next to the "Verify with the authority" flag. Strings in en/hi/bn.
+- UI: every citation shows "Expert-reviewed" (0.9 or more, set when a reviewer verifies it); the earlier "Awaiting expert review" label was removed on 2026-11-13 at the owner's request, next to the "Verify with the authority" flag. Strings in en/hi/bn.
 - PITFALL: before `npx playwright test`, kill every leftover `next start` and `uvicorn` process (PowerShell: Get-CimInstance Win32_Process, match the command line). A stale `next start` from an earlier test pass kept port 3000 after I rebuilt `.next`, served the old HTML with missing chunks, and all 5 e2e tests failed with "Application error: a client-side exception". Playwright reuses a server it finds on the port (`reuseExistingServer` is on outside CI).
 - Writing multi-line Unicode edit scripts: use the Write tool to create the .py file, not a bash heredoc (a long heredoc with quotes made bash fail with "unexpected EOF").
 
