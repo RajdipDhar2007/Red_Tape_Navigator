@@ -43,53 +43,51 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 
 ## Contents
 
-**About the project**
-
-1. [Hackathon and team](#-hackathon-and-team)
-2. [The problem statement in full](#-the-problem-statement-in-full)
-3. [The problem, in real life](#-the-problem-in-real-life)
-4. [Who we are building this for](#-who-we-are-building-this-for)
-5. [How the Indian government context shaped the design](#-how-the-indian-government-context-shaped-the-design)
-
-**Our approach and the agent**
-
-6. [Our approach and plan](#-our-approach-and-plan)
-7. [Where the agentic AI is](#-where-the-agentic-ai-is)
-8. [The workflow, step by step](#-the-workflow-step-by-step)
-9. [How the app works: what does what](#-how-the-app-works-what-does-what)
-10. [Project structure](#-project-structure)
-11. [Every feature](#-every-feature)
-12. [Screenshots of the running app](#-screenshots-of-the-running-app)
-
-**How it is built and how well**
-
-13. [Technology and tools we used](#-technology-and-tools-we-used)
-14. [Architecture and pipelines](#-architecture-and-pipelines)
-15. [Challenges we faced and how we solved them](#-challenges-we-faced-and-how-we-solved-them)
-16. [Quality and testing](#-quality-and-testing)
-17. [Honest status: real, simulated, untested](#-honest-status-real-simulated-untested)
-
-**Looking ahead and getting started**
-
-18. [Pending work and roadmap](#-pending-work-and-roadmap)
-19. [Our vision](#-our-vision)
-20. [Quick start](#-quick-start)
-21. [Documentation index](#-documentation-index)
-22. [Credits and acknowledgements](#-credits-and-acknowledgements)
-23. [License](#-license)
+| Part | # | Section | What you will find |
+|---|---|---|---|
+| **About the project** | 1 | [Hackathon and team](#-hackathon-and-team) | Hackathon, institution, team name, track, members |
+|  | 2 | [The problem statement in full](#-the-problem-statement-in-full) | The brief, verbatim, and how each requirement is met |
+|  | 3 | [The problem, in real life](#-the-problem-in-real-life) | Real people, real photos, and the pain point by point with our fixes |
+|  | 4 | [Who we are building this for](#-who-we-are-building-this-for) | The people this helps |
+|  | 5 | [How the Indian government context shaped the design](#-how-the-indian-government-context-shaped-the-design) | Official systems and laws the product points to |
+| **Approach and the agent** | 6 | [Our approach and plan](#-our-approach-and-plan) | Principles and the phase-by-phase plan |
+|  | 7 | [Where the agentic AI is](#-where-the-agentic-ai-is) | How the agent plans, uses tools, remembers and checks itself |
+|  | 8 | [The workflow, step by step](#-the-workflow-step-by-step) | The citizen journey with screenshots |
+|  | 9 | [How the app works: what does what](#-how-the-app-works-what-does-what) | System view, pipelines and the role of each part |
+|  | 10 | [Project structure](#-project-structure) | Folder tree and what every file does |
+|  | 11 | [Every feature](#-every-feature) | Complete feature list |
+|  | 12 | [Screenshots of the running app](#-screenshots-of-the-running-app) | The real app in English, Hindi, Bengali and on a phone |
+| **Build and quality** | 13 | [Technology and tools we used](#-technology-and-tools-we-used) | Languages, frameworks, services |
+|  | 14 | [Architecture and pipelines](#-architecture-and-pipelines) | Component diagram and the deployment path |
+|  | 15 | [Challenges we faced and how we solved them](#-challenges-we-faced-and-how-we-solved-them) | Problems met and how we dealt with each |
+|  | 16 | [Quality and testing](#-quality-and-testing) | Tests, coverage, CI, security scans |
+|  | 17 | [Honest status: real, simulated, untested](#-honest-status-real-simulated-untested) | What is finished and what is not |
+| **Looking ahead and getting started** | 18 | [Pending work and roadmap](#-pending-work-and-roadmap) | What is left and future ideas |
+|  | 19 | [Our vision](#-our-vision) | Where this is going |
+|  | 20 | [Quick start](#-quick-start) | Installation and setup, commands |
+|  | 21 | [Documentation index](#-documentation-index) | Every guide, runbook and report |
+|  | 22 | [Credits and acknowledgements](#-credits-and-acknowledgements) | People, sources, software, photos |
+|  | 23 | [License](#-license) | Proprietary licence, summary and full text |
 
 ---
 
 ## 🏁 Hackathon and team
 
-| | |
-|---|---|
-| **Hackathon** | **HACK&lt;N&gt;PITCH** |
-| **Institution** | Jadavpur University |
-| **Team name** | **Team Onyx** |
-| **Project** | Red Tape Navigator |
-| **Track** | Agentic AI, Software and Civic Tech |
-| **Problem statement** | *Agentic AI: The "Red Tape" Bureaucracy Navigator* |
+<table width="100%">
+<tr>
+<td width="58%" valign="top">
+
+### Hackathon details
+
+**Hackathon:** **HACK&lt;N&gt;PITCH**<br />
+**Institution:** Jadavpur University<br />
+**Team name:** **Team Onyx**<br />
+**Project:** Red Tape Navigator<br />
+**Track:** Agentic AI, Software and Civic Tech<br />
+**Problem statement:** *Agentic AI: The "Red Tape" Bureaucracy Navigator*
+
+</td>
+<td width="42%" valign="top">
 
 ### Team members
 
@@ -99,6 +97,10 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 | **Raktim Chakraborty** | Team member |
 | **Anish Goswami** | Team member |
 | **Imon Patra** | Team member |
+
+</td>
+</tr>
+</table>
 
 Our submission materials live in this repository: the [pitch deck (PDF)](Onyx_HackNPitch.pdf), the [editable deck (PPTX)](Onyx_HackNPitch.pptx)
 and the [demo video](Onyx_Demo_Video.mp4).
