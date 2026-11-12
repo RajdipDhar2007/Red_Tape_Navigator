@@ -91,7 +91,7 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 
 ### Team members
 
-| Member | Role |
+| | |
 |---|---|
 | **Rajdip Dhar** | **Team Leader** |
 | **Raktim Chakraborty** | Team member |
