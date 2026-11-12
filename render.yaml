@@ -30,6 +30,7 @@ services:
     healthCheckPath: /health
     autoDeployTrigger: checksPass   # a push to main deploys only after the CI checks pass
     envVars:
+      - { key: PORT, value: "8000" }   # the port the container listens on (Render routes traffic to it)
       - { key: APP_ENV, value: prod }
       - { key: DEMO_MODE, value: "false" }
       - { key: TRUST_PROXY, value: "true" }

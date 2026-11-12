@@ -61,7 +61,7 @@ Render has no India region (Singapore); if the department needs in-India storage
 
 ## 8. Final docs, CI green, final report: DONE (2026-11-12)
 - [x] `docs/FINAL_REPORT.md`: what is real, what is simulated, what remains and who must do it, monthly running costs.
-- [x] All local gates green on 2026-11-12: 459 backend tests, evaluation set, frontend lint/types/unit/build, 10 browser tests. CI result: see the run for the final commit.
+- [x] All local gates green on 2026-11-12: 459 backend tests, evaluation set, frontend lint/types/unit/build, 12 browser tests. CI result: see the run for the final commit.
 - [x] Emails drafted in the owner's Gmail (not sent): FSSAI permission request and Digio sandbox request. The owner fills the bracketed parts and sends them.
 
 ## 9. Billing: REMOVED 2026-11-10 (decision: the site is free to use and charges no one)

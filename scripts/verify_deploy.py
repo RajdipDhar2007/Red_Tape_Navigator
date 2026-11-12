@@ -56,7 +56,7 @@ def web_checks(w: httpx.Client, api: str) -> None:
     check("frame-ancestors 'none'" in csp, "website sends a Content-Security-Policy")
     check(api in csp, "the website was built against this API", f"NEXT_PUBLIC_API_URL on the host must be {api}, then redeploy")
     check("localhost" not in csp, "no localhost left in the website build")
-    for path in ("/en/privacy", "/en/terms", "/robots.txt", "/sitemap.xml", "/manifest.webmanifest"):
+    for path in ("/en/help", "/hi/help", "/bn/help", "/en/privacy", "/en/terms", "/robots.txt", "/sitemap.xml", "/manifest.webmanifest"):
         check(w.get(path).status_code == 200, f"website {path} loads")
     check("Disallow: /en/account" in w.get("/robots.txt").text, "private pages are kept out of search engines")
 

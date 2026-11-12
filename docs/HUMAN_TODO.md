@@ -75,7 +75,7 @@ Every rule I add needs a source link or pasted official text. Without one it sta
 
 **Built on 2026-11-12:** calendar export of reminders, robots/sitemap/manifest, threat model, one-file hosting set-up with a 30-minute guide, live-deployment checker, backup drill, final report (`docs/FINAL_REPORT.md`).
 
-**Not built yet:** partner portal, help centre, document vault, per-licence landing pages. None blocks a launch.
+**Not built yet:** partner portal, document vault, per-licence landing pages, support-ticket inbox. None blocks a launch. (A help page with common questions exists at `/help`.)
 
 **Never done and not claimed:** live SMS, live eSign, native-speaker review, legal review, pentest, load test, a pilot.
 

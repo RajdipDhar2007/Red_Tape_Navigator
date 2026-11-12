@@ -465,5 +465,48 @@
     "acceptVerify": "Confirm your email address from your account page, then open this link again.",
     "acceptSignin": "Please log in with the email address that was invited, then open this link again.",
     "open": "Open teams"
+  },
+  "help": {
+    "title": "Help and common questions",
+    "intro": "Short answers to what people ask most. For anything about your personal data, the contact is on the Privacy policy page.",
+    "link": "Help",
+    "items": {
+      "q1": {
+        "h": "Is this free?",
+        "p": "Yes. Red Tape Navigator charges nothing, shows no advertising and never asks for card, UPI or bank payment details."
+      },
+      "q2": {
+        "h": "Does it apply for the licence for me?",
+        "p": "No. It works out which licences you need, fills the forms with your details and shows them for your review. You sign and submit every application yourself on the official portal. It never submits anything."
+      },
+      "q3": {
+        "h": "Can I rely on the rules it shows?",
+        "p": "Treat them as guidance, not legal advice. Every rule shows the official source it came from. Fees, documents and timelines change, so check with the issuing authority before you pay or apply. A rule marked \"Awaiting expert review\" has not yet been checked by a reviewer."
+      },
+      "q4": {
+        "h": "Which cities and businesses are covered?",
+        "p": "City rules are included for Kolkata, Mumbai, Delhi, Bengaluru, Chennai, Hyderabad, Pune, Ahmedabad and Surat, for about 120 kinds of business.\nFor other cities you get the central registrations that apply everywhere, and a note to ask your local authority about the rest."
+      },
+      "q5": {
+        "h": "What happens to my Aadhaar, PAN and other details?",
+        "p": "We ask only for what the chosen forms need.\nAadhaar, PAN and bank account numbers are encrypted before they are stored.\nYour session data is deleted automatically after the period shown on the Privacy policy page.\nYou can download or delete your data at any time from Your account."
+      },
+      "q6": {
+        "h": "I forgot my password",
+        "p": "On the log-in form choose \"Forgot your password?\" and enter your email. The reset link is valid for 30 minutes. If no email arrives, check your spam folder."
+      },
+      "q7": {
+        "h": "How do reminders work?",
+        "p": "After you tell us which applications you submitted, we remind you to check their status and to renew on time. Reminders need your consent and you can withdraw it. You can also add the dates to your own calendar with the \"Add to my calendar\" button."
+      },
+      "q8": {
+        "h": "How do I change the language?",
+        "p": "Use the language menu at the top of any page. English, Hindi and Bengali are available. Official forms stay in the language the department publishes them in."
+      },
+      "q9": {
+        "h": "How do I make my account safer?",
+        "p": "Open Your account and turn on two-factor sign-in. You will need an authenticator app on your phone. Keep the recovery codes somewhere safe."
+      }
+    }
   }
 }

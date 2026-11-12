@@ -9,5 +9,5 @@ export function siteUrl(): string {
 }
 
 /** Pages that are the same for every visitor. Everything else is behind sign-in and is kept out of search engines. */
-export const PUBLIC_PATHS = ["", "/privacy", "/terms"] as const;
+export const PUBLIC_PATHS = ["", "/help", "/privacy", "/terms"] as const;
 export const PRIVATE_PATHS = ["/account", "/session", "/staff", "/teams", "/invite", "/reset", "/verify-email"] as const;

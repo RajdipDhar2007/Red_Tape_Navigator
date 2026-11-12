@@ -23,8 +23,9 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**:
 | **First officer account from environment variables (new)**, for hosts without a shell | Built and tested; can never overwrite an existing password |
 | **Live-deployment checker (new)**: `scripts/verify_deploy.py` | Written; run it against the real site after deploying |
 | **Backup-and-restore drill (new)**: `scripts/backup_restore_drill.sh` | Runs in CI on every push against PostgreSQL |
-| **Search-engine and install basics (new)**: `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates, social preview tags | Built; private pages are excluded from search engines |
-| Quality gates | Backend: lint, types, 459 tests (about 96% coverage), evaluation set with zero invented facts. Frontend: lint, types, unit tests, production build, 10 browser tests. 7 CI jobs |
+| **Search-engine and install basics (new)**: `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates, social preview tags | Built and browser-tested; private pages are excluded from search engines |
+| **Help page (new)**: nine common questions at `/help`, in all three languages | Built and browser-tested |
+| Quality gates | Backend: lint, types, 459 tests (about 96% coverage), evaluation set with zero invented facts. Frontend: lint, types, unit tests, production build, 12 browser tests. 7 CI jobs |
 
 ## 3. What is simulated or switched off
 
@@ -61,7 +62,7 @@ Development work that is still open, in order of value:
 1. Keep browser tokens out of script reach (cookie-based sessions). Needs the site and API under one domain; design in `docs/THREAT_MODEL.md`.
 2. Rule gaps listed in `README.md` section 10 (pages that would not load or exist only as scans). Each needs the official text.
 3. DigiLocker field import, after the first real sandbox response.
-4. Not built from the earlier wish list: a partner portal for professionals, a help centre, a document vault, per-licence landing pages. None blocks a launch.
+4. Not built from the earlier wish list: a partner portal for professionals, a document vault, per-licence landing pages, a support-ticket inbox. None blocks a launch.
 
 ## 5. Monthly running costs
 

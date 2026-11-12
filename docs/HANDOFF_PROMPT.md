@@ -262,6 +262,9 @@ Owner instruction: finish everything pending, make the app ready to deploy, comm
   (first officer from `BOOTSTRAP_ADMIN_*`, never overwrites a password), config accepts standard-base64 Fernet keys (Render `generateValue`) and
   `sslmode=` in PostgreSQL URLs, `GET /sessions/{sid}/reminders` and `/reminders.ics`.
 - New frontend pieces: `app/robots.ts`, `app/sitemap.ts`, `app/manifest.ts`, `app/icon.svg`, metadata with language alternates, "Add to my calendar" button.
+- Help page `/[locale]/help` (strings under `help.items` in the three message files; read a group with `t.raw("items")`, because `t.raw("")` on a
+  namespace root throws MISSING_MESSAGE at build time). Footer link; `frontend/e2e/public.spec.ts` covers it and the robots/sitemap/manifest files (12 e2e tests).
+- Both Blueprints set `PORT=8000` so Render routes to the port the container listens on.
 - New scripts: `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh` (a step in the CI compose job).
 - New tests (`tests/test_deploy_ready.py`): Blueprint variables must exist in `Settings` and carry no committed secret; every route in the OpenAPI table
   must answer 401 without sign-in unless it is on the public list. Total 459 backend tests.
@@ -275,5 +278,5 @@ Owner instruction: finish everything pending, make the app ready to deploy, comm
 - Gotcha: the GitHub Actions runs for commit `ba69bc7` sat in "queued" for over 11 hours with no jobs. If a run never starts, check the account's
   Actions status and billing page before assuming the code is at fault.
 - Not done: cookie-based sessions (needs one domain for site and API; design in `docs/THREAT_MODEL.md`), the rule gaps in README section 10,
-  partner portal, help centre, document vault. Next: the owner deploys, then run `verify_deploy.py --journey` and the hosted load test.
+  partner portal, document vault. Next: the owner deploys, then run `verify_deploy.py --journey` and the hosted load test.
 

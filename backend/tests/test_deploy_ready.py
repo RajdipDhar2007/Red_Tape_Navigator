@@ -171,7 +171,7 @@ def test_render_blueprints_only_set_variables_the_app_reads():
     import yaml
 
     root = Path(__file__).resolve().parents[2]
-    known = {name.upper() for name in Settings.model_fields} | {"RUN_MIGRATIONS", "SEED_ON_START"}
+    known = {name.upper() for name in Settings.model_fields} | {"RUN_MIGRATIONS", "SEED_ON_START", "PORT"}
     for name in ("render.yaml", "render.production.yaml"):
         doc = yaml.safe_load((root / name).read_text(encoding="utf-8"))
         groups = {g["name"]: g["envVars"] for g in doc.get("envVarGroups", [])}

@@ -49,6 +49,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "app" });
   const tl = await getTranslations({ locale, namespace: "legal" });
+  const th = await getTranslations({ locale, namespace: "help" });
 
   return (
     <html lang={locale} className={`${head.variable} ${body.variable} ${deva.variable} ${beng.variable}`}>
@@ -69,6 +70,9 @@ export default async function LocaleLayout({
               </p>
               <p>{t("independent")}</p>
               <p className="space-x-4 pt-1">
+                <Link className="underline" href={`/${locale}/help`}>
+                  {th("link")}
+                </Link>
                 <Link className="underline" href={`/${locale}/privacy`}>
                   {tl("linkPrivacy")}
                 </Link>

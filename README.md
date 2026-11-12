@@ -242,7 +242,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **459 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 10 browser e2e tests, **9 cities**,
+Numbers as of the last update: **459 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 12 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **438 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -262,7 +262,8 @@ Numbers as of the last update: **459 backend tests** passing (about 95.8% covera
 | Privacy / terms pages | **Built**, shown as "draft, pending legal review" until `NEXT_PUBLIC_LEGAL_REVIEWED=true` |
 | Reminders as a calendar file (`GET /sessions/{id}/reminders.ics`, button after reminders are set) | **Built and tested** |
 | Scheduled jobs inside the API (`RUN_SCHEDULER=true`, no worker or Redis needed on one instance); first officer from `BOOTSTRAP_ADMIN_*` | **Built and tested** |
-| `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates | **Built**; private pages are excluded from search engines |
+| `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates | **Built and browser-tested**; private pages are excluded from search engines |
+| Help page with nine common questions (`/help`, linked in the footer) in English, Hindi and Bengali | **Built and browser-tested**; Hindi and Bengali wording awaits native review |
 | Backup-and-restore drill (`scripts/backup_restore_drill.sh`) | **Runs in CI** on every push against PostgreSQL |
 | Production deployment | **Not deployed.** Ready to apply: `docs/DEPLOY_NOW.md` (free trial, about 30 minutes). Needs the owner to create the Render, Vercel and email-sender accounts; the Blueprints have not been applied on a real account yet |
 | Load test, backup-restore test, pentest, real-device test, pilot | **Not done** |
