@@ -1,13 +1,14 @@
 """Human escalation (review queue for CSC operators / officers) and admin operations."""
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.llm import LLM
 from app.agent.research import refresh_all
 from app.api.deps import require_roles
 from app.core import audit
+from app.core.config import get_settings
 from app.db.models import Claim, Consent, FormSource, NavSession, ReviewItem, User
 from app.db.session import get_db
 from app.forms import official
@@ -188,3 +189,105 @@ async def decide_source(source_id: str, decision: str, user: User = Depends(requ
 @router.post("/forms/refresh")
 async def refresh_forms(user: User = Depends(require_roles("admin")), db: AsyncSession = Depends(get_db)):
     return await official.check_for_changes(db)
+
+
+@router.get("/readiness")
+async def operational_readiness(user: User = Depends(require_roles(*STAFF)), db: AsyncSession = Depends(get_db)):
+    """Restricted operational readiness check for staff/admins. Never exposes secrets or calls external third-party APIs."""
+    s = get_settings()
+    db_reachable = False
+    try:
+        await db.execute(text("SELECT 1"))
+        db_reachable = True
+    except Exception:  # noqa: BLE001
+        db_reachable = False
+
+    redis_configured = bool(s.redis_url.strip())
+    redis_reachable: bool | None = None
+    if redis_configured:
+        try:
+            import redis.asyncio as redis_async
+
+            r = redis_async.from_url(s.redis_url, socket_connect_timeout=1.0, socket_timeout=1.0)
+            try:
+                redis_reachable = bool(await r.ping())
+            finally:
+                await r.aclose()
+        except Exception:  # noqa: BLE001
+            redis_reachable = False
+
+    storage_configured = (
+        bool(s.storage_local_dir.strip())
+        if s.storage_backend == "local"
+        else bool(s.storage_bucket and s.storage_region and s.storage_access_key_id and s.storage_secret_access_key)
+    )
+    scanner_configured = bool(s.document_scan_url.startswith(("https://", "http://"))) if s.document_scan_mode == "external" else False
+
+    return {
+        "application": {
+            "running": True,
+            "env": s.app_env,
+            "demo_mode": s.demo_mode,
+            "integrations_mode": s.integrations_mode,
+        },
+        "database": {
+            "reachable": db_reachable,
+            "engine": "sqlite" if s.database_url.startswith("sqlite") else "postgresql",
+        },
+        "redis": {
+            "configured": redis_configured,
+            "reachable": redis_reachable,
+        },
+        "storage": {
+            "backend": s.storage_backend,
+            "configured": storage_configured,
+            "durable": s.storage_backend == "s3",
+            "production_warning": (
+                "STORAGE_BACKEND=local in prod relies on local disk; use S3 or a backed-up persistent volume"
+                if (s.storage_backend == "local" and s.is_prod)
+                else None
+            ),
+            "scan_mode": s.document_scan_mode,
+            "scanner_configured": scanner_configured,
+        },
+        "providers": {
+            "llm": {
+                "provider": "anthropic",
+                "configured": bool(s.anthropic_api_key.strip() and s.anthropic_model.strip()),
+                "model_configured": bool(s.anthropic_model.strip()),
+            },
+            "smtp": {
+                "configured": bool(s.smtp_host.strip() and s.smtp_from.strip()),
+                "mode": "live" if (s.smtp_host.strip() and s.smtp_from.strip()) else "mock",
+                "tls": "ssl" if s.smtp_port == 465 else ("starttls" if s.smtp_starttls else "plain"),
+                "auth_configured": bool(s.smtp_username.strip() and s.smtp_password),
+            },
+            "msg91": {
+                "configured": bool(s.msg91_authkey.strip() and s.msg91_template_id.strip()),
+                "mode": "live" if (s.msg91_authkey.strip() and s.msg91_template_id.strip()) else "mock",
+            },
+            "digio": {
+                "configured": s.digio_configured,
+                "mode": "live" if s.digio_configured else "mock",
+                "env": s.digio_env if s.digio_configured else None,
+                "webhook_secret_configured": bool(s.digio_webhook_secret.strip()),
+                "webhook_ip_allowlist_configured": bool(s.digio_ip_list),
+                "digilocker_field_mapping_ready": False,
+            },
+            "sentry": {
+                "configured": bool(s.sentry_dsn.strip()),
+            },
+            "otel": {
+                "configured": bool(s.otel_exporter_otlp_endpoint.strip()),
+            },
+            "whatsapp": {
+                "configured": False,
+                "mode": "stub" if s.integrations_mode == "real" else "mock",
+            },
+            "umang": {
+                "configured": False,
+                "mode": "stub" if s.integrations_mode == "real" else "mock",
+            },
+        },
+    }
+

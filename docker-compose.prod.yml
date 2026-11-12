@@ -45,6 +45,7 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:?set SMTP_FROM}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
       METRICS_TOKEN: ${METRICS_TOKEN:-}
       GRIEVANCE_CONTACT: ${GRIEVANCE_CONTACT:?set GRIEVANCE_CONTACT}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
@@ -52,7 +53,36 @@ services:
       SENTRY_DSN: ${SENTRY_DSN:-}
       RETENTION_DAYS: ${RETENTION_DAYS:-90}
       DATA_REGION: ${DATA_REGION:-in-mumbai}
-    volumes: ["./scripts:/scripts:ro"]
+      MSG91_AUTHKEY: ${MSG91_AUTHKEY:-}
+      MSG91_TEMPLATE_ID: ${MSG91_TEMPLATE_ID:-}
+      MSG91_TEXT_VAR: ${MSG91_TEXT_VAR:-var1}
+      DIGIO_CLIENT_ID: ${DIGIO_CLIENT_ID:-}
+      DIGIO_CLIENT_SECRET: ${DIGIO_CLIENT_SECRET:-}
+      DIGIO_ENV: ${DIGIO_ENV:-sandbox}
+      DIGIO_WEBHOOK_SECRET: ${DIGIO_WEBHOOK_SECRET:-}
+      DIGIO_WEBHOOK_IPS: ${DIGIO_WEBHOOK_IPS:-}
+      DIGIO_DIGILOCKER_TEMPLATE: ${DIGIO_DIGILOCKER_TEMPLATE:-DIGILOCKER_AADHAAR_PAN}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      STORAGE_LOCAL_DIR: ${STORAGE_LOCAL_DIR:-/var/lib/rtn/vault}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-}
+      STORAGE_REGION: ${STORAGE_REGION:-auto}
+      STORAGE_ENDPOINT_URL: ${STORAGE_ENDPOINT_URL:-}
+      STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:-}
+      STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:-}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-5242880}
+      DOCUMENT_SCAN_MODE: ${DOCUMENT_SCAN_MODE:-disabled}
+      DOCUMENT_SCAN_URL: ${DOCUMENT_SCAN_URL:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    volumes:
+      - ./scripts:/scripts:ro
+      - vaultdata:/var/lib/rtn/vault
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=2).status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     depends_on: { db: { condition: service_healthy }, redis: { condition: service_healthy } }
 
   worker:
@@ -63,6 +93,9 @@ services:
       <<: *api-env
       RUN_MIGRATIONS: "false"
       SEED_ON_START: "false"
+    volumes:
+      - ./scripts:/scripts:ro
+      - vaultdata:/var/lib/rtn/vault
     healthcheck:
       test: ["CMD", "arq", "--check", "app.jobs.worker.WorkerSettings"]
       interval: 30s
@@ -96,5 +129,6 @@ services:
 volumes:
   pgdata:
   redisdata:
+  vaultdata:
   caddy_data:
   caddy_config:

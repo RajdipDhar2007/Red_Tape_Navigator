@@ -2,10 +2,28 @@
 
 Status key: DONE / WAITING ON OWNER / BLOCKED ON THIRD PARTY. Updated as work proceeds.
 
-## 1. Health check: DONE (2026-11-08)
-- Backend: 114 tests pass, coverage 95.8%, ruff clean.
-- Frontend: lint, typecheck, unit tests (5) and production build pass.
-- Local run (SQLite, production web build): `/ready` ok, 185 rules loaded, `/en` `/hi` `/bn` `/en/staff` return 200.
+## 1. Health check: DONE (Updated 2026-11-12)
+- Backend: 475 tests pass (0 failed, 0 skipped), coverage 95.20%+ (95%), ruff clean, mypy clean (84 files), AI evals 26/26 (0 hallucinations across 600 claims), rule freshness 438/438 OK.
+- Frontend: lint, typecheck, unit tests (10/10) and production build (36 static routes across `en`, `hi`, `bn`) pass.
+- Production Operations, Backup/Restore Readiness & Disaster Recovery completed:
+  - `/health`, `/health/live`, `/ready`, `/health/ready`, and `/admin/readiness` with non-blocking Redis degradation status and local-storage durability warnings in prod.
+  - Expanded log/exception redaction covering passwords, API keys, JWTs, PostgreSQL URI passwords, TOTP/recovery codes, and binary document payloads (`backend/app/core/crypto.py`, `backend/app/core/errors.py`).
+  - Safe PostgreSQL backup & non-production restore-verification CLI (`scripts/db_backup_restore.py`) with `PGPASSWORD` env isolation and strict production-target refusal.
+  - Observed Arq background worker jobs (`backend/app/jobs/worker.py`) and complete 6-incident Disaster-Recovery Runbook (`docs/RUNBOOK.md`).
+- P1 Security Hardening completed:
+  - Audit-chain concurrency serialized via PostgreSQL `pg_advisory_xact_lock` + `SELECT ... FOR UPDATE` and per-loop `asyncio.Lock` (`backend/app/core/audit.py`).
+  - Rate limiter backed by Redis (`MULTI`/`EXEC` `INCR` + `EXPIRE`) when `REDIS_URL` is configured, with fail-safe fallback to a bounded 10,000-key in-memory sliding window (`backend/app/core/middleware.py`).
+  - 2FA brute-force lockout (`failed_logins` / `locked_until`) enforced consistently across `/auth/login`, `/auth/2fa/enable`, and `/auth/2fa/disable` (`backend/app/api/auth.py`).
+- Document Vault completed (`POST/GET/DELETE /documents`, `GET /documents/{id}/download`, migration `0009_document_vault.py`, `LocalStorageBackend` + `S3StorageBackend`, `DOCUMENT_SCAN_MODE=disabled|external`, DPDP deletion integration, and `/[locale]/documents` UI in `en`/`hi`/`bn`).
+- Provider Readiness & Integration Hardening completed (`GET /admin/readiness`, Anthropic PII redaction + bounded retries/timeout, SMTP bounded transient retry, MSG91 + Digio timeout/malformed-response handling, webhook payload guards, and partial-credential startup checks).
+- Product Workflows & Help Centre completed:
+  - Localized Help & Support Centre (`/[locale]/help`) with keyword search, category filters, and live `/privacy/policy` grievance contact display.
+  - Session rename (`PATCH /sessions/{sid}`), stage badges on Dashboard, and full step navigation (`Checklist` ↔ `Interview` ↔ `Review` ↔ `Submit`).
+  - Reminder management (`GET /sessions/{sid}/reminders`, `DELETE /sessions/{sid}/reminders/{rid}`) with honest `live` vs `mock` channel badges.
+  - Officer Console readiness panel (`GET /admin/readiness`) and confirmation-gated expired session purge (`POST /admin/purge`).
+- DPDP Self-Service UI completed in `/[locale]/account` (`Export My Data`, `Consent Management`, `Delete Session Data`, and `Delete My Account`) + per-session delete on Dashboard (`/[locale]`).
+- Migration `0008_external_requests_cascade.py` and `privacy.py` verified for PostgreSQL FK safety and SQLite compatibility.
+- Local run (SQLite, production web build): `/ready` ok, 438 rules loaded, `/en` `/hi` `/bn` `/en/staff` return 200.
 - Signup, login, `/auth/me` and wrong-password rejection (401) verified.
 
 ## 2. Digio (DigiLocker + Aadhaar eSign): WAITING ON OWNER, then BLOCKED ON THIRD PARTY

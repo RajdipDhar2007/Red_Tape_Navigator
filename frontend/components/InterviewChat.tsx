@@ -2,20 +2,30 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { api, post } from "@/lib/api";
+import { api, ApiError, post } from "@/lib/api";
 import type { InterviewState, Session } from "@/lib/types";
 import VoiceInput from "./VoiceInput";
 
 type Msg = { role: "bot" | "user"; text: string };
 type Submit = { saved: Record<string, string>; errors: Record<string, { message: string }>; next: InterviewState };
 
-export default function InterviewChat({ session, onReview }: { session: Session; onReview: () => void }) {
+export default function InterviewChat({
+  session,
+  onBack,
+  onReview,
+}: {
+  session: Session;
+  onBack?: () => void;
+  onReview: () => void;
+}) {
   const t = useTranslations("interview");
+  const ta = useTranslations("app");
   const sid = session.id;
   const [st, setSt] = useState<InterviewState | null>(null);
   const [log, setLog] = useState<Msg[]>([]);
   const [vals, setVals] = useState<Record<string, string>>({});
   const [errs, setErrs] = useState<Record<string, string>>({});
+  const [netErr, setNetErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -30,8 +40,10 @@ export default function InterviewChat({ session, onReview }: { session: Session;
   }, []);
 
   useEffect(() => {
-    void api<InterviewState>(`/sessions/${sid}/interview`).then(ask);
-  }, [sid, ask]);
+    void api<InterviewState>(`/sessions/${sid}/interview`)
+      .then(ask)
+      .catch(() => setNetErr(ta("error")));
+  }, [sid, ask, ta]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
@@ -42,6 +54,7 @@ export default function InterviewChat({ session, onReview }: { session: Session;
     const answers = override ?? Object.fromEntries(st.questions.map((q) => [q.key, (vals[q.key] ?? "").trim()]).filter(([, v]) => v));
     if (!Object.keys(answers).length) return;
     setBusy(true);
+    setNetErr(null);
     try {
       const res = await post<Submit>(`/sessions/${sid}/interview`, { answers });
       setErrs(Object.fromEntries(Object.entries(res.errors).map(([k, v]) => [k, v.message])));
@@ -57,18 +70,40 @@ export default function InterviewChat({ session, onReview }: { session: Session;
         if (Object.keys(res.errors).length) setSt(rest);
         else ask(rest);
       }
+    } catch (e) {
+      setNetErr(e instanceof ApiError ? e.message : ta("error"));
     } finally {
       setBusy(false);
     }
   };
 
   const skip = async (key: string) => {
-    const s = await post<InterviewState>(`/sessions/${sid}/interview/skip`, { key });
-    setLog((l) => [...l, { role: "user", text: "—" }]);
-    ask(s);
+    setNetErr(null);
+    try {
+      const s = await post<InterviewState>(`/sessions/${sid}/interview/skip`, { key });
+      setLog((l) => [...l, { role: "user", text: "—" }]);
+      ask(s);
+    } catch (e) {
+      setNetErr(e instanceof ApiError ? e.message : ta("error"));
+    }
   };
 
-  const resume = async () => ask(await api<InterviewState>(`/sessions/${sid}/interview?include_skipped=true`));
+  const resume = async () => {
+    setNetErr(null);
+    try {
+      ask(await api<InterviewState>(`/sessions/${sid}/interview?include_skipped=true`));
+    } catch (e) {
+      setNetErr(e instanceof ApiError ? e.message : ta("error"));
+    }
+  };
+
+  if (netErr && !st) {
+    return (
+      <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-900">
+        {netErr}
+      </p>
+    );
+  }
 
   if (!st) return <p aria-live="polite">…</p>;
   const skippedCount = st.progress.skipped.length;
@@ -77,10 +112,19 @@ export default function InterviewChat({ session, onReview }: { session: Session;
 
   return (
     <section aria-labelledby="int-h">
-      <h2 id="int-h" className="text-xl font-semibold">
-        {t("heading")}
-      </h2>
-      <p className="mb-2">{t("intro")}</p>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 id="int-h" className="text-xl font-semibold">
+            {t("heading")}
+          </h2>
+          <p>{t("intro")}</p>
+        </div>
+        {onBack && (
+          <button type="button" className="btn-secondary !py-1.5 text-sm" onClick={onBack}>
+            ← {t("backToChecklist")}
+          </button>
+        )}
+      </div>
       <div className="mb-3">
         <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={st.progress.percent} aria-label={t("progress", { answered: st.progress.answered, total: st.progress.total })} className="h-3 w-full overflow-hidden rounded bg-slate-300">
           <div className="fill-bar h-full" style={{ width: `${st.progress.percent}%` }} />
@@ -90,6 +134,12 @@ export default function InterviewChat({ session, onReview }: { session: Session;
           {cheer && <span key={cheer} className="font-semibold text-saffron-700 animate-pop">{cheer}</span>}
         </p>
       </div>
+
+      {netErr && (
+        <p role="alert" className="mb-3 rounded-lg bg-red-50 p-2.5 text-sm text-red-900">
+          {netErr}
+        </p>
+      )}
 
       <div className="card mb-3 max-h-80 space-y-2 overflow-y-auto" role="log" aria-live="polite" aria-relevant="additions">
         {log.map((m, i) => (

@@ -13,7 +13,7 @@ from app.api.consent import has_consent
 from app.api.deps import current_user
 from app.core import audit
 from app.core.config import get_settings
-from app.db.models import ExternalRequest, NavSession, User
+from app.db.models import ExternalRequest, NavSession, Reminder, User
 from app.db.session import get_db
 from app.followup.checklist import submission_checklist
 from app.followup.reminders import schedule_after_submission
@@ -68,6 +68,30 @@ class EsignIn(BaseModel):
     form_id: str
 
 
+class SessionTitleIn(BaseModel):
+    goal: str = Field(min_length=5, max_length=200)
+
+
+def _reminder_view(r: Reminder) -> dict:
+    s = get_settings()
+    live_map = {
+        "email": bool(s.smtp_host and s.smtp_from) and not s.demo_mode,
+        "sms": bool(s.msg91_authkey and s.msg91_template_id) and not s.demo_mode,
+        "whatsapp": False,
+    }
+    is_live = live_map.get(r.channel, False)
+    return {
+        "id": r.id,
+        "title": r.title,
+        "due_at": r.due_at.isoformat(),
+        "kind": r.kind,
+        "channel": r.channel,
+        "sent": r.sent,
+        "status": "dispatched" if r.sent else "scheduled",
+        "delivery_mode": "live" if is_live else "mock",
+    }
+
+
 def _view(ns: NavSession) -> dict:
     return {
         "id": ns.id, "goal": ns.goal, "language": ns.language, "parsed": ns.parsed, "plan": ns.plan,
@@ -82,6 +106,7 @@ async def list_sessions(user: User = Depends(current_user), db: AsyncSession = D
     rows = (await db.execute(select(NavSession).where(NavSession.user_id == user.id).order_by(NavSession.created_at.desc()).limit(50))).scalars().all()
     return [{
         "id": r.id, "goal": r.goal, "created_at": r.created_at.isoformat(), "reviewed": r.reviewed_at is not None,
+        "stage": r.stage, "workspace_id": r.workspace_id,
         "activity": (r.parsed or {}).get("activity"), "intent": (r.parsed or {}).get("intent"),
         "city": (r.parsed or {}).get("city"), "steps": len((r.plan or {}).get("steps") or []),
     } for r in rows]
@@ -131,6 +156,18 @@ async def clarify(sid: str, body: ClarifyIn, user: User = Depends(current_user),
 @router.get("/{sid}")
 async def get(sid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     ns = await svc.get_owned(db, user, sid)
+    return {**_view(ns), "tracker": await svc.tracker(db, ns)}
+
+
+@router.patch("/{sid}")
+async def rename_session(sid: str, body: SessionTitleIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    cleaned = body.goal.strip()
+    if len(cleaned) < 5:
+        raise HTTPException(422, "Session title must be at least 5 characters.")
+    ns.goal = cleaned
+    await db.commit()
+    await audit.record(db, user.id, "session.renamed", {"length": len(cleaned)}, ns.id)
     return {**_view(ns), "tracker": await svc.tracker(db, ns)}
 
 
@@ -492,4 +529,35 @@ async def i_submitted(sid: str, body: SubmittedIn, user: User = Depends(current_
         raise HTTPException(422, "No destination for this channel; provide your mobile number first")
     rows = await schedule_after_submission(db, session_id=ns.id, user_id=user.id, licences=body.licences, channel=body.channel, destination=dest, language=ns.language)
     await audit.record(db, user.id, "followup.scheduled", {"count": len(rows), "channel": body.channel}, ns.id)
-    return {"scheduled": [{"title": r.title, "due_at": r.due_at.isoformat(), "kind": r.kind} for r in rows]}
+    return {"scheduled": [_reminder_view(r) for r in rows]}
+
+
+@router.get("/{sid}/reminders")
+async def list_reminders(sid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    rows = (
+        await db.execute(
+            select(Reminder).where(Reminder.session_id == ns.id).order_by(Reminder.due_at.asc())
+        )
+    ).scalars().all()
+    s = get_settings()
+    return {
+        "items": [_reminder_view(r) for r in rows],
+        "channels": {
+            "email": "live" if (s.smtp_host and s.smtp_from and not s.demo_mode) else "mock",
+            "sms": "live" if (s.msg91_authkey and s.msg91_template_id and not s.demo_mode) else "mock",
+            "whatsapp": "mock",
+        },
+    }
+
+
+@router.delete("/{sid}/reminders/{rid}", status_code=204)
+async def cancel_reminder(sid: str, rid: str, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    ns = await svc.get_owned(db, user, sid)
+    row = await db.get(Reminder, rid)
+    if not row or row.session_id != ns.id:
+        raise HTTPException(404, "Reminder not found")
+    await db.delete(row)
+    await db.commit()
+    await audit.record(db, user.id, "followup.cancelled", {"reminder_id": rid}, ns.id)
+    return Response(status_code=204)

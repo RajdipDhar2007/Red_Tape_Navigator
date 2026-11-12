@@ -29,7 +29,7 @@ services:
     plan: starter
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    healthCheckPath: /health
+    healthCheckPath: /health/ready
     autoDeploy: false
     envVars:
       - { key: APP_ENV, value: prod }
@@ -49,6 +49,7 @@ services:
       - { key: SMTP_USERNAME, sync: false }
       - { key: SMTP_PASSWORD, sync: false }
       - { key: SMTP_FROM, sync: false }
+      - { key: SMTP_STARTTLS, value: "true" }
       - { key: MSG91_AUTHKEY, sync: false }
       - { key: MSG91_TEMPLATE_ID, sync: false }
       - { key: MSG91_TEXT_VAR, value: var1 }
@@ -63,6 +64,19 @@ services:
       - { key: ANTHROPIC_API_KEY, sync: false }
       - { key: ANTHROPIC_MODEL, sync: false }
       - { key: SENTRY_DSN, sync: false }
+      # Document Vault object storage (set STORAGE_BACKEND=s3 for durable S3/R2 storage on ephemeral Render disks)
+      - { key: STORAGE_BACKEND, value: local }
+      - { key: STORAGE_LOCAL_DIR, value: /app/data/vault }
+      - { key: STORAGE_BUCKET, sync: false }
+      - { key: STORAGE_REGION, value: auto }
+      - { key: STORAGE_ENDPOINT_URL, sync: false }
+      - { key: STORAGE_ACCESS_KEY_ID, sync: false }
+      - { key: STORAGE_SECRET_ACCESS_KEY, sync: false }
+      - { key: MAX_UPLOAD_BYTES, value: "5242880" }
+      - { key: DOCUMENT_SCAN_MODE, value: disabled }
+      - { key: DOCUMENT_SCAN_URL, sync: false }
+      - { key: LOG_LEVEL, value: INFO }
+      - { key: OTEL_EXPORTER_OTLP_ENDPOINT, sync: false }
 
   - type: worker
     name: rtn-worker
@@ -95,6 +109,23 @@ services:
       - { key: SMTP_USERNAME, sync: false }
       - { key: SMTP_PASSWORD, sync: false }
       - { key: SMTP_FROM, sync: false }
+      - { key: SMTP_STARTTLS, value: "true" }
       - { key: MSG91_AUTHKEY, sync: false }
       - { key: MSG91_TEMPLATE_ID, sync: false }
       - { key: MSG91_TEXT_VAR, value: var1 }
+      - { key: ANTHROPIC_API_KEY, sync: false }
+      - { key: ANTHROPIC_MODEL, sync: false }
+      - { key: SENTRY_DSN, sync: false }
+      # Document Vault object storage parity (used by purge_job when deleting expired session documents)
+      - { key: STORAGE_BACKEND, value: local }
+      - { key: STORAGE_LOCAL_DIR, value: /app/data/vault }
+      - { key: STORAGE_BUCKET, sync: false }
+      - { key: STORAGE_REGION, value: auto }
+      - { key: STORAGE_ENDPOINT_URL, sync: false }
+      - { key: STORAGE_ACCESS_KEY_ID, sync: false }
+      - { key: STORAGE_SECRET_ACCESS_KEY, sync: false }
+      - { key: MAX_UPLOAD_BYTES, value: "5242880" }
+      - { key: DOCUMENT_SCAN_MODE, value: disabled }
+      - { key: DOCUMENT_SCAN_URL, sync: false }
+      - { key: LOG_LEVEL, value: INFO }
+      - { key: OTEL_EXPORTER_OTLP_ENDPOINT, sync: false }

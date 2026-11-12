@@ -2,14 +2,18 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import audit
 from app.core.cache import get_cache
+from app.core.logging import get_logger
+from app.core.storage import get_storage
 from app.db.models import (
     Answer,
     Consent,
+    Document,
+    ExternalRequest,
     NavSession,
     RefreshToken,
     Reminder,
@@ -20,6 +24,8 @@ from app.db.models import (
     WorkspaceMember,
 )
 from app.interview import memory
+
+_log = get_logger("privacy")
 
 
 async def export_user_data(db: AsyncSession, user: User) -> dict:
@@ -34,11 +40,30 @@ async def export_user_data(db: AsyncSession, user: User) -> dict:
         })
     consents = (await db.execute(select(Consent).where(Consent.user_id == user.id).order_by(Consent.created_at))).scalars().all()
     reminders = (await db.execute(select(Reminder).where(Reminder.user_id == user.id))).scalars().all()
+    docs = (
+        await db.execute(
+            select(Document)
+            .where(Document.user_id == user.id, Document.deleted_at.is_(None))
+            .order_by(Document.created_at)
+        )
+    ).scalars().all()
     return {
         "exported_at": datetime.now(UTC).isoformat(),
         "user": {"id": user.id, "email": user.email, "role": user.role, "language": user.language, "created_at": user.created_at.isoformat()},
         "consents": [{"purpose": c.purpose, "granted": c.granted, "policy_version": c.policy_version, "at": c.created_at.isoformat()} for c in consents],
         "sessions": out_sessions,
+        "documents": [
+            {
+                "id": d.id,
+                "original_filename": d.original_filename,
+                "content_type": d.content_type,
+                "size_bytes": d.size_bytes,
+                "checksum": d.checksum,
+                "category": d.category,
+                "created_at": d.created_at.isoformat(),
+            }
+            for d in docs
+        ],
         "workspaces": [{"id": w.id, "name": w.name, "role": role} for w, role in (await db.execute(
             select(Workspace, WorkspaceMember.role).join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
             .where(WorkspaceMember.user_id == user.id))).all()],
@@ -46,12 +71,36 @@ async def export_user_data(db: AsyncSession, user: User) -> dict:
     }
 
 
+async def _delete_documents(db: AsyncSession, docs: list[Document]) -> None:
+    if not docs:
+        return
+    storage = get_storage()
+    for d in docs:
+        try:
+            await storage.delete(d.stored_object_key)
+        except Exception as exc:  # noqa: BLE001
+            _log.warning("privacy_document_storage_delete_failed", doc_id=d.id, error_type=type(exc).__name__)
+    doc_ids = [d.id for d in docs]
+    await db.execute(delete(Document).where(Document.id.in_(doc_ids)))
+
+
 async def _delete_session_data(db: AsyncSession, session_ids: list[str]) -> None:
     if not session_ids:
         return
+    # Delete private session-scoped documents; detach shared workspace documents from the deleted session
+    private_session_docs = list(
+        (
+            await db.execute(
+                select(Document).where(Document.session_id.in_(session_ids), Document.workspace_id.is_(None))
+            )
+        ).scalars().all()
+    )
+    await _delete_documents(db, private_session_docs)
+    await db.execute(update(Document).where(Document.session_id.in_(session_ids)).values(session_id=None))
     await db.execute(delete(Answer).where(Answer.session_id.in_(session_ids)))
     await db.execute(delete(Reminder).where(Reminder.session_id.in_(session_ids)))
     await db.execute(delete(ReviewItem).where(ReviewItem.session_id.in_(session_ids)))
+    await db.execute(delete(ExternalRequest).where(ExternalRequest.session_id.in_(session_ids)))
     await db.execute(delete(NavSession).where(NavSession.id.in_(session_ids)))
     for sid in session_ids:
         await get_cache().delete(f"answers:{sid}")
@@ -71,6 +120,8 @@ async def _leave_workspaces(db: AsyncSession, user: User) -> None:
                 others[0].role = "owner"
             else:
                 empty = True
+                await db.execute(update(NavSession).where(NavSession.workspace_id == m.workspace_id).values(workspace_id=None))
+                await db.execute(update(Document).where(Document.workspace_id == m.workspace_id).values(workspace_id=None))
                 await db.execute(delete(WorkspaceInvite).where(WorkspaceInvite.workspace_id == m.workspace_id))
         await db.delete(m)
         await db.flush()
@@ -84,11 +135,16 @@ async def erase_user(db: AsyncSession, user: User) -> dict:
     """Erase personal data. The consent log and (PII-free) audit entries are retained as legal records."""
     ids = list((await db.execute(select(NavSession.id).where(NavSession.user_id == user.id))).scalars())
     await _delete_session_data(db, ids)
+    user_docs = list((await db.execute(select(Document).where(Document.user_id == user.id))).scalars().all())
+    await _delete_documents(db, user_docs)
+    await db.execute(delete(ExternalRequest).where(ExternalRequest.user_id == user.id))
+    await db.execute(delete(Reminder).where(Reminder.user_id == user.id))
     await _leave_workspaces(db, user)
     await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
     user.email = f"deleted-{uuid.uuid4().hex[:12]}@erased.invalid"
     user.password_hash = "!"  # noqa: S105 - unusable hash
-    user.totp_secret, user.totp_enabled, user.recovery_hashes, user.email_verified_at = None, False, [], None
+    user.totp_secret, user.totp_enabled, user.totp_last_step, user.recovery_hashes, user.email_verified_at = None, False, 0, [], None
+    user.failed_logins, user.locked_until = 0, None
     user.deleted_at = datetime.now(UTC)
     await db.commit()
     await audit.record(db, user.id, "privacy.erasure", {"sessions": len(ids)})

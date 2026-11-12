@@ -30,7 +30,7 @@ export default function Header() {
   }, [pathname]);
 
   const link = (href: string, label: string) => {
-    const active = pathname === href;
+    const active = pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
     return (
       <Link
         href={href}
@@ -56,9 +56,11 @@ export default function Header() {
 
         <nav aria-label={tn("label")} className="flex flex-wrap items-center gap-1.5">
           {me && link("/", tn("applications"))}
+          {me && link("/documents", tn("documents"))}
           {me && me.role !== "citizen" && link("/staff", ts("link"))}
           {me && link("/teams", tn("teams"))}
           {me && link("/account", tn("account"))}
+          {link("/help", tn("help"))}
           <label className="ml-1 flex items-center gap-1.5 text-sm">
             <span className="sr-only">{t("language")}</span>
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" className="text-navy-700" fill="currentColor">

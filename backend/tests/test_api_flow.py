@@ -202,6 +202,104 @@ async def test_privacy_export_erase_and_purge(client, auth):
         assert u.email.endswith("@erased.invalid")
 
 
+async def test_privacy_deletion_and_purge_remove_external_requests_under_fk_constraints(client, auth):
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import select, text
+
+    from app.db.models import ExternalRequest, NavSession
+    from app.services.privacy import purge_expired
+
+    headers, s1 = await start(client, auth)
+    _, s2 = await start(client, auth)
+    _, s3 = await start(client, auth)
+    uid = (await client.get("/auth/me", headers=headers)).json()["id"]
+
+    async with maker()() as db:
+        await db.execute(text("PRAGMA foreign_keys = ON"))
+        db.add_all([
+            ExternalRequest(user_id=uid, session_id=s1["id"], provider="mock", kind="digilocker", external_id="dl-1"),
+            ExternalRequest(user_id=uid, session_id=s2["id"], provider="mock", kind="esign", external_id="es-2"),
+            ExternalRequest(user_id=uid, session_id=s3["id"], provider="mock", kind="esign", external_id="es-3"),
+        ])
+        ns1 = await db.get(NavSession, s1["id"])
+        ns1.expires_at = datetime.now(UTC) - timedelta(days=1)
+        await db.commit()
+
+        # 1. Retention purge with foreign keys enforced
+        assert await purge_expired(db) == 1
+        rem_s1 = (await db.execute(select(ExternalRequest).where(ExternalRequest.session_id == s1["id"]))).scalars().all()
+        assert rem_s1 == []
+
+    # 2. Single session deletion removes its ExternalRequest
+    assert (await client.delete(f"/privacy/sessions/{s2['id']}", headers=headers)).status_code == 204
+    async with maker()() as db:
+        rem_s2 = (await db.execute(select(ExternalRequest).where(ExternalRequest.session_id == s2["id"]))).scalars().all()
+        assert rem_s2 == []
+
+    # 3. Full DPDP account erasure removes remaining ExternalRequests
+    assert (await client.delete("/privacy/me", headers=headers)).status_code == 200
+    async with maker()() as db:
+        rem_all = (await db.execute(select(ExternalRequest).where(ExternalRequest.user_id == uid))).scalars().all()
+        assert rem_all == []
+
+
+async def test_single_session_and_account_deletion_preserve_other_sessions_and_shared_data(client, auth):
+    from sqlalchemy import select
+
+    from app.db.models import Answer, Consent, ExternalRequest, NavSession, Reminder, ReviewItem
+
+    headers_a, s_a1 = await start(client, auth, goal="I want to open a small bakery in Kolkata")
+    _, s_a2 = await start(client, auth, goal="I want to open a salon in Mumbai")
+    uid_a = (await client.get("/auth/me", headers=headers_a)).json()["id"]
+
+    # Second user with their own session
+    r_b = await client.post("/auth/register", json={"email": "userb@example.com", "password": "correct-horse-battery"})
+    headers_b = {"Authorization": f"Bearer {r_b.json()['access_token']}"}
+    await client.post("/consent", json={"purpose": "service", "granted": True}, headers=headers_b)
+    s_b1 = (await client.post("/sessions", json={"goal": "I want to start a gym in Pune", "language": "en"}, headers=headers_b)).json()
+    uid_b = (await client.get("/auth/me", headers=headers_b)).json()["id"]
+
+    # Populate answers, reminders, review items, and external requests for s_a1, s_a2, and s_b1
+    for h, sid in ((headers_a, s_a1["id"]), (headers_a, s_a2["id"]), (headers_b, s_b1["id"])):
+        await client.post(f"/sessions/{sid}/research", json={}, headers=h)
+        await client.post(f"/sessions/{sid}/interview", json={"answers": {"applicant_name": "Test User", "pan": "ABCPE1234F"}}, headers=h)
+
+    async with maker()() as db:
+        db.add_all([
+            ExternalRequest(user_id=uid_a, session_id=s_a1["id"], provider="mock", kind="esign", external_id="ea1"),
+            ExternalRequest(user_id=uid_a, session_id=s_a2["id"], provider="mock", kind="esign", external_id="ea2"),
+            ExternalRequest(user_id=uid_b, session_id=s_b1["id"], provider="mock", kind="esign", external_id="eb1"),
+            ReviewItem(session_id=None, claim_id="global-claim", reason="Global KB check"),
+        ])
+        await db.commit()
+
+    # Deleting s_a1 removes ONLY s_a1's data; s_a2, s_b1, and global ReviewItem remain intact
+    assert (await client.delete(f"/privacy/sessions/{s_a1['id']}", headers=headers_a)).status_code == 204
+    async with maker()() as db:
+        assert await db.get(NavSession, s_a1["id"]) is None
+        assert await db.get(NavSession, s_a2["id"]) is not None
+        assert await db.get(NavSession, s_b1["id"]) is not None
+        assert (await db.execute(select(Answer).where(Answer.session_id == s_a1["id"]))).scalars().all() == []
+        assert len((await db.execute(select(Answer).where(Answer.session_id == s_a2["id"]))).scalars().all()) > 0
+        assert (await db.execute(select(ExternalRequest).where(ExternalRequest.session_id == s_a1["id"]))).scalars().all() == []
+        assert len((await db.execute(select(ExternalRequest).where(ExternalRequest.session_id == s_a2["id"]))).scalars().all()) == 1
+
+    # Erasing User A removes s_a2 and all User A personal data, retains Consent legal log, and leaves User B untouched
+    assert (await client.delete("/privacy/me", headers=headers_a)).status_code == 200
+    async with maker()() as db:
+        assert await db.get(NavSession, s_a2["id"]) is None
+        assert (await db.execute(select(Answer).where(Answer.session_id == s_a2["id"]))).scalars().all() == []
+        assert (await db.execute(select(ExternalRequest).where(ExternalRequest.user_id == uid_a))).scalars().all() == []
+        assert (await db.execute(select(Reminder).where(Reminder.user_id == uid_a))).scalars().all() == []
+        assert len((await db.execute(select(Consent).where(Consent.user_id == uid_a))).scalars().all()) >= 1
+        # User B and global review item are completely untouched
+        assert await db.get(NavSession, s_b1["id"]) is not None
+        assert len((await db.execute(select(Answer).where(Answer.session_id == s_b1["id"]))).scalars().all()) > 0
+        assert len((await db.execute(select(ExternalRequest).where(ExternalRequest.user_id == uid_b))).scalars().all()) == 1
+        assert len((await db.execute(select(ReviewItem).where(ReviewItem.claim_id == "global-claim"))).scalars().all()) == 1
+
+
 async def test_admin_review_queue_and_roles(client, auth):
     headers, s = await start(client, auth)
     await client.post(f"/sessions/{s['id']}/research", json={}, headers=headers)

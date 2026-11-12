@@ -44,4 +44,9 @@ class MockMessenger:
 
     async def send(self, to: str, text: str, subject: str = "Red Tape Navigator") -> AdapterResult:
         MockMessenger.OUTBOX.append({"channel": self.channel, "to": to, "text": text, "subject": subject})
-        return AdapterResult(True, {"queued": True}, True, f"{DEMO} {self.channel} (not actually sent)")
+        return AdapterResult(
+            True,
+            {"queued": True, "smtp_accepted": False, "delivery_status": "queued_mock"},
+            True,
+            f"{DEMO} {self.channel} (not actually sent)",
+        )
