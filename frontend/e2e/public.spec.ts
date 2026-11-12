@@ -23,6 +23,7 @@ test("search engines: public pages are listed, private pages are excluded, the a
   expect(sitemap).not.toContain("/documents");
   const manifest = await (await request.get("/manifest.webmanifest")).json();
   expect(manifest.name).toBe("Red Tape Navigator");
-  expect(manifest.icons[0].src).toBe("/icon.svg");
-  expect((await request.get("/icon.svg")).status()).toBe(200);
+  expect(manifest.icons[0].src).toBe("/icon-192.png");
+  expect((await request.get("/icon-192.png")).status()).toBe(200);
+  expect((await request.get("/logo.png")).status()).toBe(200);
 });

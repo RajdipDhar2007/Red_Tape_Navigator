@@ -30,7 +30,7 @@ costs and how it is funded.
   human to paste it. Every rule stays "verify with the authority" until an officer signs it off in the officer console.
 - Never auto-submit anything to a government portal (CAPTCHA/OTP/Aadhaar login and terms forbid it). The product fills official PDFs and
   gives a "key-in sheet" for online-only portals; the citizen submits.
-- Do not use the State Emblem of India (illegal under the 2005 Act). An authorised department may supply its emblem via `NEXT_PUBLIC_EMBLEM_URL`.
+- The team logo (`Red_Tape_Navigator_Logo.png`, used in the header, icons, README and deck) shows the State Emblem of India on the robot's cap. The 2005 Act restricts the emblem: have counsel clear it or replace the cap badge before launch. Do not add any other use of the emblem.
 - Never run `npm run build` while `npm run dev` or `npm run start` is running (they share `.next`); stop servers first and check for stray
   `node`/`uvicorn` processes afterwards. Clean up test databases and stray processes when done. Do not stop servers that belong to other projects.
 - **Keep the documentation true.** Whenever behaviour changes, update `README.md`, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md`
@@ -262,7 +262,7 @@ Owner instruction: finish everything pending, make the app ready to deploy, comm
 - New backend pieces: `app/jobs/inprocess.py` (the worker's four jobs inside the API; last run read from the audit log), `app/services/bootstrap.py`
   (first officer from `BOOTSTRAP_ADMIN_*`, never overwrites a password), config accepts standard-base64 Fernet keys (Render `generateValue`) and
   `sslmode=` in PostgreSQL URLs, `GET /sessions/{sid}/reminders` and `/reminders.ics`.
-- New frontend pieces: `app/robots.ts`, `app/sitemap.ts`, `app/manifest.ts`, `app/icon.svg`, metadata with language alternates, "Add to my calendar" button.
+- New frontend pieces: `app/robots.ts`, `app/sitemap.ts`, `app/manifest.ts`, `app/icon.png`, `app/apple-icon.png`, `public/logo.png` (from the team logo), metadata with language alternates, "Add to my calendar" button.
 - Help page `/[locale]/help` (strings under `help.items` in the three message files; read a group with `t.raw("items")`, because `t.raw("")` on a
   namespace root throws MISSING_MESSAGE at build time). Footer link; `frontend/e2e/public.spec.ts` covers it and the robots/sitemap/manifest files (12 e2e tests).
 - Both Blueprints set `PORT=8000` so Render routes to the port the container listens on.

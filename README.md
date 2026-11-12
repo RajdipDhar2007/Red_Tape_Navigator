@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="frontend/app/icon.svg" alt="Red Tape Navigator logo" width="96" />
+<img src="Red_Tape_Navigator_Logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="240" />
 
 # Red Tape Navigator
 
@@ -188,7 +188,7 @@ or complies with. **We use them as sources and as guard-rails. We do not represe
 | **Digital Personal Data Protection Act, 2023 (DPDP)** | Explicit consent, purpose limitation, retention purge, export and erase, grievance contact, encrypted sensitive fields. See [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md). |
 | **Information Technology Act, 2000** and **Aadhaar (e-Sign) framework** | We integrate **Digio** for Aadhaar e-Sign and DigiLocker, with a signed webhook and a separate consent. |
 | **DigiLocker** and **UMANG** (MeitY, Digital India) | Document-fetch flow built against Digio's DigiLocker API; a UMANG adapter is mocked and labelled. |
-| **State Emblem of India (Prohibition of Improper Use) Act, 2005** | We **do not** use the State Emblem. The logo is a neutral tricolour mark; an authorised department may supply its own emblem by configuration. |
+| **State Emblem of India (Prohibition of Improper Use) Act, 2005** | The team-designed logo shows the national emblem on the robot officer's cap. The 2005 Act restricts use of the emblem, so **before any public launch this must be reviewed by counsel and either authorised by the competent authority or replaced with a neutral cap badge**. Tracked in [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md). |
 | **Digital India, Ease of Doing Business and Startup India** | The wider push to make compliance simple is the reason this problem is worth solving. We are a citizen-side helper, not a replacement for any of these portals. |
 
 The product text is always written to be honest about its limits: where we could not read an official source, the app says so and routes the item to an officer review

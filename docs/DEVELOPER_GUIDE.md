@@ -413,7 +413,7 @@ without a webhook secret.
 OWASP mapping and controls are in [`docs/SECURITY.md`](SECURITY.md); DPDP Act mapping in [`docs/COMPLIANCE.md`](COMPLIANCE.md). Highlights:
 rotating refresh tokens with reuse detection, account lockout, rate limits, constant-cost login, Fernet encryption of Aadhaar / PAN / bank answers,
 hash-chained audit log, PII-redacting logs, allowlisted outbound fetching (SSRF defence), prompt-injection defences, signed provider webhooks,
-CSP and HSTS headers, non-root containers, dependency and secret scans in CI. Never use the State Emblem of India (illegal under the 2005 Act); an
+CSP and HSTS headers, non-root containers, dependency and secret scans in CI. The team logo (`Red_Tape_Navigator_Logo.png`) shows the State Emblem of India on the robot's cap: the 2005 Act restricts that, so get it cleared or replaced before public launch. Otherwise do not use the emblem; an
 authorised department may supply its own via `NEXT_PUBLIC_EMBLEM_URL`.
 
 ## 14. Lessons learned and gotchas

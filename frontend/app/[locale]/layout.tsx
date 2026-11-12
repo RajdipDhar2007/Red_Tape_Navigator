@@ -30,8 +30,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     applicationName: "Red Tape Navigator",
     // Each page lists its own language versions; search engines then show the right one to each reader.
     alternates: { languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])) },
-    openGraph: { type: "website", siteName: "Red Tape Navigator", title: t("title"), description: t("tagline"), locale, url: `/${locale}` },
-    twitter: { card: "summary", title: t("title"), description: t("tagline") },
+    openGraph: { type: "website", siteName: "Red Tape Navigator", title: t("title"), description: t("tagline"), locale, url: `/${locale}`, images: [{ url: "/og.png", width: 1200, height: 630, alt: "Red Tape Navigator" }] },
+    twitter: { card: "summary_large_image", title: t("title"), description: t("tagline"), images: ["/og.png"] },
   };
 }
 

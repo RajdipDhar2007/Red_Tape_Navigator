@@ -94,7 +94,7 @@ test("full demo: goal -> research -> interview -> filled PDF review -> download"
   // done: downloads available only now; human submits
   await expect(page.getByRole("heading", { name: "Ready to sign and submit" })).toBeVisible();
   await expect(page.getByText("This tool never submits anything for you.").first()).toBeVisible();
-  const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: /Download PDF: fssai_form_a/ }).click()]);
+  const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: /Download PDF: (fssai_form_a|FSSAI Form A)/ }).click()]);
   expect(download.suggestedFilename()).toBe("fssai_form_a.pdf");
   await page.getByRole("button", { name: "Sign with Aadhaar e-Sign" }).first().click();
   await expect(page.getByText(/Demo mode: simulated e-Sign/).first()).toBeVisible();

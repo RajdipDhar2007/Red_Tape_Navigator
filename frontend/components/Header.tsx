@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { AUTH_EVENT, api, clearTokens, hasToken } from "@/lib/api";
-import LogoMark from "./LogoMark";
+import Image from "next/image";
 
 const NAMES: Record<string, string> = { en: "English", bn: "বাংলা", hi: "हिन्दी" };
 type Me = { email: string; role: string };
@@ -52,7 +52,7 @@ export default function Header() {
       <div className="tricolour-bar h-1" aria-hidden="true" />
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
         <Link href="/" className="flex items-center gap-3" aria-label={t("title")}>
-          <LogoMark size={42} />
+          <Image src="/logo.png" alt="" width={56} height={56} priority className="h-14 w-14 shrink-0 object-contain" />
           <span className="leading-tight">
             <span className="block font-head text-lg font-bold text-navy-900">{t("title")}</span>
             <span className="hidden text-xs font-medium text-slate-600 sm:block">{t("subtitle")}</span>
