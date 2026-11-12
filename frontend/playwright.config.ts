@@ -26,6 +26,7 @@ export default defineConfig({
         DATABASE_URL: "sqlite+aiosqlite:///./data/e2e.db",
         DEMO_MODE: "true",
         APP_ENV: "dev",
+        LLM_PROVIDER: "none", // browser tests must not call a live model, whatever is in backend/.env
         CORS_ORIGINS: "http://localhost:3000",
         RATE_LIMIT_PER_MINUTE: "1000",
         AUTH_RATE_LIMIT_PER_MINUTE: "200",

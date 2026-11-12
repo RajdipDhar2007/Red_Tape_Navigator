@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useId, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { formatDate } from "@/lib/format";
 import { Link, useRouter } from "@/i18n/navigation";
-import { api, ApiError, del, hasToken, post, setTokens } from "@/lib/api";
+import { AUTH_EVENT, api, ApiError, del, hasToken, post, setTokens } from "@/lib/api";
 import Icon, { type IconName } from "./Icon";
 import { ChakraWheel } from "./LogoMark";
 import CountUp from "./fx/CountUp";
@@ -467,7 +468,7 @@ function Dashboard() {
                   </div>
                   <p className="mt-2 line-clamp-2 font-semibold text-navy-900">{a.goal}</p>
                   <p className="mt-1 text-sm text-slate-600">
-                    {new Date(a.created_at).toLocaleDateString()}
+                    {formatDate(a.created_at, locale)}
                     {a.city ? ` · ${a.city}` : ""}
                     {a.steps ? ` · ${t("steps", { n: a.steps })}` : ""}
                   </p>
@@ -548,6 +549,15 @@ export default function Home() {
   useEffect(() => {
     void check();
   }, [check]);
+
+  // Logging out from the header must leave this screen too, not only the navigation bar.
+  useEffect(() => {
+    const onAuth = () => {
+      if (!hasToken()) setStage("auth");
+    };
+    window.addEventListener(AUTH_EVENT, onAuth);
+    return () => window.removeEventListener(AUTH_EVENT, onAuth);
+  }, []);
 
   if (stage === "loading") return <p aria-live="polite">{t("loading")}</p>;
   if (stage === "auth") return <Landing onDone={() => void check()} />;

@@ -35,7 +35,9 @@ SYSTEM_GUARD = (
     "are supported by a verbatim quote from the source."
 )
 
-_breaker = CircuitBreaker(failure_threshold=4, reset_seconds=45)
+# Fail fast: a busy provider (HTTP 503) must cost a citizen seconds, not minutes. After two failures the breaker stays open for a minute
+# and callers use the deterministic fallback immediately.
+_breaker = CircuitBreaker(failure_threshold=2, reset_seconds=60)
 
 
 class LLMUnavailable(RuntimeError):
@@ -88,7 +90,7 @@ class LLM:
             with span("llm.call", model=self.model, provider=self.provider):
                 out = await call_with_resilience(
                     lambda: post_json(endpoint, payload, headers, self._http),
-                    breaker=_breaker, retries=2, timeout=120,
+                    breaker=_breaker, retries=1, timeout=25,
                 )
             LLM_CALLS.labels("ok").inc()
             return out

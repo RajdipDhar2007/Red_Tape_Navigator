@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { api, clearTokens, hasToken } from "@/lib/api";
+import { AUTH_EVENT, api, clearTokens, hasToken } from "@/lib/api";
 import LogoMark from "./LogoMark";
 
 const NAMES: Record<string, string> = { en: "English", bn: "বাংলা", hi: "हिन्दी" };
@@ -20,13 +20,18 @@ export default function Header() {
   const [me, setMe] = useState<Me | null>(null);
 
   useEffect(() => {
-    if (!hasToken()) {
-      setMe(null);
-      return;
-    }
-    api<Me>("/auth/me")
-      .then(setMe)
-      .catch(() => setMe(null));
+    const load = () => {
+      if (!hasToken()) {
+        setMe(null);
+        return;
+      }
+      api<Me>("/auth/me")
+        .then(setMe)
+        .catch(() => setMe(null));
+    };
+    load();
+    window.addEventListener(AUTH_EVENT, load);
+    return () => window.removeEventListener(AUTH_EVENT, load);
   }, [pathname]);
 
   const link = (href: string, label: string) => {

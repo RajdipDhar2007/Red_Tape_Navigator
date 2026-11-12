@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDate } from "@/lib/format";
 import {
   api,
   apiBlob,
@@ -44,6 +45,7 @@ const CATEGORIES = ["general", "identity", "premises", "business", "licence"] as
 
 export default function DocumentsView() {
   const t = useTranslations("documents");
+  const locale = useLocale();
   const categorySelectId = useId();
   const fileInputId = useId();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -350,7 +352,7 @@ export default function DocumentsView() {
                   </div>
                   <p className="break-all font-semibold text-navy-900">{doc.original_filename}</p>
                   <p className="text-xs text-slate-600">
-                    {formatFileSize(doc.size_bytes)} · {new Date(doc.created_at).toLocaleDateString()} · SHA-256{" "}
+                    {formatFileSize(doc.size_bytes)} · {formatDate(doc.created_at, locale)} · SHA-256{" "}
                     <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px]">
                       {doc.checksum.slice(0, 12)}…
                     </code>

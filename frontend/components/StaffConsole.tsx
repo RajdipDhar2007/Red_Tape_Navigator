@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useId, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDate } from "@/lib/format";
 import { api, apiBlob, ApiError, hasToken, post } from "@/lib/api";
 
 type Stats = {
@@ -82,6 +83,7 @@ function Breakdown({ title, data }: { title: string; data: Record<string, number
 
 function FormRowView({ f, onDone }: { f: FormRow; onDone: () => void }) {
   const t = useTranslations("staff");
+  const locale = useLocale();
   const id = useId();
   const [url, setUrl] = useState(f.official_url ?? "");
   const [busy, setBusy] = useState(false);
@@ -113,7 +115,7 @@ function FormRowView({ f, onDone }: { f: FormRow; onDone: () => void }) {
         </span>
       </div>
       <p className="text-sm text-slate-700">{f.authority}</p>
-      {f.active && <p className="text-sm">{t("activeCopy", { hash: f.active.sha256.slice(0, 10), date: new Date(f.active.fetched_at).toLocaleDateString() })}</p>}
+      {f.active && <p className="text-sm">{t("activeCopy", { hash: f.active.sha256.slice(0, 10), date: formatDate(f.active.fetched_at, locale) })}</p>}
       <label htmlFor={id}>{t("officialUrl")}</label>
       <div className="flex flex-wrap gap-2">
         <input id={id} className="input flex-1" type="url" placeholder="https://" value={url} onChange={(e) => setUrl(e.target.value)} />

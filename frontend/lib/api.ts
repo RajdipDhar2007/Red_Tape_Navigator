@@ -15,13 +15,23 @@ function store(): Storage | null {
   }
 }
 
+export const AUTH_EVENT = "rtn:auth";
+
+function announce(): void {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(AUTH_EVENT));
+}
+
 export function setTokens(access: string, refresh: string): void {
+  const had = hasToken();
   store()?.setItem(ACCESS, access);
   store()?.setItem(REFRESH, refresh);
+  if (!had) announce(); // signed in: let the header load the user without waiting for a page change
 }
 export function clearTokens(): void {
+  const had = hasToken();
   store()?.removeItem(ACCESS);
   store()?.removeItem(REFRESH);
+  if (had) announce();
 }
 export function hasToken(): boolean {
   return !!store()?.getItem(ACCESS);

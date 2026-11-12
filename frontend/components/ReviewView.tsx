@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { api, apiBlob, ApiError, post, put } from "@/lib/api";
+import { formatDate } from "@/lib/format";
 import type { ReportRow, Review, Session } from "@/lib/types";
 import CitationLine from "./CitationLine";
 
@@ -20,6 +21,7 @@ function saveData(): boolean {
 
 export default function ReviewView({ session, onBack, onConfirmed }: { session: Session; onBack: () => void; onConfirmed: () => Promise<void> }) {
   const t = useTranslations("review");
+  const locale = useLocale();
   const tc = useTranslations("checklist");
   const ta = useTranslations("app");
   const sid = session.id;
@@ -109,7 +111,7 @@ export default function ReviewView({ session, onBack, onConfirmed }: { session: 
         <p role="note" className="mb-3 rounded border border-green-500 bg-green-50 p-2 text-green-950">
           {t("officialSource", {
             host: new URL(form.official_source.url).hostname,
-            date: new Date(form.official_source.fetched_at).toLocaleDateString(),
+            date: formatDate(form.official_source.fetched_at, locale),
             hash: form.official_source.sha256.slice(0, 10),
           })}
         </p>

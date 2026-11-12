@@ -72,3 +72,17 @@ test("a bad confirmation link says so", async ({ page }) => {
   await page.goto("/en/verify-email?token=not-a-real-token-not-a-real-token");
   await expect(page.getByText(en.verify.failed)).toBeVisible();
 });
+
+test("navigation bar follows sign-in and log-out without a page reload", async ({ page }) => {
+  const nav = page.getByRole("navigation", { name: en.nav.label });
+  await signUp(page);
+  // right after sign-up, on the same page, the signed-in links must already be there
+  await expect(nav.getByRole("link", { name: en.nav.account, exact: true })).toBeVisible();
+  await expect(nav.getByRole("link", { name: en.nav.documents, exact: true })).toBeVisible();
+  await page.getByRole("button", { name: en.consent.accept, exact: true }).click();
+  await expect(page.getByRole("heading", { name: en.dash.newTitle })).toBeVisible();
+  await page.getByRole("button", { name: en.app.logout, exact: true }).click();
+  await expect(nav.getByRole("link", { name: en.nav.account, exact: true })).toHaveCount(0);
+  // and the page body must leave the signed-in dashboard too
+  await expect(page.getByRole("button", { name: en.auth.register, exact: true })).toBeVisible();
+});

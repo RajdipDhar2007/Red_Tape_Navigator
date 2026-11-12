@@ -5,7 +5,16 @@ _tmp = tempfile.mkdtemp()
 os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL") or f"sqlite+aiosqlite:///{_tmp}/test.db".replace("\\", "/")
 os.environ["STORAGE_LOCAL_DIR"] = f"{_tmp}/vault".replace("\\", "/")
 os.environ["ANTHROPIC_API_KEY"] = ""
+# Tests must never read a developer's .env or call a live model (keys, providers, models are all blanked here).
+for _k in ("GEMINI_API_KEY", "GEMINI_MODEL", "OLLAMA_MODEL", "ANTHROPIC_MODEL"):
+    os.environ[_k] = ""
+os.environ["LLM_PROVIDER"] = "auto"
 os.environ["APP_ENV"] = "test"
+
+from app.core.config import Settings  # noqa: E402
+
+# Never read a developer's backend/.env during tests: results must not depend on personal keys or settings.
+Settings.model_config["env_file"] = None
 
 import pytest  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402

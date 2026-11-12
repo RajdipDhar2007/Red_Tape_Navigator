@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useId, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { api, apiBlob, clearTokens, del, hasToken, post, setTokens } from "@/lib/api";
+import { formatDate } from "@/lib/format";
 import { passwordStrength } from "./Home";
 
 type ConsentPurpose = "service" | "reminders" | "identity_providers";
@@ -14,6 +15,7 @@ const PURPOSES: ConsentPurpose[] = ["service", "reminders", "identity_providers"
 
 export default function AccountView() {
   const t = useTranslations("account");
+  const locale = useLocale();
   const ta = useTranslations("auth");
   const tp = useTranslations("privacy");
   const router = useRouter();
@@ -414,6 +416,7 @@ export default function AccountView() {
                       <button
                         type="button"
                         className={active ? "btn-ghost text-red-800 !min-h-0 py-1 text-sm" : "btn-secondary !min-h-0 py-1.5 text-sm"}
+                        aria-label={`${active ? tp("withdrawBtn") : tp("grantBtn")}: ${tp(`purpose_${p}`)}`}
                         disabled={isBusy}
                         onClick={() => {
                           if (p === "service" && active) {
@@ -455,7 +458,7 @@ export default function AccountView() {
                     <div>
                       <p className="font-medium text-navy-900">{s.goal}</p>
                       <p className="text-xs text-slate-600">
-                        {new Date(s.created_at).toLocaleDateString()}
+                        {formatDate(s.created_at, locale)}
                         {s.city ? ` · ${s.city}` : ""}
                       </p>
                     </div>

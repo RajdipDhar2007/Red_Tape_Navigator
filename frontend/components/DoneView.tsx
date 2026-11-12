@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { api, apiBlob, ApiError, del, post } from "@/lib/api";
+import { formatDate } from "@/lib/format";
 import type { ChecklistItem, Session } from "@/lib/types";
 import Confetti from "./fx/Confetti";
 import KeyInSheet from "./KeyInSheet";
@@ -31,6 +32,7 @@ export default function DoneView({
   onBackToReview?: () => void;
 }) {
   const t = useTranslations("done");
+  const locale = useLocale();
   const ta = useTranslations("app");
   const sid = session.id;
   const [items, setItems] = useState<ChecklistItem[]>([]);
@@ -45,6 +47,7 @@ export default function DoneView({
   const forms = [...new Set((session.plan.steps ?? []).map((s) => s.form).filter((f): f is string => !!f))];
 
   const [burst, setBurst] = useState(0);
+  const [titles, setTitles] = useState<Record<string, string>>({});
   useEffect(() => setBurst(1), []);
 
   const loadReminders = useCallback(() => {
@@ -67,6 +70,10 @@ export default function DoneView({
       .then((r) => setItems(r.items))
       .catch(() => setMsg(ta("error")));
     loadReminders();
+    // Readable form names for the download buttons (falls back to the form id if this fails).
+    void api<{ forms: { form_id: string; title: string }[] }>(`/sessions/${sid}/review`)
+      .then((r) => setTitles(Object.fromEntries(r.forms.map((f) => [f.form_id, f.title.replace(/\s*\(PLACEHOLDER\)/, "")]))))
+      .catch(() => undefined);
   }, [sid, ta, loadReminders]);
 
   const download = async (fid: string) => {
@@ -181,7 +188,7 @@ export default function DoneView({
         {forms.map((f) => (
           <div key={f} className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
             <button className="btn" onClick={() => void download(f)}>
-              {t("download")}: {f}
+              {t("download")}: {titles[f] ?? f}
             </button>
             <button className="btn-secondary" onClick={() => void sign(f)}>
               {t("esign")}
@@ -286,7 +293,7 @@ export default function DoneView({
               {sched.map((s, idx) => (
                 <li key={s.id ?? `${s.title}-${idx}`} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                   <div>
-                    <span className="font-medium">{s.title}</span> — {new Date(s.due_at).toLocaleDateString()}
+                    <span className="font-medium">{s.title}</span> — {formatDate(s.due_at, locale)}
                     <div className="mt-1 flex flex-wrap gap-1.5 text-xs">
                       {s.channel && <span className="badge bg-slate-200 text-slate-800">{s.channel.toUpperCase()}</span>}
                       <span className={`badge ${s.sent ? "bg-green-100 text-green-900" : "bg-navy-100 text-navy-900"}`}>
