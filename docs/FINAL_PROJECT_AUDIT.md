@@ -122,7 +122,7 @@ flowchart LR
 Comparing the codebase against `docs/HANDOFF_PROMPT.md` and the audit requirements:
 
 1. **Gemini API Provider in LLM Adapter (`backend/app/agent/llm.py`):**
-   - Currently `app/agent/llm.py` only supports Anthropic (`anthropic.AsyncAnthropic`). There is no Google Gemini API (`google-genai` / `GEMINI_API_KEY` / `GEMINI_MODEL`) provider implementation for intake classification, grounded research synthesis, or voice normalization.
+   - (Resolved: `app/agent/llm.py` now supports Ollama, Gemini (REST via `httpx`, `GEMINI_API_KEY` + `GEMINI_MODEL`) and Anthropic, chosen by `LLM_PROVIDER`; see `backend/tests/test_llm_providers.py`.)
 2. **Citizen Document Upload & Vault (Backend + Frontend):**
    - The system generates filled application PDFs from interview text answers, but citizens cannot upload supporting attachment files (e.g., electricity bill, rent agreement, NOC, passport photo, shop photo) or store them in an encrypted document vault for reuse across licence applications.
 3. **Object Storage Adapter (S3 / Cloudflare R2 / GCS):**
@@ -202,7 +202,7 @@ Every external integration was inspected across `backend/app/integrations/`, `ba
 
 | Integration | Audit Classification | Evidence in Codebase | Exact Requirements for Production Completion |
 |---|---|---|---|
-| **Gemini API** | `NOT IMPLEMENTED` | No `google-genai` or `GEMINI_API_KEY` references exist in `backend/`. `app/agent/llm.py` only wires `anthropic`. | Add `google-genai` (or REST client via `httpx`) to `app/agent/llm.py` + `GEMINI_API_KEY` / `GEMINI_MODEL` in `app/core/config.py` so operators can choose `LLM_PROVIDER=gemini\|anthropic\|none`. |
+| **Gemini API** | `IMPLEMENTED` | `app/agent/llm.py` + `app/core/llm_http.py` call the Gemini REST API with JSON-schema output; settings `GEMINI_API_KEY`, `GEMINI_MODEL`, `LLM_PROVIDER`. | Set the key and model on the host; with none set the product uses its deterministic fallback. |
 | **Anthropic API (optional)** | `IMPLEMENTED AND TESTED` | [`app/agent/llm.py`](file:///d:/Hack_N_Pitch/Red_Tape_Navigator/backend/app/agent/llm.py) (`AsyncAnthropic` with circuit breaker, 20s timeout, JSON extractor, and graceful no-op fallback when key is unset). Tested in `tests/test_agent_and_api.py`. | Optional. Set `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL=claude-haiku-4-5-20251001` (and add to `rtn-worker` in `render.yaml`). App works 100% deterministically without it. |
 | **SMTP / Brevo** | `IMPLEMENTED AND TESTED` | [`app/integrations/real/smtp.py`](file:///d:/Hack_N_Pitch/Red_Tape_Navigator/backend/app/integrations/real/smtp.py) (`smtplib.SMTP` / `SMTP_SSL`, STARTTLS, CRLF header-injection sanitizer, `asyncio.to_thread`). Unit-tested in `tests/test_password_and_email.py`. | Provision Brevo (free tier: 300 emails/day) or AWS SES SMTP credentials; verify sender domain SPF/DKIM; set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`. |
 | **MSG91** | `IMPLEMENTED AND TESTED` *(mocked HTTP; untested against live DLT)* | [`app/integrations/real/msg91.py`](file:///d:/Hack_N_Pitch/Red_Tape_Navigator/backend/app/integrations/real/msg91.py) (`POST https://control.msg91.com/api/v5/flow`, 10-digit Indian mobile validation, 3x exponential backoff on 5xx/429). Tested with `httpx.MockTransport` in `tests/test_prod_and_fetcher.py`. | Human action required: TRAI DLT principal entity registration + 6-char sender ID + approved DLT template ID. Set `MSG91_AUTHKEY`, `MSG91_SENDER_ID`, `MSG91_TEMPLATE_ID`, `MSG91_TEXT_VAR`. |
@@ -340,7 +340,7 @@ All quality checks below were executed directly in `d:\Hack_N_Pitch\Red_Tape_Nav
    - Increment `user.failed_logins` on failed `/auth/2fa/enable` and `/auth/2fa/disable` attempts.
    - Add `sentry-sdk>=2.0.0` to `backend/pyproject.toml`.
 4. **Task P1-3: Gemini API Provider Support & Digio DigiLocker Field Mapping**
-   - Extend `app/agent/llm.py` and `app/core/config.py` to support Google Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`, `LLM_PROVIDER=gemini|anthropic|auto`) alongside Anthropic while preserving the zero-cost deterministic fallback.
+   - Done: Gemini support alongside Anthropic and Ollama, with the zero-cost deterministic fallback preserved.
    - Implement document field extraction (`full_name`, `dob`, `address`, `aadhaar`, `pan`, `gstin`) in `DigioDigiLocker.get_status()` (`app/integrations/real/digio.py`) with comprehensive unit tests.
 5. **Task P1-4: Staff Console Completion**
    - Extend [`frontend/components/StaffConsole.tsx`](file:///d:/Hack_N_Pitch/Red_Tape_Navigator/frontend/components/StaffConsole.tsx) with tabs for Rule Freshness (`GET /admin/rule-freshness`), Audit Chain Verification (`GET /admin/audit/verify`), User Role Assignment (`POST /admin/users/{id}/role`), and Expired Session Purge (`POST /admin/purge`).

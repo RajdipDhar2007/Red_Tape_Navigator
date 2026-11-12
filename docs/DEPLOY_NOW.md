@@ -91,6 +91,13 @@ This also stops the free instance from sleeping, so reminders go out on time. On
 
 The free database is deleted 30 days after it was created. Either upgrade it in Render (Database, Change plan, `0.1c-256mb`, US$6 a month plus storage) or move to `render.production.yaml`. Put the date in your calendar today.
 
+## 9. Optional: turn on Gemini (AI help with goal reading and rules refresh)
+
+The product works without it (rules-first mode). To add Gemini, create a key in Google AI Studio, then in Render open `rtn-api` > Environment and set
+`LLM_PROVIDER=gemini`, `GEMINI_API_KEY=<your key>` and `GEMINI_MODEL=<a model name from Google's current model list>`. Type the key yourself into Render; never paste it
+into chat or commit it. Save and let it redeploy. Locally, put the same three values in `backend/.env`. Personal details (Aadhaar, PAN, phone, email) are masked before text is sent.
+Every claim the model produces still needs a verbatim quote from the official page, or it is dropped.
+
 ## If something fails
 
 | Symptom | Cause and fix |
