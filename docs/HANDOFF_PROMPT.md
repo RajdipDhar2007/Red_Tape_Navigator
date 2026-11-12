@@ -3,7 +3,7 @@
 You are taking over **Red Tape Navigator**, a web product that helps Indian citizens and small businesses (shops, bakeries, salons,
 hotels, clinics, schools, small manufacturers, online sellers) work out which licences and registrations they need, interviews them
 for the missing details, fills the official forms for them to review, and tracks follow-ups and renewals. Languages: English, Hindi,
-Bengali. **`README.md` is the full description of the plan, the pipelines, what is done and how, and what is pending. Read it first.
+Bengali. **`docs/DEVELOPER_GUIDE.md` is the full description of the plan, the pipelines, what is done and how, and what is pending. Read it first.
 This file tells you how to continue from exactly where the last contributor stopped.**
 
 ## YOUR MISSION (read this twice)
@@ -38,15 +38,15 @@ costs and how it is funded.
 - The previous owner's personal machine preferences (drive letters, accounts) do not apply to your machine unless told.
 
 ## Snapshot at handoff (November 2026)
-Backend 443 tests passing (about 95.8% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/5 unit tests/build pass,
-10 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
+Backend 491 tests passing (about 95.4% coverage, gate 80%), evals pass (0 hallucinations), frontend lint/typecheck/10 unit tests/build pass,
+13 Playwright e2e tests pass, CI has 7 jobs. 9 cities, 120 business types, 16 licences (liquor and drug licences are state-specific per city),
 438 seeded rules, 3 languages (the backend text is translated too). Not deployed (ready to apply: `docs/DEPLOY_NOW.md`). Digio, MSG91 and all live integrations are built but untested
-against the real services. Seven Alembic migrations (0001 to 0007). **The product is free to use and charges no one (owner decision, 2026-11-10): do not add billing, prices, payments or paywalls** (`docs/BUSINESS_MODEL.md`; `tests/test_free_forever.py` enforces it).
+against the real services. Nine Alembic migrations (0001 to 0009). **The product is free to use and charges no one (owner decision, 2026-11-10): do not add billing, prices, payments or paywalls** (`docs/BUSINESS_MODEL.md`; `tests/test_free_forever.py` enforces it).
 
 ## Step 0: get the code and run it
 1. Ask the owner (GitHub user `RajdipDhar2007`) to add you as a collaborator on the repo (public since November 2026, proprietary licence: you still need the owner's approval to use it)
    `https://github.com/RajdipDhar2007/Red_Tape_Navigator`, then clone it. Work on branch `main`.
-2. Read, in this order: `README.md`, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md`, `docs/INTEGRATIONS.md`,
+2. Read, in this order: `README.md`, `docs/DEVELOPER_GUIDE.md`, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md`, `docs/INTEGRATIONS.md`,
    `docs/DEPLOYMENT_VERCEL_RENDER.md`, `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/ASSUMPTIONS.md`, `docs/RUNBOOK.md`, `docs/LOAD_TEST.md`,
    `docs/PILOT_PLAN.md`.
 3. Backend (Python 3.12 or 3.13): `cd backend && python -m venv .venv`, activate, `pip install -e ".[dev]"`, then `ruff check .`, `mypy app`,
@@ -268,7 +268,7 @@ Owner instruction: finish everything pending, make the app ready to deploy, comm
 - Both Blueprints set `PORT=8000` so Render routes to the port the container listens on.
 - New scripts: `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh` (a step in the CI compose job).
 - New tests (`tests/test_deploy_ready.py`): Blueprint variables must exist in `Settings` and carry no committed secret; every route in the OpenAPI table
-  must answer 401 without sign-in unless it is on the public list. Total 459 backend tests.
+  must answer 401 without sign-in unless it is on the public list. Total 491 backend tests (current).
 - Docs: `docs/DEPLOY_NOW.md`, `docs/THREAT_MODEL.md`, `docs/FINAL_REPORT.md`; checklist, README, runbook and owner lists updated.
 - Gmail: two DRAFTS created, not sent (FSSAI permission; Digio sandbox). Digio's address is not known; the draft says to add it or use their form.
 - Fixed a breakage from commit `ba69bc7`: `license = { file = "../LICENSE" }` in `backend/pyproject.toml` made `pip install -e .` fail
@@ -296,3 +296,10 @@ Owner instruction: finish everything pending, make the app ready to deploy, comm
 - Next, the moment the owner says "deployed": read the API address from the `rtn-api` page, watch the first deploy log (first ever build on Render and first
   start against Render PostgreSQL), deploy Vercel with root `frontend`, replace the two placeholders in Render, run `verify_deploy.py --journey`, then
   write both live addresses into `README.md`, `docs/FINAL_REPORT.md` and the checklist.
+
+## Session log: 2026-11-12 (merge of Anish Goswami's work, Gemini, browser review)
+- Merged Anish Goswami's fork (document vault, hardening, provider readiness, help centre, DR runbook) into `main`; Gemini provider is live-verified (`LLM_PROVIDER=gemini` plus `GEMINI_API_KEY`; model calls fail fast through a circuit breaker and fall back to the rules-only path).
+- Browser review fixes: header and dashboard follow sign-in/out without reload (`rtn:auth` event), readable download labels, locale-aware dates (`frontend/lib/format.ts`), distinct consent button names, `/documents` kept out of search engines.
+- Tests are hermetic: `backend/tests/conftest.py` ignores `backend/.env` and blanks model keys; Playwright runs the API with `LLM_PROVIDER=none`.
+- Backend 491 tests (95.4%), frontend 10 unit tests, 13 browser tests, migrations 0001 to 0009; CI on `main` all 7 jobs green.
+- Next: rotate the Gemini key that was shared in chat; owner steps in `docs/OWNER_ACTIONS.md`.

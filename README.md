@@ -1,298 +1,626 @@
+<div align="center">
+
+<img src="frontend/app/icon.svg" alt="Red Tape Navigator logo" width="96" />
+
 # Red Tape Navigator
 
-An agentic assistant that helps Indian citizens and small-business owners navigate government bureaucracy.
-Say your goal in plain language ("I want to open a small bakery in Kolkata"). The app works out which licences you need,
-researches the rules from official sources, asks **only** for the details that are missing, fills the official forms, and
-shows everything for review. **The citizen reviews, signs and submits. The system never submits anything on its own.**
+### Tell us your goal. We cut through the red tape.
 
-> AI-assisted guidance, not legal advice. Verify with the issuing authority.
+**An agentic AI assistant that turns one sentence, such as _"I want to open a small bakery in Kolkata"_, into a researched, cited, step-by-step licensing plan and filled-in paperwork, while the citizen stays in full control.**
 
----
+[![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#-hackathon-and-team)
+[![Hackathon](https://img.shields.io/badge/Hackathon-HackNPitch-FF9933?style=for-the-badge)](#-hackathon-and-team)
+[![Track](https://img.shields.io/badge/Track-Agentic%20AI%20%C2%B7%20Civic%20Tech-138808?style=for-the-badge)](#-the-problem-statement-in-full)
+[![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)](#-license)
 
-## Hackathon and team
+![CI](https://img.shields.io/badge/CI-7%20jobs%20passing-138808?logo=githubactions&logoColor=white)
+![Backend tests](https://img.shields.io/badge/backend%20tests-491%20passing-138808)
+![Coverage](https://img.shields.io/badge/coverage-95%25-138808)
+![Languages](https://img.shields.io/badge/languages-English%20%C2%B7%20%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80%20%C2%B7%20%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE-0B1F4F)
+![Cities](https://img.shields.io/badge/cities-9-FF9933)
+![Licences](https://img.shields.io/badge/business%20types-120-FF9933)
+![Rules](https://img.shields.io/badge/cited%20rules-438-FF9933)
+![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-4169E1?logo=postgresql&logoColor=white)
 
-- **Project:** Red Tape Navigator
-- **Team:** Onyx (HackNPitch, Jadavpur University). Category: Software / AI and civic tech.
-- **Members:** Rajdip Dhar (team leader), Raktim Chakraborty, Anish Goswami, Imon Patra.
+<br />
 
----
+<img src="docs/media/demo-walkthrough.gif" alt="Animated walkthrough of Red Tape Navigator: goal, plan, interview, review, download, Hindi and Bengali" width="880" />
 
-## READ THIS FIRST: a request to the next contributor
+<sub>The real app, recorded from a local run: goal, plan, interview, review, download, then the same journey in Hindi and Bengali.
+Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &nbsp;·&nbsp; Pitch deck: <a href="Onyx_HackNPitch.pdf">Onyx_HackNPitch.pdf</a></sub>
 
-This README and [`docs/HANDOFF_PROMPT.md`](docs/HANDOFF_PROMPT.md) are the project's memory. Please follow them:
+<br />
 
-1. **Read this whole README, then `docs/HANDOFF_PROMPT.md` and `docs/LAUNCH_CHECKLIST.md`, before changing anything.**
-   The handoff prompt is written so you (or your AI coding assistant) can continue exactly from where the last person stopped.
-2. **Do not stop at "it runs on my machine".** The goal is a finished, launched product (section 11). Keep working through the
-   pending list (section 10) in order until each item is done or blocked only by something a human must do. When you are blocked,
-   say exactly what you need, then continue with everything that does not depend on it.
-3. **Never invent legal facts.** Every fee, timeline, document list and rule must come from an official page or document you actually
-   read, and be recorded in `docs/RULES_VERIFICATION.md`. If you cannot read it, say so in the product text and ask a human to paste it.
-4. **Never commit secrets** (`.env*` except `*.example`, `*.db`, keys, tokens). Never type a password, OTP, Aadhaar or PAN anywhere
-   for anyone. Never create accounts, solve CAPTCHAs, or submit to a government portal.
-5. **Verify before you claim.** Run the quality gates (section 8) and report real results. Keep CI green. Push small, verified commits.
-6. **Keep the docs true.** When you change behaviour, update this README, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md`
-   and `docs/HANDOFF_PROMPT.md` in the same commit. The next person depends on them.
-7. Do **not** add `.github/dependabot.yml` (it once opened 12 unwanted pull requests), and do not open PRs, repos or other GitHub
-   actions unless the owner asks.
+> **AI-assisted guidance, not legal advice.** Every figure is cited to an official source. Verify with the issuing authority before you rely on it.
+> **The citizen reviews, signs and submits. The system never submits anything to a government portal on its own.**
+
+</div>
 
 ---
 
 ## Contents
 
-1. [The problem and the plan](#1-the-problem-and-the-plan)
-2. [How the product works (citizen workflow)](#2-how-the-product-works-citizen-workflow)
-3. [Architecture and pipelines](#3-architecture-and-pipelines)
-4. [What is done, and how it was done](#4-what-is-done-and-how-it-was-done)
-5. [Technology and tools used](#5-technology-and-tools-used)
-6. [Current status: real, simulated, untested](#6-current-status-real-simulated-untested)
-7. [Quick start](#7-quick-start)
-8. [Quality gates, CI and testing](#8-quality-gates-ci-and-testing)
-9. [How to extend the product](#9-how-to-extend-the-product)
-10. [What is pending, how to do it, and what to use](#10-what-is-pending-how-to-do-it-and-what-to-use)
-11. [Definition of done](#11-definition-of-done)
-12. [Configuration reference](#12-configuration-reference)
-13. [Security and compliance](#13-security-and-compliance)
-14. [Lessons learned and gotchas](#14-lessons-learned-and-gotchas)
-15. [Repository layout and documentation index](#15-repository-layout-and-documentation-index)
+| | | |
+|---|---|---|
+| 1. [Hackathon and team](#-hackathon-and-team) | 7. [The workflow, step by step](#-the-workflow-step-by-step) | 13. [Challenges we faced and how we solved them](#-challenges-we-faced-and-how-we-solved-them) |
+| 2. [The problem statement in full](#-the-problem-statement-in-full) | 8. [How the app works: what does what](#-how-the-app-works-what-does-what) | 14. [Quality and testing](#-quality-and-testing) |
+| 3. [The problem, in real life](#-the-problem-in-real-life) | 9. [Every feature](#-every-feature) | 15. [Honest status](#-honest-status-real-simulated-untested) |
+| 4. [Who we are building this for](#-who-we-are-building-this-for) | 10. [Screenshots](#-screenshots-of-the-running-app) | 16. [Pending work and roadmap](#-pending-work-and-roadmap) |
+| 5. [How the Indian government context shaped us](#-how-the-indian-government-context-shaped-the-design) | 11. [Technology and tools](#-technology-and-tools-we-used) | 17. [Our vision](#-our-vision) |
+| 6. [Our approach and plan](#-our-approach-and-plan) | 12. [Architecture and pipelines](#-architecture-and-pipelines) | 18. [Quick start](#-quick-start) · [Docs](#-documentation-index) · [License](#-license) |
 
 ---
 
-## 1. The problem and the plan
+## 🏁 Hackathon and team
 
-**Problem** (full text in [`ps.md`](ps.md)): citizens and small businesses lose weeks to scattered departmental sites, outdated PDF
-forms and contradictory requirements. They need to know *which* licences apply, *in what order*, *with which documents*, *what it costs*,
-and then fill the forms correctly.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-**The plan** was to build an agent that does the research and the paperwork, while keeping the human in control:
+**Hackathon:** HackNPitch
+**Institution:** Jadavpur University
+**Team name:** **Team Onyx**
+**Project:** Red Tape Navigator
+**Track:** Agentic AI, Software and Civic Tech
+**Problem statement:** *Agentic AI: The "Red Tape" Bureaucracy Navigator*
+
+</td>
+<td width="50%" valign="top">
+
+**Team members**
+
+| Member | Role |
+|---|---|
+| **Rajdip Dhar** | **Team Leader** |
+| **Raktim Chakraborty** | Team member |
+| **Anish Goswami** | Team member |
+| **Imon Patra** | Team member |
+
+</td>
+</tr>
+</table>
+
+Our submission materials live in this repository: the [pitch deck (PDF)](Onyx_HackNPitch.pdf), the [editable deck (PPTX)](Onyx_HackNPitch.pptx)
+and the [demo video](Onyx_Demo_Video.mp4).
+
+---
+
+## 📜 The problem statement in full
+
+> The text below is the problem statement we were given, reproduced in full. The same text is kept in [`Problem_Statement.md`](Problem_Statement.md).
+
+### Agentic AI: The "Red Tape" Bureaucracy Navigator
+
+**Problem Statement.** Everyday citizens and small business owners waste weeks trying to navigate the maze of local government bureaucracy. Whether applying for a neighbourhood food vendor license, securing residential zoning permits, or accessing agricultural grants, the process is usually buried in confusing departmental websites, outdated PDF forms, and contradictory requirements that require a legal or administrative background to understand.
+
+**Challenge.** Build an autonomous "Red Tape" AI Agent that acts as a proactive legal-administrative assistant. The agent should take a simple, natural language goal (e.g., "I want to open a small bakery in my town") and independently research local regulations, fetch the correct forms, interview the user for missing details, and auto-fill the required paperwork for submission.
+
+**Key Requirements.**
+
+1. A web-scraping and reasoning agent capable of navigating unstructured, text-heavy government or municipal portals to extract accurate, up-to-date compliance steps.
+2. An interactive memory system that allows the agent to conduct a conversational "interview" with the user, asking only for the specific personal or business details needed for the application.
+3. Document processing tools that allow the agent to map the collected information and autonomously populate official PDF forms or digital web portals.
+4. A transparency and review checkpoint where the agent presents the finalized, filled-out forms and a summary of the regulations to the user for final signature and submission.
+
+### How each requirement is met
+
+| # | Requirement | What we built | Where it lives |
+|---|---|---|---|
+| 1 | Scraping and reasoning agent over text-heavy portals | A **guarded fetcher** (HTTPS only, domain allowlist re-checked on every redirect, `robots.txt`, rate limit, size cap, CAPTCHA or login means a human hand-off), a **sanitiser** against prompt injection, and a **research agent** that builds a dependency-ordered plan from a cited rules knowledge base. A live-refresh mode keeps a claim only if its quote appears **verbatim** on the official page. | `backend/app/scraping/`, `backend/app/agent/`, `backend/app/kb/` |
+| 2 | Interactive memory and a conversational interview | An **interview engine** that asks one or two questions at a time, validates every answer (PAN, Aadhaar checksum, PIN, IFSC, dates), never asks twice, and stores sensitive answers **encrypted**. | `backend/app/interview/` |
+| 3 | Document processing and form filling | A **PDF filler** (AcroForm fill or flat-PDF overlay) with per-field provenance, and a **key-in sheet** for online-only portals such as FoSCoS and Udyam. | `backend/app/forms/` |
+| 4 | Transparency and review checkpoint | A side-by-side **review screen** with editable fields, a plain-language summary and an explicit consent tick-box. Any later edit invalidates the review. **No code path submits to a government portal** (a test fails if one is added). | `frontend/components/ReviewView.tsx`, `backend/app/api/sessions.py` |
+
+---
+
+## 🌆 The problem, in real life
+
+Behind the statement are real people: a baker in Mysuru, a sweet-maker in a Kolkata lane, a tea-stall owner in Madhya Pradesh, a wholesaler in Burrabazar.
+Each of them is told to "get the licences" and then has to work out **which** ones, **in what order**, **from which office**, **with which documents**, **at what cost**.
+
+<table>
+<tr>
+<td align="center" width="50%">
+<img src="https://commons.wikimedia.org/wiki/Special:FilePath/A_street_vendor_preparing_Malpua_Sweet_in_Kolkata%2C_India.jpg?width=900" alt="A street vendor preparing malpua sweets in Kolkata" width="100%" /><br />
+<sub><b>A street vendor preparing malpua, Kolkata.</b> Food vendors need FSSAI registration and often a municipal trade licence.<br />Photo: Salil Kumar Mukherjee, <a href="https://commons.wikimedia.org/wiki/File:A_street_vendor_preparing_Malpua_Sweet_in_Kolkata,_India.jpg">Wikimedia Commons</a>, CC BY-SA 4.0</sub>
+</td>
+<td align="center" width="50%">
+<img src="https://commons.wikimedia.org/wiki/Special:FilePath/Sri_Krishna_Bakery_in_Mysuru%2C_July_2013.jpg?width=900" alt="A neighbourhood bakery in Mysuru" width="100%" /><br />
+<sub><b>A neighbourhood bakery, Mysuru.</b> Our own example goal: "open a small bakery".<br />Photo: Sunnya343, <a href="https://commons.wikimedia.org/wiki/File:Sri_Krishna_Bakery_in_Mysuru,_July_2013.jpg">Wikimedia Commons</a>, CC BY-SA 4.0</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="50%">
+<img src="https://commons.wikimedia.org/wiki/Special:FilePath/Burrabazar_Market_in_Kolkata_03.jpg?width=900" alt="Burrabazar wholesale market in Kolkata" width="100%" /><br />
+<sub><b>Burrabazar, Kolkata.</b> Thousands of small traders, each with their own set of registrations.<br />Photo: Kritzolina, <a href="https://commons.wikimedia.org/wiki/File:Burrabazar_Market_in_Kolkata_03.jpg">Wikimedia Commons</a>, CC BY-SA 4.0</sub>
+</td>
+<td align="center" width="50%">
+<img src="https://commons.wikimedia.org/wiki/Special:FilePath/Teashop_owner_in_rural_MP_%285102712755%29.jpg?width=900" alt="A tea-shop owner in rural Madhya Pradesh" width="100%" /><br />
+<sub><b>A tea-shop owner, rural Madhya Pradesh.</b> The smallest businesses have the least time for paperwork.<br />Photo: McKay Savage, <a href="https://commons.wikimedia.org/wiki/File:Teashop_owner_in_rural_MP_(5102712755).jpg">Wikimedia Commons</a>, CC BY 2.0</sub>
+</td>
+</tr>
+</table>
+
+### The pain, point by point
+
+| What the citizen faces today | What it costs them |
+|---|---|
+| Rules are scattered across **central, state and municipal** websites, each with its own layout. | Days spent just finding the right page. |
+| Forms are **outdated PDFs**, or portals that only accept typed input. | Re-typing the same name, PAN, Aadhaar and address into every form. |
+| Requirements **contradict** each other between departments and between cities. | Wrong documents, rejected applications, repeat visits. |
+| The order matters (for example Udyam first, then FSSAI, then trade licence) but nobody states it. | Applications filed in the wrong sequence and sent back. |
+| Fees and timelines are rarely written down in one place. | No budget and no schedule; a business that cannot plan its opening day. |
+| Language: official text is mostly English; many owners think in Hindi or Bengali. | Dependence on middlemen who charge for what should be free guidance. |
+| Sensitive identity data is handed to anyone who "helps". | Privacy and fraud risk. |
+
+---
+
+## 🎯 Who we are building this for
+
+| Persona | A day in their life | What Red Tape Navigator gives them |
+|---|---|---|
+| **The first-time shopkeeper** (bakery, cafe, tea stall, cloud kitchen, sweet shop, grocery) | Has the recipe and the lease; has never filed a government form. | A single ordered checklist with authority, fee, timeline and documents for each step, each cited. |
+| **The street vendor and home-food entrepreneur** | Works from a cart or a home kitchen; cannot afford an agent. | Plain-language steps, free of charge, in their own language. |
+| **The small business owner expanding** (second outlet, new city, new line of business) | Knows some rules, but not the new city's. | City-specific rules for nine cities, state-specific licences shown per state. |
+| **The regulated-sector founder** (clinic, pharmacy, school, coaching centre, jewellery, liquor retail) | Faces state laws that differ sharply. | State-by-state sourced rules, and an honest "no ordinary private route in this state" notice where that is true. |
+| **The Common Service Centre (CSC) operator and professional helper** | Files for many citizens every day. | Teams and workspaces to share a case with a colleague; reminders; downloadable plans. |
+| **The government officer or reviewer** | Wants the information the public sees to be correct. | An officer console where every rule is **verified, corrected or rejected**, with an audit trail. |
+
+---
+
+## 🇮🇳 How the Indian government context shaped the design
+
+Red Tape Navigator is built around the way Indian public services actually work. The references below are the official systems and laws the product points to
+or complies with. **We use them as sources and as guard-rails. We do not represent any government body, and this is not an official service.**
+
+| Government system or law | How it appears in the product |
+|---|---|
+| **Udyam Registration** (Ministry of MSME) | The first step in most small-business plans. We fill the details sheet and give a key-in sheet for the portal. |
+| **FSSAI and FoSCoS** (Food Safety and Standards Authority of India) | Food Business Registration or Licence, with the fee slabs read from FSSAI documents. We build a key-in sheet because FoSCoS is an online-only portal. |
+| **GST registration** (GST Council, GSTN) | Included as a step where turnover thresholds apply, with the threshold and timeline cited. |
+| **Municipal trade licence and Shops and Establishments Acts** | State and city specific: Kolkata, Mumbai, Delhi, Bengaluru, Chennai, Hyderabad, Pune, Ahmedabad and Surat, each with its own authority and fee structure. |
+| **Fire, pollution-board and labour approvals** | Shown with authority and conditions where we could read an official source. |
+| **State excise, drugs, clinical-establishment and education rules** | Liquor retail, retail drug licence, clinic and hospital registration, bio-medical waste, school recognition, college approval and coaching registration, each marked as state-specific. |
+| **BIS hallmarking** | Included for jewellers. |
+| **Digital Personal Data Protection Act, 2023 (DPDP)** | Explicit consent, purpose limitation, retention purge, export and erase, grievance contact, encrypted sensitive fields. See [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md). |
+| **Information Technology Act, 2000** and **Aadhaar (e-Sign) framework** | We integrate **Digio** for Aadhaar e-Sign and DigiLocker, with a signed webhook and a separate consent. |
+| **DigiLocker** and **UMANG** (MeitY, Digital India) | Document-fetch flow built against Digio's DigiLocker API; a UMANG adapter is mocked and labelled. |
+| **State Emblem of India (Prohibition of Improper Use) Act, 2005** | We **do not** use the State Emblem. The logo is a neutral tricolour mark; an authorised department may supply its own emblem by configuration. |
+| **Digital India, Ease of Doing Business and Startup India** | The wider push to make compliance simple is the reason this problem is worth solving. We are a citizen-side helper, not a replacement for any of these portals. |
+
+The product text is always written to be honest about its limits: where we could not read an official source, the app says so and routes the item to an officer review
+instead of inventing a rule.
+
+---
+
+## 🧭 Our approach and plan
+
+### The question we asked first
+
+> *How do we build an agent that does the research and the paperwork, **without** ever becoming something a citizen cannot trust?*
+
+A bureaucracy agent that invents a fee or files a wrong form is worse than no agent. So we did not start with a model. We started with **principles**, and let the model sit inside them.
+
+### Six principles
 
 | Principle | What it means in the product |
-| --- | --- |
-| Human in the loop | The citizen reviews every form and must tick an explicit consent box. Any later edit invalidates the review. There is no code path that submits to a government portal (a test enforces it). |
-| Ask only what is missing | An interview engine asks 1-2 questions at a time, validates each answer (PAN, Aadhaar checksum, PIN, IFSC, dates...), and never asks twice. |
-| Every claim is cited | Each fee, timeline, authority and document list carries a source URL, a fetch time, a content hash and a confidence score. Low confidence shows "verify with the authority". |
-| Honest about limits | Business types or states we have no sourced rules for get an honest note or an officer review, never a made-up checklist. |
-| Privacy by design | DPDP Act consent, encrypted Aadhaar/PAN/bank answers, audit log, retention purge, export and erase. |
-| Three languages | English, Hindi, Bengali across the interface and the backend text. |
+|---|---|
+| **1. Human in the loop** | The citizen reviews every form and ticks an explicit consent box. Any later edit invalidates the review. There is **no code path that submits** to a government portal. |
+| **2. Ask only what is missing** | The interview engine asks one or two questions at a time, validates each answer, remembers earlier answers and never asks twice. |
+| **3. Every claim is cited** | Each fee, timeline, authority and document list carries a source URL, a fetch time, a content hash and a confidence score. Low confidence shows "verify with the authority". |
+| **4. Honest about limits** | If we have no sourced rules for a business type or state, we say so, or route it to an officer. We never make up a checklist. |
+| **5. Privacy by design** | DPDP-style consent, encrypted Aadhaar, PAN and bank answers, a hash-chained audit log, retention purge, export and erase. |
+| **6. Three languages, free for everyone** | English, Hindi and Bengali across the interface and the backend text. No billing, price list or paywall exists in the code. |
 
-## 2. How the product works (citizen workflow)
+### The plan we followed
 
-1. **Sign up / log in** (email + password; password reset by email; lockout after repeated failures; email confirmation; optional two-factor sign-in with an authenticator app and one-time recovery codes; teams, see section 6).
-2. **Consent** (DPDP): a required "service" consent, optional "reminders", and a separate "identity providers" consent before data is
-   shared with Digio.
-3. **Describe the goal** in plain language, in any of the three languages. Intake extracts the business type, city and state.
-   If something is missing it asks one question (place first, then business type). Common misspellings are understood.
-4. **Research**: the plan is built from the rules knowledge base: an ordered, dependency-aware list of licences (for example Udyam, then
-   FSSAI, then trade licence...) with authority, fee, timeline and documents, each with its citation. State-specific licences (such as a
-   liquor licence) show that state's own rules; if there is no ordinary private route, a prominent notice says so.
-5. **Interview**: only the missing details, with validation. Sensitive answers (Aadhaar, PAN, bank) are encrypted.
-6. **Forms**: official PDFs are filled (AcroForm fill or flat-PDF overlay). Online-only portals (FoSCoS, Udyam) get a "key-in sheet".
-   Today the three bundled PDFs are watermarked placeholders until the authorities permit the real forms.
-7. **Review**: side-by-side preview and editable fields, with provenance for every value and a plain-language summary. The citizen ticks
-   the consent box to unlock download / e-Sign.
-8. **Done**: download the filled PDF, optionally sign with Aadhaar e-Sign (Digio), follow the submission checklist, and **submit yourself
-   on the official portal**.
-9. **Follow-up**: when the citizen says they submitted, status-check and renewal reminders are scheduled (email now, SMS via MSG91 once live).
+| Phase | Goal | What we delivered |
+|---|---|---|
+| **0. Understand** | Read the problem and real government sites; decide what "correct" means. | Assumptions, architecture and task plan (`docs/ASSUMPTIONS.md`, `docs/ARCHITECTURE.md`). |
+| **1. Core product** | Goal in, cited plan out, forms filled, human reviews. | Auth, consent, audit log, scraping guard, research agent, rules KB, interview engine, form filler, review checkpoint, officer console. |
+| **2. Production readiness** | Make it safe to run for real people. | Email, password reset, lockout, privacy export and erase, retention purge, deployment blueprints, UI redesign. |
+| **3. Integrations** | Real signing and identity. | Digio e-Sign and DigiLocker adapters with a signed webhook, tested against mocks. |
+| **4. Rules and coverage** | Replace generic rules with sourced ones. | 120 business types, 9 cities, 16 licences, 438 rules, state-specific liquor, drug, clinic and school rules. |
+| **5. Quality and CI** | Trust the build. | 7 CI jobs, PostgreSQL parity, security scans, browser end-to-end tests, evaluation set with a hallucination gate. |
+| **6. Language** | Reach people in their own language. | Complete Hindi and Bengali (interface **and** backend text). |
+| **7. Delight** | Make the journey feel good. | Progress ring, confetti when the checklist is done, print and WhatsApp share, reduced-motion support. |
+| **8. Hardening and the Document Vault** | Safe document storage and provider readiness. | Private vault with magic-byte checks, redaction before any model call, resilient adapters, help centre, disaster-recovery runbook. |
+| **9. AI provider choice** | Optional model help, free to run. | One switch for a local Ollama model or Google Gemini, with a circuit breaker and a deterministic rules-only fallback. |
 
-## 3. Architecture and pipelines
+---
 
-### 3.1 System view
+## 🔄 The workflow, step by step
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 1. Sign in and consent
+
+Email and password, optional two-factor sign-in with an authenticator app, and a **DPDP consent** screen: a required "service" consent, an optional "reminders" consent, and a separate consent before any identity-provider (Digio) sharing.
+
+</td>
+<td width="50%" valign="top">
+<img src="docs/media/02-consent.png" alt="Consent screen" width="100%" />
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/media/03-goal.png" alt="Describe your goal in plain language" width="100%" />
+</td>
+<td width="50%" valign="top">
+
+### 2. Say the goal in plain language
+
+"I want to open a small bakery in Kolkata", in English, Hindi or Bengali. **Intake** extracts the business type, city and state. If something is missing it asks **one** question (place first, then business type). Common spelling mistakes ("resturent") are understood.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 3. Research and the step-by-step plan
+
+The agent builds an **ordered, dependency-aware plan** (for example Udyam, then FSSAI, then trade licence) with authority, fee, timeline and documents for each step. **Every line shows its source, the date it was checked, a confidence score and a content hash**, plus a review tag: "Awaiting expert review" or "Expert-reviewed".
+
+</td>
+<td width="50%" valign="top">
+<img src="docs/media/04-plan.png" alt="The cited step-by-step plan" width="100%" />
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/media/05-interview.png" alt="The interview asks only what is missing" width="100%" />
+</td>
+<td width="50%" valign="top">
+
+### 4. The interview: only what is missing
+
+Conversational questions, one or two at a time, each **validated** (PAN format, Aadhaar Verhoeff checksum, PIN code, IFSC, dates). Aadhaar, PAN and bank answers are **encrypted** at rest. The progress bar and milestone cheers keep the citizen going.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 5. Forms filled, then a review checkpoint
+
+Official PDFs are filled automatically (AcroForm fill or flat overlay); online-only portals get a **key-in sheet**. The review screen shows a **side-by-side preview with editable fields**, the provenance of each value, and a plain-language summary. The citizen must tick the consent box before anything can be downloaded or signed.
+
+</td>
+<td width="50%" valign="top">
+<img src="docs/media/07-review.png" alt="Review before you sign" width="100%" />
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/media/09-done.png" alt="Ready to sign and submit" width="100%" />
+</td>
+<td width="50%" valign="top">
+
+### 6. Download, sign, submit yourself, follow up
+
+Download the filled PDF, optionally **e-Sign with Aadhaar** (Digio), follow the submission checklist and **submit on the official portal yourself**. When the citizen says they have submitted, **status-check and renewal reminders** are scheduled (email now, SMS once live) and can be exported to a calendar.
+
+</td>
+</tr>
+</table>
+
+---
+
+## ⚙️ How the app works: what does what
+
+### System view
 
 ```mermaid
 flowchart LR
-  B[Citizen browser] -->|HTTPS, Accept-Language| W[Next.js web on Vercel]
-  W -->|HTTPS, bearer token| A[FastAPI API on Render]
+  B[Citizen browser] -->|HTTPS, Accept-Language| W[Next.js web app]
+  W -->|HTTPS, bearer token| A[FastAPI API]
   A --> P[(PostgreSQL + pgvector)]
-  A --> R[(Redis)]
-  A -.-> L[Claude API, optional]
-  A -->|HTTPS allowlisted, read only| G[Official government pages]
+  A --> R[(Redis, optional)]
+  A -.->|optional, PII redacted| L[Ollama or Gemini]
+  A -->|allowlisted, read only| G[Official government pages]
   A -->|upload PDF, status| D[Digio: eSign + DigiLocker]
   D -->|signed webhook| A
   A --> M[MSG91 SMS]
   A --> S[SMTP email]
-  K[Worker: reminders, form re-checks] --> P
+  K[Scheduler: reminders, retention, form re-checks] --> P
   K --> M
   K --> S
 ```
 
-### 3.2 The request pipeline (what happens to one citizen goal)
+### The life of one citizen goal
 
 ```text
 goal text
-  -> intake (app/agent/intake.py)        rules first (keywords incl. typos, regulated-sector check, city/state); optional LLM fills gaps,
-                                          validated against the catalogue
-  -> clarify loop (api/sessions.py)      asks place, then business type; keeps earlier answers; a city answer is never a business type
-  -> research (app/agent/research.py)    plan = licences_for(activity) in dependency order (planner.py) + cited claims from the KB;
-                                          seeds missing licences on demand; adds notes (coverage, restricted-state) and officer review items
-  -> interview (app/interview)           only missing fields; validators; encrypted memory
-  -> form fill (app/forms)               AcroForm / flat overlay; field provenance report; key-in sheet for online-only portals
-  -> review checkpoint                   explicit consent; invalidated by any edit
-  -> download / e-Sign (integrations)    Digio: upload reviewed PDF -> signing link -> signed webhook -> signed copy on demand
-  -> citizen submits on the portal       (never the system)
-  -> reminders (followup + worker)       status check and renewal, in the citizen's language
+  -> intake        rules first (keywords incl. typos, regulated-sector check, city and state); an optional model fills gaps, then is validated against the catalogue
+  -> clarify       asks place, then business type; keeps earlier answers
+  -> research      plan = licences in dependency order + cited claims from the knowledge base; adds notes and officer-review items
+  -> interview     only the missing fields; validators; encrypted memory
+  -> form fill     AcroForm or flat overlay; per-field provenance; key-in sheet for online-only portals
+  -> review        explicit consent; invalidated by any edit
+  -> download / e-Sign   Digio: upload reviewed PDF -> signing link -> signed webhook -> signed copy
+  -> citizen submits on the official portal   (never the system)
+  -> reminders     status check and renewal, in the citizen's language
 ```
 
-### 3.3 The translation pipeline
+### What each part does
 
-Interface strings live in `frontend/messages/{en,hi,bn}.json` (next-intl). Backend text (licence names, every rule, document lists,
-authority names, form titles and field labels, checklists, notices) is stored in English and translated on the way out:
-the browser sends `Accept-Language` (`frontend/lib/api.ts`), `LocalizeMiddleware` (`backend/app/core/localize.py`) rewrites JSON responses
-for `/sessions/*` using the tables in `backend/app/i18n_content/` (`data_hi.py`, `data_bn.py`, aligned to `source.py`).
-Tests fail if an English string is added without a translation, or if a full Hindi/Bengali session still shows English.
+| Part | Where | What it does |
+|---|---|---|
+| **Intake agent** | `backend/app/agent/intake.py` | Turns free text into business type, city and state; handles typos and regulated sectors. |
+| **Planner** | `backend/app/agent/planner.py` | Orders licences by dependency. |
+| **Research agent** | `backend/app/agent/research.py` | Builds the plan with cited claims; seeds missing licences on demand. |
+| **LLM wrapper** | `backend/app/agent/llm.py` | One switch (`LLM_PROVIDER`) for Ollama, Gemini or none; redacts personal data first; circuit breaker and fail-fast retries; deterministic fallback. |
+| **Rules knowledge base** | `backend/app/kb/` | Catalogue of licences, 9 cities, 120 business types, sourced licences; claims carry source, hash, confidence. |
+| **Scraping guard** | `backend/app/scraping/` | Allowlist, robots.txt, redirect re-checks, size caps, sanitiser. SSRF and prompt-injection defence. |
+| **Interview engine** | `backend/app/interview/` | Field definitions, validators, question engine, encrypted memory. |
+| **Forms** | `backend/app/forms/` | Template registry, PDF filler, official-PDF fetch with officer approval, key-in sheets. |
+| **Follow-up** | `backend/app/followup/` | Submission checklist and reminders (email, SMS, calendar file). |
+| **Integrations** | `backend/app/integrations/` | Interfaces with labelled mocks, plus real Digio, MSG91, SMTP and UMANG adapters. **No interface has a "submit" method.** |
+| **API** | `backend/app/api/` | Auth, consent, sessions (the main flow), privacy, admin (officer console), webhooks, workspaces, documents. |
+| **Core** | `backend/app/core/` | Config, security, encryption, hash-chained audit log, middleware (headers, limits, metrics), translation middleware, vault storage and scanner. |
+| **Jobs** | `backend/app/jobs/` | Reminders, retention purge and weekly rule re-checks, as a worker or inside the API. |
+| **Translation** | `backend/app/i18n_content/` + `frontend/messages/` | Hindi and Bengali tables for backend text; interface strings for all three languages. |
+| **Web app** | `frontend/` | Next.js App Router, next-intl, Tailwind, the citizen journey, officer console, Document Vault, help centre. |
 
-### 3.4 The rules pipeline
+### The rules pipeline (why you can trust the numbers)
 
 ```text
-catalog.py (licences, 9 cities)  +  sourced_licences.py (read from official documents, state-specific by_city)
-  + business_types.py (114 types mapped to sourced licence sets)
-        -> seed_loader.py -> claims (key licence:scope:category, text, source_url, hash, confidence, seed flag) in the KB
-        -> verify_sources.py (reports which numbers appear on the live official page; never marks anything verified)
-        -> officer console review queue: verified / corrected / rejected (audited)
-        -> optional live refresh: POST /admin/refresh with an LLM; a claim is kept only if its quote appears verbatim on the page
+catalog.py (licences, 9 cities) + sourced_licences.py (read from official documents; state-specific by city)
+  + business_types.py (120 types mapped to licence sets)
+      -> seed_loader.py -> claims (text, source_url, hash, confidence)
+      -> verify_sources.py  reports which numbers appear on the live official page (never marks anything verified by itself)
+      -> officer console review queue: verified / corrected / rejected, every decision audited
+      -> optional live refresh: a claim is kept only if its quote appears verbatim on the page
 ```
 
-### 3.5 Deployment pipeline
+---
 
-`git push main` -> GitHub Actions CI (7 jobs, section 8) -> manual deploy (autoDeploy is off on purpose):
-Render Blueprints (`render.yaml`: zero-cost trial with one `rtn-api` and Postgres; `render.production.yaml`: `rtn-api`, `rtn-worker`, Postgres, Redis; the container entrypoint runs `alembic upgrade head` and loads the
-rules pack) + Vercel (frontend, Root Directory `frontend`). Alternative: `docker-compose.prod.yml` + Caddy on a VPS. See
-[`docs/DEPLOYMENT_VERCEL_RENDER.md`](docs/DEPLOYMENT_VERCEL_RENDER.md).
+## ✨ Every feature
 
-## 4. What is done, and how it was done
+### For the citizen
 
-The work happened in phases (November 2026). Each phase ended with tests, lint and CI green and a commit pushed to `main`.
+- **Natural-language goal** in English, Hindi or Bengali, with spelling-mistake tolerance.
+- **Dependency-ordered licence plan**: authority, fee, timeline, documents, **with a citation for every line**.
+- **9 cities, 120 business types, 16 licences**, including state-specific liquor, drug, clinic, school and coaching rules.
+- **Honest coverage notes** for regulated sectors we cannot fully source (bank, insurance, post office and similar).
+- **Conversational interview** that asks only what is missing and never twice.
+- **Validators** for PAN, Aadhaar (Verhoeff checksum), mobile, PIN code, IFSC, dates.
+- **Auto-filled forms** with per-field provenance and a **key-in sheet** for FoSCoS and Udyam.
+- **Review checkpoint** with editable fields, plain-language summary and a mandatory consent tick-box.
+- **Aadhaar e-Sign and DigiLocker** through Digio (demo-labelled until credentials exist).
+- **Submission checklist** and **reminders** by email and SMS, plus **calendar (.ics) export**.
+- **Print or save as PDF**, copy the checklist, **share to WhatsApp** (licence names only, never personal data).
+- **Document Vault**: private upload of PDF, PNG and JPEG up to 5 MB with magic-byte checks and per-owner isolation.
+- **Progress ring, badges and confetti** (skipped when the system asks for reduced motion).
+- **Voice input** for the goal and a **Help centre** with searchable common questions.
+- **Fully free**: no billing, price list or paywall in the code.
 
-### Phase 1: the core product (10 steps, see `docs/TASKS.md`)
+### For teams and professionals
 
-- **How:** monorepo (`backend/`, `frontend/`, `docs/`, `infra/`), FastAPI + SQLAlchemy async + Alembic, Next.js App Router + next-intl.
-- Auth (JWT with rotating refresh tokens and reuse detection, RBAC), DPDP consent, hash-chained audit log, field encryption (Fernet).
-- Scraping guard (HTTPS only, domain allowlist re-checked on redirects, robots.txt, rate limit, size cap, captcha/login = human handoff),
-  research agent and rules KB with citations, confidence and diffing.
-- Interview engine with validators and encrypted memory; form registry and PDF filler with provenance; review checkpoint; officer console.
-- Adapter pattern for integrations with clearly labelled mocks. **No interface has a "submit" method** (a test fails if one appears).
+- **Workspaces** with owner, admin and member roles; **invitation links** the inviter shares; sessions stay private until their owner shares one into a team.
+- **Email confirmation** and **two-factor sign-in** (TOTP, RFC 6238) with eight one-time recovery codes.
 
-### Phase 2: production readiness
+### For officers and reviewers
 
-- Real SMTP email, password reset (single-use 30-minute links), change password, account lockout, privacy export/erase, retention purge.
-- Production config validation that refuses an unsafe start; officer bootstrap (`backend/scripts/create_admin.py`, inside the image).
-- Deployment files: `render.yaml` (free trial) and `render.production.yaml` (launch), `docs/DEPLOY_NOW.md`, `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh`, Vercel guide, `docker-compose.prod.yml` + Caddy, asyncpg URL normalisation for Render.
-- UI redesign (tricolour mark, saffron/navy/green palette), a hydration fix, accessibility basics, privacy/terms pages (en/hi/bn) that read
-  retention period, hosting region and grievance contact live from the API.
-- MSG91 SMS adapter (Flow API), unit-tested with a mocked transport.
+- **Officer console**: review queue where each rule is **verified, corrected or rejected**; official PDF fetch and approval; audit-chain check.
+- **Rule freshness check** in CI, and a reviewer worksheet export (`docs/RULES_REVIEW_EXPORT.csv`).
 
-### Phase 3: integrations (Digio eSign and DigiLocker)
+### Privacy and security
 
-- **How:** read Digio's documentation in a real browser (it is JavaScript-rendered, in a shadow DOM), then redesigned the interfaces: e-Sign is
-  now upload-PDF / signing link / status / signed copy; DigiLocker is start request / wait for consent / status.
-- `backend/app/integrations/real/digio.py`, webhook `POST /webhooks/digio` (HMAC `X-Digio-Checksum`, duplicate suppression, optional IP allowlist),
-  `external_requests` and `webhook_events` tables (migration 0004), a separate `identity_providers` consent, endpoints and UI for signing.
-- 28 unit tests against a mocked Digio. **Never run against the real sandbox** (no credentials yet). DigiLocker data-field mapping is not
-  implemented because the response shape was not confirmed; it is deliberately not guessed (`docs/INTEGRATIONS.md`).
+- **DPDP-style consent** per purpose (service, reminders, identity providers), **export and erase** of personal data, **retention purge**.
+- **Field-level encryption** (Fernet) for Aadhaar, PAN and bank answers; **PII redaction** in logs and before any model call.
+- **Rotating refresh tokens with reuse detection**, account lockout, constant-cost login, rate limiting.
+- **Hash-chained audit log**, signed provider webhooks, CSP and HSTS headers, non-root containers, dependency and secret scans in CI.
+- **Allowlisted outbound fetching** (SSRF defence) and **prompt-injection defences**.
 
-### Phase 4: rules, sources and coverage
+### Reliability and operations
 
-- **How:** official pages and documents were read in a browser or extracted locally (PyMuPDF, isolated Python) and recorded with their sources
-  in `docs/RULES_VERIFICATION.md`; nothing is copied from memory.
-- `make verify-sources` now reports numeric versus qualitative claims; a reviewer worksheet is exported (`docs/RULES_REVIEW_EXPORT.csv`, now 438 rules).
-- **Sourced licences** (`backend/app/kb/sourced_licences.py`): liquor retail (state-specific for all 9 cities: West Bengal, Maharashtra, Delhi,
-  Karnataka e-auction from the 01.07.2026 Gazette, Tamil Nadu, Telangana, Gujarat), retail drug licence (Delhi checklist + Drugs Rules), pet shop
-  (final Pet Shop Rules 2018), clinic/hospital registration, bio-medical waste, school recognition, college approval, coaching registration, BIS
-  hallmarking for jewellers.
-- **120 business types** (`backend/app/kb/business_types.py`), including hotel, gold shop, ration shop, pharmacy, school, college, clinic, hospital.
-  Regulated sectors with no sourced checklist (bank, insurance, post office...) get an accurate regulator note.
-- Licences with extra permits outside the pack carry `coverage="specific"` (the UI says so and an officer is asked to confirm).
-- Hyderabad trade licence fee table (GHMC) and Ahmedabad shops-and-establishments (AMC) were added from official pages.
+- **Health, liveness and readiness endpoints**, Prometheus metrics, OpenTelemetry, optional Sentry, JSON logs with request ids.
+- **Backup-and-restore drill in CI**, disaster-recovery runbook, scheduler inside the API for single-instance hosting.
+- **Deployment blueprints** for Render and Vercel, Docker Compose with Caddy, and a Terraform skeleton.
 
-### Phase 5: quality, CI and bug fixes
+---
 
-- Fixed the browser e2e tests (the UI no longer has a demo account: tests now sign up a real account, decide answers by question type, and use
-  `/ready` so another app on port 8000 is never mistaken for this one). Fixed the gitleaks CI step (needs `fetch-depth: 0`).
-- Fixed: old local SQLite files lacking new columns made login return 500 ("Could not sign in"); `sqlite_upgrade.py` now adds missing columns
-  in dev. Fixed: licences added after a KB was seeded showed empty steps (research now loads claims for any licence that has none).
-- Fixed the follow-up question flow: a city answer was taken as the business type; earlier answers were forgotten; typos like "resturent" and
-  words like "cake" were not recognised.
+## 🖼️ Screenshots of the running app
 
-### Phase 6: full Hindi and Bengali
+All images below were captured from the real application running locally (English unless stated).
 
-- About 275 backend strings per language (licence names, all rules, documents, authorities, form titles and field labels), the
-  `LocalizeMiddleware`, reminder titles in the citizen's language, and tests that check a complete Hindi and Bengali session. **Native-speaker
-  review is still pending.**
+| Landing and sign-in | Cited plan (full page) |
+|---|---|
+| <img src="docs/media/01-home.png" alt="Landing page" width="100%" /> | <img src="docs/media/04b-plan-full.png" alt="Full plan page" width="100%" /> |
+| **Review: official-style FSSAI Form A** | **Ready to sign and submit** |
+| <img src="docs/media/08-review-fssai.png" alt="FSSAI form review" width="100%" /> | <img src="docs/media/09b-done-full.png" alt="Done screen" width="100%" /> |
+| **Hindi (हिन्दी)** | **Bengali (বাংলা)** |
+| <img src="docs/media/14-hindi.png" alt="Hindi interface" width="100%" /> | <img src="docs/media/15-bengali.png" alt="Bengali interface" width="100%" /> |
+| **My applications dashboard** | **Document Vault** |
+| <img src="docs/media/16-dashboard.png" alt="Dashboard" width="100%" /> | <img src="docs/media/13-vault.png" alt="Document Vault" width="100%" /> |
+| **Account, privacy and two-factor** | **Help centre** |
+| <img src="docs/media/12-account.png" alt="Account page" width="100%" /> | <img src="docs/media/11-help.png" alt="Help centre" width="100%" /> |
 
-### Phase 7: delight and motion (frontend)
+<div align="center">
 
-- Pure CSS and small React helpers in `frontend/components/fx/` (no new packages): scroll reveals, counting stats, floating glow orbs, a
-  rotating example goal in the empty goal box, card tilt, a shimmer on the main button, page fade-in (`app/[locale]/template.tsx`).
-- Checklist: each step can be ticked off (kept only in this browser's storage, never sent anywhere), a progress ring, a pulsing "Next up"
-  marker, and a tricolour confetti burst when every step is done. The finished-forms screen also celebrates.
-- Interview: slide-in chat bubbles, a typing indicator, an animated progress bar and milestone cheers. Dashboard: a progress ring and
-  badges derived from the citizen's own plans.
-- The plan can be printed or saved as PDF (print stylesheet), copied, or shared to WhatsApp (licence names only, never answers or identifiers).
-- Every rule shows a review tag: "Awaiting expert review" until a reviewer verifies it in the officer console, then "Expert-reviewed".
-- Every effect is skipped when the visitor's system asks for reduced motion; the strings exist in `en`, `hi` and `bn`.
+**Phone-sized screen (Pixel 7 emulation)**
 
-### Phase 5: hardening, document vault and provider readiness (merged from Anish Goswami's work)
+<img src="docs/media/17-mobile.png" alt="Mobile layout" width="280" />
 
-- **Document Vault** (`backend/app/api/documents.py`, `core/storage.py`, `core/scanner.py`, migration 0009, `/documents` page): private upload of
-  PDF/PNG/JPEG up to 5 MB with magic-byte checks, per-owner isolation, optional external malware scan, and local or S3-compatible storage
-  (`STORAGE_BACKEND=local|s3`). Local storage is ephemeral on Render free instances: use `s3` before relying on it.
-- Hardening: PII redaction before text reaches a language model, resilient SMTP/MSG91/Digio adapters, audit-log and crypto improvements,
-  migration 0008 (cascade on external requests), DPDP erasure now covers vault files, reminders can be listed with channel status and cancelled.
-- Help centre with search and categories (`/help`, en/hi/bn) that shows the live grievance contact; backup/restore tool `scripts/db_backup_restore.py`
-  with non-production safeguards; disaster-recovery runbook (`docs/RUNBOOK.md`); a code audit in `docs/FINAL_PROJECT_AUDIT.md`.
+</div>
 
-## 5. Technology and tools used
+> The form shown is a **watermarked placeholder** ("not an official government document, do not submit"). Real FSSAI and department forms are loaded only after the
+> authority gives permission. The identity numbers in these screenshots are test values that pass the checksums.
+
+---
+
+## 🧰 Technology and tools we used
 
 | Area | Used |
-| --- | --- |
-| Backend | Python 3.12+ (3.13 works), FastAPI, Uvicorn, Pydantic v2, SQLAlchemy 2 (async), Alembic, asyncpg / aiosqlite, ARQ worker, Redis, httpx |
-| Database | PostgreSQL with pgvector (production), SQLite (local dev and tests) |
-| AI | Optional and free to run: a local Ollama model (`OLLAMA_MODEL`) or Google Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`), through one provider switch in `app/agent/llm.py` (`LLM_PROVIDER`); model names come from env, never hard-coded; deterministic rules-first mode needs no model at all |
-| PDFs and scraping | PyMuPDF, pypdf, reportlab, trafilatura, Playwright (optional JS rendering), PyYAML allowlist |
-| Security | passlib/bcrypt, PyJWT, cryptography (Fernet / MultiFernet), structlog with PII redaction, in-process sliding-window rate limiter in `core/middleware.py` |
-| Observability | Prometheus metrics, OpenTelemetry, optional Sentry, JSON logs with request ids |
-| Frontend | Next.js 15.5, React 19, TypeScript 5, next-intl 4 (en/hi/bn), Tailwind CSS 3, Vitest 5, Playwright |
-| Quality | pytest + pytest-asyncio + coverage (gate 80%, actual ~95.7%), ruff, mypy, eslint, tsc, evals (golden cases, hallucination gate) |
-| Security scans | pip-audit, bandit, npm audit, gitleaks, Trivy (container), CodeQL (opt-in) |
-| CI | GitHub Actions: 7 jobs (backend, backend on Postgres + pgvector with Alembic up/down/up, frontend, Playwright e2e, security, container build + scan, compose smoke) |
-| Hosting | Render (API, worker, Postgres, Redis; Singapore, no India region), Vercel (web); VPS alternative with Docker Compose + Caddy; Terraform skeleton in `infra/` |
-| Third parties | Digio (eSign + DigiLocker), MSG91 (SMS, TRAI DLT), an SMTP provider (SES / Brevo / SendGrid / NIC mail), UptimeRobot-style monitor |
-| How the work was done | Claude Code as the engineering assistant, with the Claude in Chrome extension to read official sites and API docs read-only, `gh` CLI for CI status, local PyMuPDF for PDFs |
+|---|---|
+| **Backend** | Python 3.12+, FastAPI, Uvicorn, Pydantic v2, SQLAlchemy 2 (async), Alembic (nine migrations), asyncpg and aiosqlite, ARQ worker, Redis, httpx |
+| **Database** | PostgreSQL with pgvector (production), SQLite (local development and tests) |
+| **AI (optional, free to run)** | A local **Ollama** model or **Google Gemini** through one provider switch; model names come from environment variables; a deterministic rules-first mode needs no model at all |
+| **PDFs and scraping** | PyMuPDF, pypdf, reportlab, trafilatura, Playwright (optional JavaScript rendering), a YAML domain allowlist |
+| **Security** | bcrypt, PyJWT, `cryptography` (Fernet), structlog with PII redaction, sliding-window rate limiter |
+| **Observability** | Prometheus, OpenTelemetry, optional Sentry, JSON logs |
+| **Frontend** | Next.js 15, React 19, TypeScript, next-intl (en, hi, bn), Tailwind CSS, Vitest, Playwright |
+| **Quality** | pytest and coverage (gate 80%, actual about 95%), ruff, mypy, eslint, tsc, an evaluation set with a hallucination gate |
+| **Security scans** | pip-audit, bandit, npm audit, gitleaks, Trivy (container) |
+| **CI** | GitHub Actions, 7 jobs: backend, backend on PostgreSQL with Alembic up and down, frontend, Playwright end-to-end, security, container build and scan, compose smoke test |
+| **Hosting** | Render (API, Postgres) and Vercel (web); VPS alternative with Docker Compose and Caddy; Terraform skeleton |
+| **Third parties** | Digio (Aadhaar e-Sign and DigiLocker), MSG91 (SMS, with TRAI DLT), an SMTP provider |
+| **How we built it** | Claude Code as an engineering assistant, with the Claude in Chrome extension to read official sites and API documents read-only, the `gh` CLI for CI status, and PyMuPDF for PDF extraction |
 
-## 6. Current status: real, simulated, untested
+---
 
-Numbers as of the last update: **459 backend tests** passing (about 95.8% coverage), 5 frontend unit tests, 12 browser e2e tests, **9 cities**,
-**120 business types**, **16 licences** (2 state-specific by city), **438 seeded rules**, **3 languages**, **7 CI jobs** green.
+## 🏗️ Architecture and pipelines
+
+```mermaid
+flowchart TB
+  subgraph Client
+    UI[Next.js pages: goal, plan, interview, review, done, vault, teams, account, officer console]
+  end
+  subgraph API[FastAPI]
+    MW[Middleware: security headers, rate limit, metrics, translation]
+    AG[Agent: intake, planner, research, llm]
+    IV[Interview: validators, encrypted memory]
+    FM[Forms: registry, PDF filler]
+    FU[Follow-up: checklist, reminders]
+    IT[Integrations: Digio, MSG91, SMTP, UMANG]
+  end
+  subgraph Data
+    DB[(PostgreSQL / SQLite)]
+    KB[(Rules knowledge base with citations)]
+    VT[(Document Vault: local or S3)]
+  end
+  UI --> MW --> AG
+  AG --> KB
+  AG --> IV --> FM --> FU
+  FM --> IT
+  API --> DB
+  API --> VT
+```
+
+Deployment path: `git push main` triggers GitHub Actions (7 jobs), then the Render Blueprint (`render.yaml` for a zero-cost trial, `render.production.yaml` for launch)
+runs `alembic upgrade head` and loads the rules pack, and Vercel serves the web app. Details: [`docs/DEPLOY_NOW.md`](docs/DEPLOY_NOW.md).
+
+---
+
+## 🧗 Challenges we faced and how we solved them
+
+| # | Challenge | How we dealt with it |
+|---|---|---|
+| 1 | **Government sites are hostile to automation.** Many reset connections, block non-browser clients, hide content behind JavaScript, or publish scanned PDFs. | We read pages in a **real browser, read-only**, extracted PDFs locally with PyMuPDF, recorded every attempt (including dead ends) in `docs/RULES_VERIFICATION.md`, and never bypassed a firewall or CAPTCHA. Where we could not read a source we say so in the product. |
+| 2 | **An agent that hallucinates fees is dangerous.** | Rules-first design: the model is optional, every claim needs a source URL and hash, a live refresh keeps a claim only if its quote appears **verbatim** on the page, and an **evaluation set with a hallucination gate** runs in CI (26 golden cases, zero invented facts). |
+| 3 | **Sensitive identity data meeting a language model.** | **Redaction** before any model call, field-level encryption at rest, redacted logs, a separate consent for identity providers, and a deterministic fallback so the product works with no model at all. |
+| 4 | **"Autonomous" versus "safe".** The brief says auto-fill for submission; the law and common sense say a human must sign. | A **review checkpoint** with an explicit consent box, invalidated by any edit, and an architectural rule that **no interface has a submit method**, enforced by a test. |
+| 5 | **We cannot legally ship official forms without permission.** | Three **watermarked placeholder forms** now, a fetch-and-approve workflow for officers, and a request to the authority for permission. |
+| 6 | **Rules differ by state and city** (liquor, drugs, clinics, schools). | State-specific `by_city` entries for all nine cities, an explicit "no ordinary private route" notice where true, and catalogue-integrity tests that fail on gaps. |
+| 7 | **Hindi and Bengali had to be complete, not decorative.** | A translation middleware for backend text, about 275 strings per language, and tests that fail if an English string is added without a translation or if a full Hindi or Bengali session shows English. |
+| 8 | **A model provider that is slow or down** (a real 503 "high demand" from Gemini during testing). | A **circuit breaker** and fail-fast retries, then the deterministic rules-only path. The user never waits on a flaky model. |
+| 9 | **Tests that depended on a developer's own settings.** A personal `.env` once changed test results. | **Hermetic tests**: the suite ignores `backend/.env` and blanks every model key; browser tests run the API with the model off. |
+| 10 | **Local and CI database differences.** A SQLite-only statement failed the PostgreSQL CI job. | Dialect-guarded setup and a dedicated **PostgreSQL plus pgvector CI job** with migration up, down and up again. |
+| 11 | **UI bugs only a real browser shows**: the header and dashboard did not update after sign-in or log-out; download buttons showed raw file names; dates ignored the language; two consent buttons had the same accessible name. | We reviewed the live app in a real browser and fixed each: an `rtn:auth` event keeps the header and dashboard in sync, readable download labels, locale-aware dates, distinct accessible names, and a new end-to-end test. |
+| 12 | **Free hosting limits.** Render's free tier sleeps, has no shell and expires its database in 30 days. | A zero-cost trial Blueprint with an in-process scheduler, a first officer created from environment variables, and a documented upgrade path to a production Blueprint. |
+| 13 | **Merging two teammates' diverged work** (core product and the hardening and Document Vault branch). | A careful three-way merge with 12 conflicts resolved by hand, then the full test suite and CI to prove nothing regressed. |
+| 14 | **Dependency bots opening unwanted pull requests.** | We removed the Dependabot config and recorded it as a rule in the contributor notes. |
+
+---
+
+## 🧪 Quality and testing
+
+| Check | Result |
+|---|---|
+| Backend tests (pytest) | **491 passing**, coverage **95.4%** (gate 80%) |
+| Static analysis | ruff clean, mypy clean (87 source files) |
+| AI evaluation set | 26 golden cases, **0 hallucinations**, full citation coverage |
+| Rule freshness | 438 of 438 rules checked in CI |
+| Frontend | eslint, tsc, **10 unit tests**, production build |
+| Browser end-to-end (Playwright) | **13 tests**, desktop and mobile |
+| Continuous integration | **7 of 7 jobs passing** on the latest `main` |
+| Security scanning | pip-audit, bandit, npm audit, gitleaks, Trivy |
+
+Run it yourself: `make test`, `make lint`, `make eval`, `make e2e`. Full details: [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md#8-quality-gates-ci-and-testing).
+
+---
+
+## 🔎 Honest status: real, simulated, untested
+
+We would rather state our limits than hide them.
 
 | Area | Status |
-| --- | --- |
-| Intake, research, rules KB, interview, validators, encrypted memory, review, downloads, checklist, reminders | **Built and tested** |
-| Accounts, password reset by SMTP, officer console, audit check, privacy export/erase, retention purge | **Built and tested** (SMTP needs real credentials in production) |
-| Email confirmation (48-hour signed link, bound to the address) | **Built and tested**; the mail itself needs SMTP |
-| Two-factor sign-in (TOTP, RFC 6238, built on the standard library; codes cannot be replayed; 8 hashed one-time recovery codes; wrong codes count towards lockout) | **Built and tested**, including a browser test. Not yet tried with a real authenticator app |
-| Teams (workspaces; roles owner, admin, member; invitation links the inviter shares themselves; sessions are private until their owner shares one into a team; leaving, removing, deleting and account erasure handled) | **Built and tested**. Invitations are never e-mailed. Pages: `/teams`, `/invite`, `/verify-email`, and two-factor on `/account` |
-| Everything is free: no billing, prices or payments exist in the code (`docs/BUSINESS_MODEL.md`) | **By design**, enforced by `tests/test_free_forever.py` |
-| Rules content | **Seed data from official sources, all flagged "verify"**; none signed off by a reviewer yet; gaps listed in `docs/RULES_VERIFICATION.md` |
-| Official PDFs | **Watermarked placeholders** (3 forms) until FSSAI / departments permit the real forms |
-| Digio eSign and DigiLocker | **Built, unit-tested with mocks, never run against the real sandbox**; DigiLocker field mapping not implemented |
-| MSG91 SMS | **Built, never sent live** (needs TRAI DLT approval) |
-| UMANG, WhatsApp | **Mocked and labelled** (no real adapters) |
-| Hindi / Bengali | **Complete in code and tests; not yet reviewed by native speakers** |
-| Privacy / terms pages | **Built**, shown as "draft, pending legal review" until `NEXT_PUBLIC_LEGAL_REVIEWED=true` |
-| Reminders as a calendar file (`GET /sessions/{id}/reminders.ics`, button after reminders are set) | **Built and tested** |
-| Scheduled jobs inside the API (`RUN_SCHEDULER=true`, no worker or Redis needed on one instance); first officer from `BOOTSTRAP_ADMIN_*` | **Built and tested** |
-| `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates | **Built and browser-tested**; private pages are excluded from search engines |
-| Help page with nine common questions (`/help`, linked in the footer) in English, Hindi and Bengali | **Built and browser-tested**; Hindi and Bengali wording awaits native review |
-| Backup-and-restore drill (`scripts/backup_restore_drill.sh`) | **Runs in CI** on every push against PostgreSQL |
-| Production deployment | **Not deployed; in progress.** The owner's Render and Vercel accounts exist and Render parsed `render.yaml` (2026-11-12). The Blueprint is waiting for six values only the owner can type; then Vercel and the live checks. Status of every step: `docs/OWNER_ACTIONS.md` |
-| Load test, backup-restore test, pentest, real-device test, pilot | **Not done** |
+|---|---|
+| Intake, research, rules, interview, validators, encrypted memory, review, downloads, checklist, reminders | ✅ **Built and tested** |
+| Accounts, two-factor sign-in, teams, officer console, privacy export and erase, Document Vault | ✅ **Built and tested** (real email needs SMTP credentials; not yet tried with a physical authenticator app) |
+| Rules content | 🟡 **Seeded from official sources, every rule flagged "verify with the authority"**; none signed off by a human reviewer yet |
+| Official PDFs | 🟡 **Watermarked placeholders** until the authorities permit the real forms |
+| Digio e-Sign and DigiLocker | 🟡 **Built and tested against mocks**; never run against the real sandbox; DigiLocker field mapping deliberately not guessed |
+| MSG91 SMS | 🟡 **Built, never sent live** (needs TRAI DLT approval) |
+| UMANG and WhatsApp | ⚪ **Mocked and labelled** |
+| Hindi and Bengali | 🟡 **Complete in code and tests; native-speaker review pending** |
+| Live deployment | ⏳ **Not deployed yet**: the deployment files are ready and waiting for the owner's account values |
+| Load test, penetration test, real-device test, pilot | ⏳ **Not done** |
 
-## 7. Quick start
+---
 
-Prerequisites: Python 3.12+, Node 20+ (CI uses 22), Git. Docker is optional.
+## 🛣️ Pending work and roadmap
 
-**Windows shortcut:** after the one-time setup below (virtual environment and `npm install`), double-click `Start-Red-Tape-Navigator.bat`. It migrates the local database, loads the rules, starts the API and the website in two windows and opens http://localhost:3000/en. Close those two windows to stop the app.
+### Pending (in priority order)
 
-**Without Docker** (SQLite, no Redis, no LLM key needed):
+| # | Item | Who | Notes |
+|---|---|---|---|
+| 1 | **Go live** on Render and Vercel | Owner | Follow [`docs/DEPLOY_NOW.md`](docs/DEPLOY_NOW.md); then run `scripts/verify_deploy.py`. |
+| 2 | **Rules verification** by a human reviewer | Reviewer | Mark each rule verified, corrected or rejected in the officer console; close the known gaps in `docs/RULES_VERIFICATION.md`. |
+| 3 | **Digio sandbox, then production** | Owner and third party | Run the sandbox checklist; implement DigiLocker mapping from a real response. |
+| 4 | **MSG91 SMS live** | Owner | Complete TRAI DLT registration. |
+| 5 | **Official forms** with permission | Owner | Ask FSSAI and departments; add field maps; keep the key-in sheets. |
+| 6 | **Native-speaker review** of Hindi and Bengali | Reviewers | Especially legal and fee wording. |
+| 7 | **Launch hardening** | Owner and counsel | Legal review of privacy and terms; real-phone, screen-reader and slow-network tests; penetration test; secret-rotation plan. |
+| 8 | **Pilot** with 5 to 10 shop owners | Team | See [`docs/PILOT_PLAN.md`](docs/PILOT_PLAN.md). |
+| 9 | **Rotate any key shared during development** | Owner | Standard hygiene before launch. |
+
+The owner's ordered, click-by-click list with a status for each step is [`docs/OWNER_ACTIONS.md`](docs/OWNER_ACTIONS.md); every go-live item is in [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).
+
+### Future ideas (not built yet)
+
+- **More cities and states**, then district-level coverage (we left Jaipur and Lucknow out because sources conflicted).
+- **Beyond business licences**: residential zoning and building permits, agricultural schemes and grants, ration and welfare applications, which are the other examples in the original problem statement.
+- **Real UMANG and WhatsApp** adapters, so reminders and status checks arrive where people already are.
+- **Partner portal** for CSC operators and professionals, with delegation and bulk cases.
+- **Per-licence landing pages** and a **support-ticket inbox**.
+- **Cookie-based sessions** behind a single domain, nonce-based CSP, shared rate limiting.
+- **Voice-first flows** and more Indian languages (Tamil, Telugu, Marathi, Gujarati, Kannada and others).
+- **DigiLocker field import** so a citizen's verified documents fill the forms with one tap.
+- **A government-side API** so departments can publish their rules directly, replacing our scraping with first-party data.
+
+---
+
+## 🔭 Our vision
+
+> **Nobody in India should need a middleman to understand what their own government requires of them.**
+
+We imagine a country where starting a bakery, a clinic, a school or a farm is limited by skill and effort, not by the ability to decode a PDF.
+Red Tape Navigator is a step towards that: a **free, multilingual, citizen-side guide** that is honest about what it knows, shows its sources, protects personal data, and
+leaves the final decision and signature with the person it serves. In the long run, we want departments to be able to **publish their requirements once** and let any citizen
+see them in their own language, in order, with the documents ready.
+
+Three commitments guide every decision:
+
+1. **Trust before automation.** A correct, cited answer beats a fast, confident wrong one.
+2. **Inclusion by default.** Free for everyone, in local languages, working on a phone.
+3. **Privacy and consent.** The citizen's data is theirs; we collect the minimum and erase it on request.
+
+---
+
+## 🚀 Quick start
+
+Prerequisites: Python 3.12+, Node 20+, Git. Docker is optional.
+
+**Windows shortcut:** after the one-time setup, double-click `Start-Red-Tape-Navigator.bat`.
+
+**Without Docker** (SQLite, no Redis, no model key needed):
 
 ```bash
 cd backend
@@ -300,174 +628,134 @@ python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\act
 pip install -e ".[dev]"
 export DATABASE_URL=sqlite+aiosqlite:///./dev_local.db
 alembic upgrade head && python -m app.kb.seed_loader
-uvicorn app.main:app --port 8000                     # API (docs at /docs in dev)
+uvicorn app.main:app --port 8000                     # API docs at /docs in dev
 
 cd ../frontend && npm ci
-npm run dev                                          # http://localhost:3000 (or: npm run build && npm run start)
+npm run build && npm run start                       # http://localhost:3000
 ```
 
-Open <http://localhost:3000>, **create an account** (any email, password of at least 10 characters), accept the data notice and describe a goal.
-With `DEMO_MODE=true` (the default) e-Sign and other unconfigured integrations show a labelled "Demo mode: simulated" message. Walkthrough:
-[`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
+Open <http://localhost:3000>, create an account (password of at least 10 characters), accept the data notice and describe a goal.
+With Docker: `make setup && make dev`.
 
-With Docker: `make setup && make dev` (db, redis, api, worker, web).
+**Optional AI:** set `LLM_PROVIDER=gemini` with `GEMINI_API_KEY` and `GEMINI_MODEL`, or `LLM_PROVIDER=ollama` with `OLLAMA_MODEL`. Leave it unset for the rules-only mode.
+Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
 
 | Command | What it does |
-| --- | --- |
-| `make setup` / `make dev` / `make stop` | install / run the whole stack / stop |
-| `make test` | backend pytest (**coverage gate 80%**) + frontend unit tests |
+|---|---|
+| `make test` | backend tests with an 80% coverage gate, plus frontend unit tests |
 | `make lint` | ruff, mypy, eslint, tsc |
-| `make eval` | golden cases, citation coverage, hallucination gate |
-| `make e2e` | Playwright end-to-end |
-| `make smoke` | demo scenario through the API of a running stack |
-| `make migrate` / `make seed` | Alembic migrations / load the rules pack |
+| `make eval` | golden cases, citation coverage and the hallucination gate |
+| `make e2e` | Playwright browser tests |
 | `make verify-sources` | check cited sources against the live official sites |
-| `make audit` | pip-audit, bandit, npm audit |
-| `make keygen` | generate a Fernet key for `FIELD_ENCRYPTION_KEY` |
-| `make loadtest` | Locust ([baseline](docs/LOAD_TEST.md)) |
 
-Windows and local-run notes: never run `npm run build` while `npm run dev` or `npm run start` is running (they share `.next`); stop servers first.
-The e2e suite needs ports 3000 and 8000 free (set `E2E_BACKEND_CMD` to your venv's uvicorn command if `python` is not the venv).
+---
 
-## 8. Quality gates, CI and testing
+## 📚 Documentation index
 
-Run all of these before every push, and report real output:
+**Start here:** [Developer and operations guide](docs/DEVELOPER_GUIDE.md) (architecture, phase history, configuration reference, lessons learned) ·
+[Owner actions](docs/OWNER_ACTIONS.md) · [Launch checklist](docs/LAUNCH_CHECKLIST.md) · [Handoff prompt](docs/HANDOFF_PROMPT.md)
 
-```bash
-cd backend && ruff check . && mypy app && python -m pytest && python -m evals.run && python ../scripts/rule_freshness.py --strict
-cd ../frontend && npm run lint && npm run typecheck && npm test && npm run build
-cd frontend && npx playwright test          # needs the ports free
-```
+| Topic | Documents |
+|---|---|
+| **Product and planning** | [Problem statement](Problem_Statement.md) · [Architecture](docs/ARCHITECTURE.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Task history](docs/TASKS.md) · [Business model](docs/BUSINESS_MODEL.md) · [Demo script](docs/DEMO_SCRIPT.md) |
+| **Rules and integrations** | [Rules verification log](docs/RULES_VERIFICATION.md) · [Reviewer worksheet](docs/RULES_REVIEW_EXPORT.csv) · [Integrations](docs/INTEGRATIONS.md) |
+| **Deploy and operate** | [Deploy now](docs/DEPLOY_NOW.md) · [Vercel and Render](docs/DEPLOYMENT_VERCEL_RENDER.md) · [VPS deployment](docs/DEPLOYMENT.md) · [Runbook](docs/RUNBOOK.md) · [Load test](docs/LOAD_TEST.md) · [Go-live notes](docs/GO_LIVE.md) |
+| **Security and compliance** | [Security (OWASP)](docs/SECURITY.md) · [Threat model](docs/THREAT_MODEL.md) · [DPDP compliance](docs/COMPLIANCE.md) |
+| **Status and reports** | [Final report](docs/FINAL_REPORT.md) · [Final project audit](docs/FINAL_PROJECT_AUDIT.md) · [Pilot plan](docs/PILOT_PLAN.md) · [Owner background and costs](docs/HUMAN_TODO.md) |
 
-CI (`.github/workflows/ci.yml`) runs on every push. A newer push cancels a run in progress, so push once per verified change and wait for the
-result (`gh run list`, `gh run view`). Test layers: unit and API tests (`backend/tests`, 23 test files), catalogue integrity
-(`test_catalog_integrity.py`: every type, keyword, state entry and source allowlist), translation alignment (`test_i18n_content.py`),
-integration mocks (`test_digio.py`), browser e2e (`frontend/e2e`), evals (`backend/evals`).
+---
 
-## 9. How to extend the product
+## 🙏 Credits and acknowledgements
 
-| To add | Do this |
-| --- | --- |
-| A business type | Add a row to `backend/app/kb/business_types.py` (id, label, licence profile, keywords, `coverage="specific"` if extra permits exist). Keywords are lower-case; the longest match wins; `test_catalog_integrity.py` checks collisions. |
-| A licence | Read the official document first. Add it to `backend/app/kb/sourced_licences.py` (state-specific: a `by_city` entry for all 9 cities, `restricted: True` where the state has no ordinary private route). Add the domain to `backend/config/sources.yaml`. Add rows to `data_hi.py` and `data_bn.py`. Record the source in `docs/RULES_VERIFICATION.md`. Regenerate the export (`python scripts/export_rules_for_review.py docs/RULES_REVIEW_EXPORT.csv`). |
-| A city | Add it to `CITIES` in `catalog.py` (authority and official URL for trade licence, fire, labour), a `by_city` entry for every state-specific licence, city names in the translation `CITIES` dicts, then tests. |
-| A form | See "How to add a real form" in `docs/INTEGRATIONS.md` (field map JSON, official-PDF fetch and officer approval workflow). |
-| A translation | Add the English string's row in the same position in `data_hi.py` and `data_bn.py` (tests tell you what is missing). Interface strings go in all three `frontend/messages/*.json`. |
-| An integration | Implement the interface in `backend/app/integrations/interfaces.py` as a real adapter, keep the labelled mock, add mocked-HTTP tests, and only then run against the provider's sandbox. |
+- **Team Onyx**: Rajdip Dhar (team leader), Raktim Chakraborty, Anish Goswami and Imon Patra.
+- **HackNPitch** and **Jadavpur University** for the platform and the problem.
+- **Official sources** we read and cite: the Ministry of MSME (Udyam), FSSAI (FoSCoS), the GST Council and GSTN, state and municipal authorities, state excise and
+  drugs-control departments, the Bureau of Indian Standards, MeitY (DigiLocker, UMANG), and the text of the Digital Personal Data Protection Act, 2023. We are not affiliated
+  with any of them.
+- **Open-source software** this project stands on: FastAPI, SQLAlchemy, Alembic, Pydantic, Next.js, React, next-intl, Tailwind CSS, PyMuPDF, pypdf, reportlab, Playwright, pytest and many more.
+- **Photographs** in [the problem section](#-the-problem-in-real-life) are from Wikimedia Commons under Creative Commons licences, credited under each image: Salil Kumar Mukherjee,
+  Sunnya343 and Kritzolina (CC BY-SA 4.0) and McKay Savage (CC BY 2.0). They are shown from their original locations and remain the property of their authors.
+- **Screenshots** and the walkthrough animation are original captures of this project.
 
-## 10. What is pending, how to do it, and what to use
+---
 
-Work in this order. Items marked **HUMAN** need the owner or a third party; do everything else around them. Full click-by-click owner steps are in
-[`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md) and [`docs/HANDOFF_PROMPT.md`](docs/HANDOFF_PROMPT.md).
+## 📄 License
 
-| # | Pending item | How to do it | What to use |
-| --- | --- | --- | --- |
-| A | **Production deployment** (**HUMAN** types six values; accounts exist since 2026-11-12; current step in `docs/OWNER_ACTIONS.md` part A) | Follow `docs/DEPLOY_NOW.md`: email-sender (Brevo) account, apply `render.yaml`, type nine values (Render generates `SECRET_KEY` and `FIELD_ENCRYPTION_KEY`; copy the encryption key to a password manager), set `CORS_ORIGINS` / `WEB_BASE_URL`, then run `scripts/verify_deploy.py --journey`, test the reset email, add an uptime monitor on `/ready`, and upgrade the free database before day 30. For launch use `render.production.yaml` and run the load test | `render.yaml`, `render.production.yaml`, `docs/DEPLOY_NOW.md`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `scripts/verify_deploy.py`, Brevo/SES/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
-| B | **Digio sandbox then production** (**HUMAN** gets credentials) | Set `DIGIO_*` in Render, set the webhook URL and secret in Digio's enterprise dashboard, run the sandbox checklist in `docs/INTEGRATIONS.md`, fix any request-shape differences, **implement the DigiLocker result mapping from a real `detail_response=true` response** (answer keys with `source="document"`, encrypt sensitive values), then production credentials and IPs | `real/digio.py`, `api/webhooks.py`, `httpx.MockTransport` tests, Digio docs read in a browser |
-| C | **MSG91 SMS live** (**HUMAN** DLT KYC) | Complete DLT registration on an operator portal (Airtel / Vi / BSNL / STPL / Tata), register a 6-character header and the template `Red Tape Navigator reminder: {#var#}`, link it to a MSG91 Flow, put `MSG91_AUTHKEY` / `MSG91_TEMPLATE_ID` in Render, send a real test SMS, fix the adapter if the live shape differs (DLT errors 203/211 mean not approved) | `real/msg91.py`, MSG91 dashboard |
-| D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `OLLAMA_MODEL` (local, free) or `GEMINI_API_KEY` + `GEMINI_MODEL`, officer console `/en/staff` |
-| E | **Official forms** (**HUMAN** FSSAI permission) | Email `helpdesk-foscos@fssai.gov.in` for permission to reproduce Form A and Form B; then officers fetch the PDFs through the console (allowlisted URLs), you write the field-map JSON in `backend/app/forms/templates/`, an officer approves; keep the key-in sheet for FoSCoS and Udyam | `docs/INTEGRATIONS.md` (field-map procedure), `backend/app/forms/official.py` |
-| F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for all the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review). The officer console (`staff.*` strings) is already translated in `en`, `hi` and `bn`, pending the same native review | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
-| G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
-| H | **Business readiness** (**HUMAN** decisions) | Decide who funds the running costs (the product is free for every user and never charges anyone; see `docs/BUSINESS_MODEL.md`), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
-| J | **Development backlog** | Cookie-based sessions (needs one domain for site and API), nonce-based CSP, DigiLocker field import, FSSAI field maps, operator delegation design, shared rate limiting, partner portal, per-licence landing pages, support inbox | `docs/LAUNCH_CHECKLIST.md` section 7a, `docs/THREAT_MODEL.md` |
-| I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
+**Proprietary, all rights reserved.** Copyright © 2026 **Team Onyx** (owner: RajdipDhar2007).
 
-**Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence
-fees for Kolkata, Delhi (health trade licence) and Mumbai (eating house, hair saloon), shops-and-establishments fees for West Bengal, Delhi,
-Telangana, Tamil Nadu, Karnataka, Maharashtra and Gujarat, the Maharashtra fire-fee structure, the pollution White-category rule, and state pollution-board consent fees for Karnataka, Tamil Nadu and Gujarat
-(Telangana partly). STILL OPEN: Karnataka's 03.07.2026 liquor amendment (no official text found); current Telangana liquor notification (Maharashtra's 2026-27 fee schedule is done); clinic laws and authorities for Tamil Nadu, Telangana and Gujarat (West Bengal, Delhi, Maharashtra and Karnataka are named, from partly press-based sources); state school and coaching forms; UGC and university rules; trade-licence fee schedules for Pune,
-Ahmedabad, Bengaluru (portal being replaced), Chennai and the rest of Delhi's general chart; Maharashtra fire rupee rates; fire-safety NOC fees and timelines;
-pollution-board fees for Maharashtra, Delhi and West Bengal (sites unreadable or fee document outdated); a cited source for every timeline; Gujarat health-permit rules. Jaipur and Lucknow
-were considered as new cities and left out because the sources conflict.
+This repository is **publicly visible for convenience only**; it is **not open-source software**. Visibility grants **no** licence or permission. In short:
 
-## 11. Definition of done
+| You may | You may not (without written permission) |
+|---|---|
+| View the repository on GitHub, as the GitHub Terms of Service allow. | Copy, fork or download for reuse; modify or translate; distribute, host or sell; train or evaluate any model or product with it; remove this notice. |
+| Use it if you are a member of Team Onyx or approved in writing by the owner. | Compete with the project using any part of the code, rules data, designs, decks or videos. |
 
-All tests, lint, types, evals, e2e and CI green; production live on HTTPS with real SMTP, MSG91 and Digio (sandbox-tested first); core rules
-verified by a reviewer and every other rule still labelled "verify with the authority"; official forms loaded with permission where available;
-privacy and terms approved and the draft banner off; no demo labels visible in production (`DEMO_MODE=false`); backups, uptime monitoring, load
-test and the security checklist done; pilot feedback addressed; docs updated; `docs/LAUNCH_CHECKLIST.md` fully resolved; everything committed and
-pushed to `main`; and a written final report of what is live, what is simulated, what remains and the monthly running costs.
+The regulatory content is informational only and **not legal advice**. Third-party libraries and official government texts keep their own licences and ownership.
+To request permission, contact the repository owner on GitHub: **RajdipDhar2007**.
 
-## 12. Configuration reference
-
-Everything is environment-driven; see [`.env.example`](.env.example) and [`.env.prod.example`](.env.prod.example). Secrets never live in the repo.
-
-| Group | Variables |
-| --- | --- |
-| Core | `APP_ENV` (`dev` / `test` / `prod`), `SECRET_KEY`, `FIELD_ENCRYPTION_KEY` (`make keygen`; losing it destroys stored Aadhaar/PAN answers), `DATABASE_URL`, `REDIS_URL`, `CORS_ORIGINS`, `WEB_BASE_URL`, `TRUST_PROXY`, `DEMO_MODE`, `DATA_REGION`, `RETENTION_DAYS`, `GRIEVANCE_CONTACT` |
-| Email | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_STARTTLS` |
-| SMS | `MSG91_AUTHKEY`, `MSG91_TEMPLATE_ID`, `MSG91_TEXT_VAR` |
-| Digio | `DIGIO_CLIENT_ID`, `DIGIO_CLIENT_SECRET`, `DIGIO_ENV` (`sandbox` / `production`), `DIGIO_WEBHOOK_SECRET`, `DIGIO_WEBHOOK_IPS`, `DIGIO_DIGILOCKER_TEMPLATE` |
-| AI (optional) | `LLM_PROVIDER` (`auto`/`ollama`/`gemini`/`none`), `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `GEMINI_API_KEY`, `GEMINI_MODEL` |
-| Ops | `SENTRY_DSN`, `METRICS_TOKEN`, `RATE_LIMIT_PER_MINUTE`, `AUTH_RATE_LIMIT_PER_MINUTE`, `INTEGRATIONS_MODE`, `RUN_SCHEDULER` (run the scheduled jobs inside a single API instance instead of the worker), `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (first officer on hosts without a shell; delete after first sign-in) |
-| Frontend | `NEXT_PUBLIC_API_URL` (baked in at build), `NEXT_PUBLIC_SITE_URL` (public address for the sitemap and canonical links; on Vercel it is detected), `NEXT_PUBLIC_LEGAL_REVIEWED`, `NEXT_PUBLIC_EMBLEM_URL` |
-
-Production refuses to start with dev secrets, localhost CORS, SQLite, missing SMTP or grievance contact, `DEMO_MODE=true`, or Digio credentials
-without a webhook secret.
-
-## 13. Security and compliance
-
-OWASP mapping and controls are in [`docs/SECURITY.md`](docs/SECURITY.md); DPDP Act mapping in [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md). Highlights:
-rotating refresh tokens with reuse detection, account lockout, rate limits, constant-cost login, Fernet encryption of Aadhaar / PAN / bank answers,
-hash-chained audit log, PII-redacting logs, allowlisted outbound fetching (SSRF defence), prompt-injection defences, signed provider webhooks,
-CSP and HSTS headers, non-root containers, dependency and secret scans in CI. Never use the State Emblem of India (illegal under the 2005 Act); an
-authorised department may supply its own via `NEXT_PUBLIC_EMBLEM_URL`.
-
-## 14. Lessons learned and gotchas
-
-- The message "Could not sign in. Check your details." is shown for **any** failed auth call, including a server 500 (for example an outdated local
-  database). Check the API response before blaming credentials. Old SQLite files are now upgraded automatically in dev.
-- Many Indian government sites reset connections or block non-browser clients (the GST portal, some municipal and state sites, one state excise site
-  failed the command-line TLS handshake). That does not mean a rule is wrong. Read them in a real browser, read-only; never bypass a firewall or CAPTCHA.
-- Digio's docs are JavaScript-rendered (content in a shadow DOM). Production webhook IPs: `13.126.198.236`, plus `52.66.66.81` on the environments page.
-  The IP allowlist can be forged via `X-Forwarded-For`; the HMAC checksum is the real control.
-- The rules KB only re-seeds a licence that has **no** claims. After changing text in the catalogue, re-run `python -m app.kb.seed_loader` on an existing
-  database (production re-seeds on start).
-- Another project on port 8000 once made every e2e sign-up fail. The e2e config now checks `/ready`; stop other servers first.
-- A newer push cancels the CI run in progress; do not chain a push after a failing check.
-- Windows: for multi-line Python edits write a script file; quoted heredocs break in some shells. Docker is often not running locally; the compose stack
-  is verified by the CI `compose-smoke` job.
-
-## 15. Repository layout and documentation index
+<details>
+<summary><b>Read the full licence text</b> (the same text as the <a href="LICENSE">LICENSE</a> file)</summary>
 
 ```text
-backend/
-  app/
-    agent/        intake (goal parsing), planner (dependency-ordered plan), research (plan + claims), llm
-    api/          auth, consent, sessions (the main flow), privacy, admin (officer), webhooks (Digio)
-    core/         config, security, crypto, audit, middleware (headers, limits, metrics), localize (translation middleware)
-    db/           models, session, sqlite_upgrade
-    forms/        registry, filler, official-PDF fetch and approval, templates (3 placeholder forms)
-    followup/     submission checklist, reminders
-    i18n_content/ Hindi and Bengali tables for backend text (core, source, data_hi, data_bn)
-    integrations/ interfaces, labelled mocks, real adapters (digio, msg91, smtp)
-    interview/    fields, validators, engine, encrypted memory
-    jobs/         worker (reminders, weekly form re-checks), inprocess (the same jobs inside the API)
-    kb/           catalog, sourced_licences, business_types, seed_loader, store, confidence
-    scraping/     allowlist, guarded fetcher, sanitizer
-  migrations/     Alembic (0001 to 0007)      tests/  23 files      evals/  golden cases      config/sources.yaml  allowlist
-frontend/         Next.js App Router, next-intl messages (en/hi/bn), components, e2e (Playwright)
-infra/            Terraform skeleton            deploy/  Caddyfile      render.yaml, render.production.yaml  Render Blueprints
-docs/             see below                     scripts/ placeholder forms, key rotation, load test, rules export, source verification,
-                                                         verify_deploy (live checks), backup_restore_drill
+Red Tape Navigator - Proprietary License
+Copyright (c) 2026 Team Onyx (owner: RajdipDhar2007). All rights reserved.
+
+NOTICE: THIS IS NOT OPEN-SOURCE SOFTWARE.
+
+This repository is made publicly visible only for technical convenience. Visibility
+does NOT grant any license or permission. No rights are granted to anyone except the
+Authorized Persons defined below.
+
+1. AUTHORIZED PERSONS
+   "Authorized Persons" means only the members of Team Onyx and any other individual
+   the copyright owner has approved in writing (email or a GitHub invitation to this
+   repository counts as written approval). Authorized Persons may use, copy, modify
+   and run the software solely for the Team Onyx project and only for as long as they
+   remain approved.
+
+2. RESTRICTIONS
+   Anyone who is not an Authorized Person may NOT, without the owner's prior written
+   permission:
+   a) copy, clone for reuse, fork for reuse, download for reuse, or reproduce
+      any part of the source code, rules knowledge base, data, documents, designs,
+      presentations, videos or other materials in this repository;
+   b) modify, adapt, translate or create derivative works from them;
+   c) distribute, publish, sublicense, sell, lease or host them, in whole or in part;
+   d) use them to build, train, fine-tune or evaluate any product, service, dataset
+      or machine-learning model, or to compete with this project;
+   e) remove or alter this license or any copyright notice.
+
+3. PERMITTED VIEWING
+   Strictly as permitted by the GitHub Terms of Service, the public may view the
+   repository on GitHub. This does not permit any use listed in section 2.
+
+4. THIRD-PARTY COMPONENTS
+   Third-party libraries and official government source texts that this project
+   references remain under their own licenses or ownership. This license covers only
+   the original work of the copyright owner.
+
+5. NO WARRANTY
+   THE SOFTWARE AND CONTENT ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. The
+   regulatory information is informational only and is not legal advice. The owner is
+   not liable for any claim or damage arising from any use.
+
+6. ENFORCEMENT
+   Unauthorized use terminates automatically any permission that may otherwise apply
+   and may be enforced under applicable law, including the Copyright Act, 1957
+   (India) and the Information Technology Act, 2000, and by DMCA or equivalent
+   takedown requests.
+
+To request permission, contact the repository owner through GitHub: RajdipDhar2007.
 ```
 
-Documentation: **[Owner actions](docs/OWNER_ACTIONS.md) (what is pending, in order, with status)** · [Deploy now](docs/DEPLOY_NOW.md) · [Final report](docs/FINAL_REPORT.md) ·
-[Threat model](docs/THREAT_MODEL.md) · [Owner background and costs](docs/HUMAN_TODO.md) · [Launch checklist](docs/LAUNCH_CHECKLIST.md) (status of every go-live item) · [Handoff prompt](docs/HANDOFF_PROMPT.md) ·
-[Rules verification log](docs/RULES_VERIFICATION.md) · [Reviewer worksheet](docs/RULES_REVIEW_EXPORT.csv) · [Integrations](docs/INTEGRATIONS.md) ·
-[Deploy on Vercel + Render](docs/DEPLOYMENT_VERCEL_RENDER.md) · [Deployment (VPS)](docs/DEPLOYMENT.md) · [Go-live notes](docs/GO_LIVE.md) ·
-[Architecture](docs/ARCHITECTURE.md) · [DPDP compliance](docs/COMPLIANCE.md) · [Security / OWASP](docs/SECURITY.md) · [Runbook](docs/RUNBOOK.md) ·
-[Pilot plan](docs/PILOT_PLAN.md) · [Demo script](docs/DEMO_SCRIPT.md) · [Load test](docs/LOAD_TEST.md) · [Assumptions](docs/ASSUMPTIONS.md) ·
-[Task history](docs/TASKS.md) · [Problem statement](ps.md)
+</details>
 
 ---
 
-*Thank you for continuing this work. Please leave the project better documented than you found it.*
+<div align="center">
 
----
+**Red Tape Navigator** · Team Onyx · HackNPitch · Jadavpur University
 
-## License
+*Built so that the next person who wants to open a bakery spends their time baking.*
 
-**Proprietary, all rights reserved.** Copyright (c) 2026 Team Onyx. This repository is publicly visible but is **not** open source: only Team Onyx
-members (and people the owner approves in writing) may use, copy, modify or distribute it. See [LICENSE](LICENSE).
+</div>

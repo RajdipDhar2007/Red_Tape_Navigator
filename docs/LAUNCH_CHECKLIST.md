@@ -3,8 +3,8 @@
 Status key: DONE / WAITING ON OWNER / BLOCKED ON THIRD PARTY. Updated as work proceeds.
 
 ## 1. Health check: DONE (Updated 2026-11-12)
-- Backend: 475 tests pass (0 failed, 0 skipped), coverage 95.20%+ (95%), ruff clean, mypy clean (84 files), AI evals 26/26 (0 hallucinations across 600 claims), rule freshness 438/438 OK.
-- Frontend: lint, typecheck, unit tests (10/10) and production build (36 static routes across `en`, `hi`, `bn`) pass.
+- Backend: 491 tests pass (0 failed, 0 skipped), coverage 95.37%, ruff clean, mypy clean (87 files), AI evals 26/26 (0 hallucinations across 600 claims), rule freshness 438/438 OK.
+- Frontend: lint, typecheck, unit tests (10/10), 13 browser tests and production build (36 static routes across `en`, `hi`, `bn`) pass.
 - Production Operations, Backup/Restore Readiness & Disaster Recovery completed:
   - `/health`, `/health/live`, `/ready`, `/health/ready`, and `/admin/readiness` with non-blocking Redis degradation status and local-storage durability warnings in prod.
   - Expanded log/exception redaction covering passwords, API keys, JWTs, PostgreSQL URI passwords, TOTP/recovery codes, and binary document payloads (`backend/app/core/crypto.py`, `backend/app/core/errors.py`).
@@ -101,7 +101,7 @@ Render has no India region (Singapore); if the department needs in-India storage
 - [ ] Nonce-based Content-Security-Policy so inline scripts can be disallowed.
 - [ ] DigiLocker field import (needs one real sandbox response from Digio).
 - [ ] Field maps for FSSAI Form A and Form B (after FSSAI's permission and an officer's fetch).
-- [ ] Rule gaps listed in `README.md` section 10 and `docs/HUMAN_TODO.md` Part 2 C (official pages that would not load or are scans).
+- [ ] Rule gaps listed in `docs/DEVELOPER_GUIDE.md` section 10 and `docs/HUMAN_TODO.md` Part 2 C (official pages that would not load or are scans).
 - [ ] Design for CSC-operator delegation (an operator acting for many citizens).
 - [ ] Rate limiting shared across instances (only needed with more than one API instance).
 - [ ] Not built from the wish list: partner portal for professionals, per-licence landing pages, support-ticket inbox,
@@ -110,7 +110,7 @@ Render has no India region (Singapore); if the department needs in-India storage
 
 ## 8. Final docs, CI green, final report: DONE (2026-11-12)
 - [x] `docs/FINAL_REPORT.md`: what is real, what is simulated, what remains and who must do it, monthly running costs.
-- [x] All local gates green on 2026-11-12: 459 backend tests, evaluation set, frontend lint/types/unit/build, 12 browser tests. CI result: see the run for the final commit.
+- [x] All local gates green on 2026-11-12: 491 backend tests, evaluation set, frontend lint/types/unit/build, 13 browser tests. CI for the latest main commit: all 7 jobs green (2026-11-12).
 - [x] Emails drafted in the owner's Gmail (not sent): FSSAI permission request and Digio sandbox request. The owner fills the bracketed parts and sends them.
 
 ## 9. Billing: REMOVED 2026-11-10 (decision: the site is free to use and charges no one)

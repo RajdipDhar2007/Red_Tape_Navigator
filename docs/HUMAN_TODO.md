@@ -76,7 +76,7 @@ Every rule I add needs a source link or pasted official text. Without one it sta
 
 **To try yourself:** sign up, open Your account, turn on two-factor with an authenticator app on your phone, then create a team. Tell me anything that feels wrong; a real phone has not been tried yet.
 
-**Built and tested:** rules catalogue (438 rules, English, Hindi, Bengali), freshness check in CI, interview and form prefill, migrations to `0007`, email confirmation, two-factor sign-in (authenticator app) and teams with invitation links. **There is no billing: the site is free to use and charges no one** (an earlier test-mode billing build was removed on 2026-11-10).
+**Built and tested:** rules catalogue (438 rules, English, Hindi, Bengali), freshness check in CI, interview and form prefill, migrations to `0009`, email confirmation, two-factor sign-in (authenticator app) and teams with invitation links. **There is no billing: the site is free to use and charges no one** (an earlier test-mode billing build was removed on 2026-11-10).
 
 **Built on 2026-11-12:** calendar export of reminders, robots/sitemap/manifest, threat model, one-file hosting set-up with a 30-minute guide, live-deployment checker, backup drill, final report (`docs/FINAL_REPORT.md`).
 

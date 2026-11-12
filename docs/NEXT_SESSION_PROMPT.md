@@ -4,7 +4,7 @@
 
 ---
 
-Read README.md, docs/HANDOFF_PROMPT.md (especially the session logs and pitfalls), docs/RULES_VERIFICATION.md, docs/LAUNCH_CHECKLIST.md and this file. Then do the work below without stopping to ask. I (the owner) have already authorised: push to `main` after every verified change (nothing else on GitHub: no PRs, repos, issues, settings). Work on the P: drive only.
+Read README.md, docs/DEVELOPER_GUIDE.md, docs/HANDOFF_PROMPT.md (especially the session logs and pitfalls), docs/RULES_VERIFICATION.md, docs/LAUNCH_CHECKLIST.md and this file. Then do the work below without stopping to ask. I (the owner) have already authorised: push to `main` after every verified change (nothing else on GitHub: no PRs, repos, issues, settings). Work on the P: drive only.
 
 ## Goal
 
