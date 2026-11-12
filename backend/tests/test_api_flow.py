@@ -216,7 +216,8 @@ async def test_privacy_deletion_and_purge_remove_external_requests_under_fk_cons
     uid = (await client.get("/auth/me", headers=headers)).json()["id"]
 
     async with maker()() as db:
-        await db.execute(text("PRAGMA foreign_keys = ON"))
+        if db.get_bind().dialect.name == "sqlite":  # PostgreSQL enforces foreign keys by default
+            await db.execute(text("PRAGMA foreign_keys = ON"))
         db.add_all([
             ExternalRequest(user_id=uid, session_id=s1["id"], provider="mock", kind="digilocker", external_id="dl-1"),
             ExternalRequest(user_id=uid, session_id=s2["id"], provider="mock", kind="esign", external_id="es-2"),
