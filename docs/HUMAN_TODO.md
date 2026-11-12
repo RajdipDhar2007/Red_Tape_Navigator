@@ -1,6 +1,8 @@
 # What the human must do, and what to give the developer (Claude)
 
-Last updated 2026-11-10. This is the full list. The short version is `docs/OWNER_ACTIONS.md`.
+Last updated 2026-11-12. This is the background and detail. **The ordered list with the current status of every step is `docs/OWNER_ACTIONS.md`.**
+
+**State on 2026-11-12:** the owner has Render and Vercel accounts (both signed in with GitHub). Render read `render.yaml` without errors. The Blueprint has **not** been applied yet: it is waiting for six values only the owner can type. Nothing is live. Whether the Brevo (email sender) account exists is not confirmed. Next step: `docs/OWNER_ACTIONS.md` part A, step 4.
 
 **Rules for everything below**
 - Never paste passwords, OTPs, card or bank details, Aadhaar or PAN into chat. Secrets go into Render, Vercel or `.env.prod` yourself.
@@ -14,19 +16,22 @@ Last updated 2026-11-10. This is the full list. The short version is `docs/OWNER
 | # | What | Why it blocks launch | How you know it is done |
 |---|------|----------------------|--------------------------|
 | 1 | Keys: Render now generates them. After the Blueprint is applied, copy `FIELD_ENCRYPTION_KEY` from the Render dashboard to two safe places. (`make keygen` is only for the Docker Compose route.) | Losing it makes stored Aadhaar/PAN answers unreadable. | Key saved offline. |
-| 2 | Hosting: follow `docs/DEPLOY_NOW.md` (free trial: Brevo, Render via `render.yaml`, Vercel root `frontend`; about 30 minutes, no card). Launch set-up: `render.production.yaml`, `docs/DEPLOYMENT_VERCEL_RENDER.md`. | Nothing is deployed yet. | A public HTTPS URL loads `/en`. |
+| 2 | Hosting: follow `docs/DEPLOY_NOW.md` (free trial: Brevo, Render via `render.yaml`, Vercel root `frontend`; about 30 minutes, no card). Launch set-up: `render.production.yaml`, `docs/DEPLOYMENT_VERCEL_RENDER.md`. | Accounts exist (2026-11-12); the Blueprint is not applied yet (six values pending). | A public HTTPS URL loads `/en`. |
 | 3 | A domain name, pointed at Vercel and Render. | Needed for email, SEO and cookies. | `https://yourdomain` works. |
 | 4 | Email sending: SMTP or SES account, verified sender domain, SPF, DKIM, DMARC. | Reminders, verification and support mail. | A test mail reaches a Gmail inbox, not spam. |
 | 5 | Grievance officer name and email for the DPDP notice, as `GRIEVANCE_CONTACT`. | Production refuses to start without it. | App starts in prod mode. |
 | 6 | Support email and the legal entity or person who runs the service (shown on the legal pages). No GST registration is needed just to offer a free service; ask your accountant if you ever receive money. | Legal pages need a named operator. | Pages show the name. |
 | 8 | MSG91 SMS: KYC, TRAI DLT entity, sender ID, template `Red Tape Navigator reminder: {#var#}`. Then `MSG91_AUTHKEY`, `MSG91_TEMPLATE_ID`, `MSG91_TEXT_VAR` (must equal the template variable name). | SMS reminders. Never sent live yet. | One reminder to your own phone. |
-| 9 | Digio sandbox request via digio.in (eSign and DigiLocker), then credentials and webhook secret. | The adapter has never run against a real sandbox. | Sandbox sign flow completes. |
-| 10 | FSSAI: email helpdesk-foscos@fssai.gov.in for permission to reproduce Forms A and B. | Form reproduction rights. | Written reply saved. |
+| 9 | Digio sandbox request via digio.in (eSign and DigiLocker), then credentials and webhook secret. A request is drafted in your Gmail (no recipient yet; fill the bracketed parts). | The adapter has never run against a real sandbox. | Sandbox sign flow completes. |
+| 10 | FSSAI: email helpdesk-foscos@fssai.gov.in for permission to reproduce Forms A and B. Drafted in your Gmail; fill the bracketed parts and send. | Form reproduction rights. | Written reply saved. |
 | 11 | A lawyer reviews privacy policy, terms, refund policy, DPDP consent text. Then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`. | Pages show "draft" until then. | Banner disappears. |
-| 12 | Native Hindi and Bengali speakers review the translations. | Translations are machine-assisted and not reviewed. | Corrections returned. |
+| 12 | Native Hindi and Bengali speakers review the translations, including the Help page added on 2026-11-12. | Translations are machine-assisted and not reviewed. | Corrections returned. |
 | 13 | Sign off rules in the officer console (a person with legal or CA knowledge). | Only human-verified rules may exceed confidence 0.9. | Rules marked verified. |
 | 14 | Pilot with 5 to 10 shop owners; test on real phones and slow networks. | Not done. | Feedback collected. |
-| 15 | Penetration test, backup-restore drill, load test. | Not done. | Reports filed. |
+| 15 | Penetration test and a load test on the hosted site. (The backup-restore drill is automated in CI since 2026-11-12.) | Not done. | Reports filed. |
+| 16 | Upgrade the free Render database within 30 days of applying the Blueprint. | It is deleted otherwise. | Plan shows `0.1c-256mb`. |
+| 17 | Delete `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` in Render after the first officer sign-in; turn on two-factor on the Render, Vercel, GitHub and Brevo accounts. | Whoever holds those accounts holds everything. | Variables gone; two-factor on. |
+| 18 | Decide on the 11 Dependabot pull requests, the two stuck "queued" runs for commit `ba69bc7`, and whether the repository stays public. | Housekeeping on your GitHub; a developer will not touch it without being asked. | Decided. |
 
 ---
 

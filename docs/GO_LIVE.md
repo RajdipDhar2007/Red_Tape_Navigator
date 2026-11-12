@@ -1,5 +1,9 @@
 # Go-live checklist (what is built, what only you can do)
 
+> Written 2026-11-08 and kept for its reasoning. For the current list of pending steps and their status read `docs/OWNER_ACTIONS.md`;
+> for deployment read `docs/DEPLOY_NOW.md`. Since this was written: the key-in sheet for FoSCoS and Udyam was built, Digio and MSG91 adapters
+> were written (untested against the real services), and the rules pack grew from 168 to 438 rules.
+
 The software is feature-complete for the citizen journey, officer oversight and production operation. Four things
 cannot be completed from inside the repository because they need third parties or domain sign-off. Each has a
 tool or switch ready so the work is data entry and configuration, not development.

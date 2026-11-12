@@ -265,7 +265,7 @@ Numbers as of the last update: **459 backend tests** passing (about 95.8% covera
 | `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates | **Built and browser-tested**; private pages are excluded from search engines |
 | Help page with nine common questions (`/help`, linked in the footer) in English, Hindi and Bengali | **Built and browser-tested**; Hindi and Bengali wording awaits native review |
 | Backup-and-restore drill (`scripts/backup_restore_drill.sh`) | **Runs in CI** on every push against PostgreSQL |
-| Production deployment | **Not deployed.** Ready to apply: `docs/DEPLOY_NOW.md` (free trial, about 30 minutes). Needs the owner to create the Render, Vercel and email-sender accounts; the Blueprints have not been applied on a real account yet |
+| Production deployment | **Not deployed; in progress.** The owner's Render and Vercel accounts exist and Render parsed `render.yaml` (2026-11-12). The Blueprint is waiting for six values only the owner can type; then Vercel and the live checks. Status of every step: `docs/OWNER_ACTIONS.md` |
 | Load test, backup-restore test, pentest, real-device test, pilot | **Not done** |
 
 ## 7. Quick start
@@ -344,7 +344,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 
 | # | Pending item | How to do it | What to use |
 | --- | --- | --- | --- |
-| A | **Production deployment** (**HUMAN** sign-ups) | Follow `docs/DEPLOY_NOW.md`: create the email-sender, Render and Vercel accounts, apply `render.yaml`, type nine values (Render generates `SECRET_KEY` and `FIELD_ENCRYPTION_KEY`; copy the encryption key to a password manager), set `CORS_ORIGINS` / `WEB_BASE_URL`, then run `scripts/verify_deploy.py --journey`, test the reset email, add an uptime monitor on `/ready`, and upgrade the free database before day 30. For launch use `render.production.yaml` and run the load test | `render.yaml`, `render.production.yaml`, `docs/DEPLOY_NOW.md`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `scripts/verify_deploy.py`, Brevo/SES/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
+| A | **Production deployment** (**HUMAN** types six values; accounts exist since 2026-11-12; current step in `docs/OWNER_ACTIONS.md` part A) | Follow `docs/DEPLOY_NOW.md`: email-sender (Brevo) account, apply `render.yaml`, type nine values (Render generates `SECRET_KEY` and `FIELD_ENCRYPTION_KEY`; copy the encryption key to a password manager), set `CORS_ORIGINS` / `WEB_BASE_URL`, then run `scripts/verify_deploy.py --journey`, test the reset email, add an uptime monitor on `/ready`, and upgrade the free database before day 30. For launch use `render.production.yaml` and run the load test | `render.yaml`, `render.production.yaml`, `docs/DEPLOY_NOW.md`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `scripts/verify_deploy.py`, Brevo/SES/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
 | B | **Digio sandbox then production** (**HUMAN** gets credentials) | Set `DIGIO_*` in Render, set the webhook URL and secret in Digio's enterprise dashboard, run the sandbox checklist in `docs/INTEGRATIONS.md`, fix any request-shape differences, **implement the DigiLocker result mapping from a real `detail_response=true` response** (answer keys with `source="document"`, encrypt sensitive values), then production credentials and IPs | `real/digio.py`, `api/webhooks.py`, `httpx.MockTransport` tests, Digio docs read in a browser |
 | C | **MSG91 SMS live** (**HUMAN** DLT KYC) | Complete DLT registration on an operator portal (Airtel / Vi / BSNL / STPL / Tata), register a 6-character header and the template `Red Tape Navigator reminder: {#var#}`, link it to a MSG91 Flow, put `MSG91_AUTHKEY` / `MSG91_TEMPLATE_ID` in Render, send a real test SMS, fix the adapter if the live shape differs (DLT errors 203/211 mean not approved) | `real/msg91.py`, MSG91 dashboard |
 | D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `OLLAMA_MODEL` (local, free) or `GEMINI_API_KEY` + `GEMINI_MODEL`, officer console `/en/staff` |
@@ -352,6 +352,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for all the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review). The officer console (`staff.*` strings) is already translated in `en`, `hi` and `bn`, pending the same native review | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
 | G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
 | H | **Business readiness** (**HUMAN** decisions) | Decide who funds the running costs (the product is free for every user and never charges anyone; see `docs/BUSINESS_MODEL.md`), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
+| J | **Development backlog** | Cookie-based sessions (needs one domain for site and API), nonce-based CSP, DigiLocker field import, FSSAI field maps, operator delegation design, shared rate limiting, partner portal, document vault, per-licence landing pages, support inbox | `docs/LAUNCH_CHECKLIST.md` section 7a, `docs/THREAT_MODEL.md` |
 | I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
 
 **Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence
@@ -424,16 +425,18 @@ backend/
     i18n_content/ Hindi and Bengali tables for backend text (core, source, data_hi, data_bn)
     integrations/ interfaces, labelled mocks, real adapters (digio, msg91, smtp)
     interview/    fields, validators, engine, encrypted memory
-    jobs/         worker (reminders, weekly form re-checks)
+    jobs/         worker (reminders, weekly form re-checks), inprocess (the same jobs inside the API)
     kb/           catalog, sourced_licences, business_types, seed_loader, store, confidence
     scraping/     allowlist, guarded fetcher, sanitizer
   migrations/     Alembic (0001 to 0007)      tests/  23 files      evals/  golden cases      config/sources.yaml  allowlist
 frontend/         Next.js App Router, next-intl messages (en/hi/bn), components, e2e (Playwright)
 infra/            Terraform skeleton            deploy/  Caddyfile      render.yaml, render.production.yaml  Render Blueprints
-docs/             see below                     scripts/ placeholder forms, key rotation, load test, rules export, source verification
+docs/             see below                     scripts/ placeholder forms, key rotation, load test, rules export, source verification,
+                                                         verify_deploy (live checks), backup_restore_drill
 ```
 
-Documentation: [Launch checklist](docs/LAUNCH_CHECKLIST.md) (status of every go-live item) · [Handoff prompt](docs/HANDOFF_PROMPT.md) ·
+Documentation: **[Owner actions](docs/OWNER_ACTIONS.md) (what is pending, in order, with status)** · [Deploy now](docs/DEPLOY_NOW.md) · [Final report](docs/FINAL_REPORT.md) ·
+[Threat model](docs/THREAT_MODEL.md) · [Owner background and costs](docs/HUMAN_TODO.md) · [Launch checklist](docs/LAUNCH_CHECKLIST.md) (status of every go-live item) · [Handoff prompt](docs/HANDOFF_PROMPT.md) ·
 [Rules verification log](docs/RULES_VERIFICATION.md) · [Reviewer worksheet](docs/RULES_REVIEW_EXPORT.csv) · [Integrations](docs/INTEGRATIONS.md) ·
 [Deploy on Vercel + Render](docs/DEPLOYMENT_VERCEL_RENDER.md) · [Deployment (VPS)](docs/DEPLOYMENT.md) · [Go-live notes](docs/GO_LIVE.md) ·
 [Architecture](docs/ARCHITECTURE.md) · [DPDP compliance](docs/COMPLIANCE.md) · [Security / OWASP](docs/SECURITY.md) · [Runbook](docs/RUNBOOK.md) ·

@@ -4,7 +4,7 @@ Where the product stands, what is real, what is simulated, what is left and what
 
 ## 1. In one paragraph
 
-Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**: putting it online needs the owner to create two hosting accounts and one email-sender account, which takes about 30 minutes with `docs/DEPLOY_NOW.md` and costs nothing on the trial tier. Everything a developer can do without those accounts is done. The remaining items need a person or an organisation outside the code: accounts, regulatory approvals (SMS, e-sign), FSSAI's permission, a lawyer, native-language reviewers, an officer to sign off rules, and a pilot with real shop owners.
+Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**. **State on 2026-11-12:** the owner has Render and Vercel accounts (both signed in with GitHub). Render read `render.yaml` without errors. The Blueprint has **not** been applied yet: it is waiting for six values only the owner can type. Nothing is live. Whether the Brevo (email sender) account exists is not confirmed. The ordered list of what is left, with the status of each step, is `docs/OWNER_ACTIONS.md`. Everything a developer can do without those values is done. The remaining items need a person or an organisation outside the code: accounts, regulatory approvals (SMS, e-sign), FSSAI's permission, a lawyer, native-language reviewers, an officer to sign off rules, and a pilot with real shop owners.
 
 ## 2. What is real and tested
 
@@ -42,7 +42,7 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**:
 
 | # | Item | Who | How |
 |---|---|---|---|
-| 1 | Deploy (Brevo, Render, Vercel sign-ups; paste nine values) | Owner | `docs/DEPLOY_NOW.md`, about 30 minutes |
+| 1 | Finish the deployment: Render and Vercel accounts exist; type six values into the Render Blueprint form and click Deploy; then Vercel import and connecting the two | Owner for the six values, then owner or developer | `docs/OWNER_ACTIONS.md` part A, steps 2 to 8 |
 | 2 | Copy `FIELD_ENCRYPTION_KEY` from Render into a password manager | Owner | Step 2.5 of the same guide |
 | 3 | Run `scripts/verify_deploy.py --journey` on the live site, test reset email | Owner or developer | One command |
 | 4 | Uptime monitor on `/ready` | Owner | UptimeRobot, 3 minutes |
@@ -56,13 +56,17 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**:
 | 12 | Independent penetration test | Tester | `docs/THREAT_MODEL.md` lists what is open |
 | 13 | Pilot with 5 to 10 shop owners | Owner | `docs/PILOT_PLAN.md` |
 | 14 | Decisions: who funds running costs, support channel, on-call contact, custom domain | Owner | `docs/BUSINESS_MODEL.md` |
+| 15 | First build on Render has never run: watch the deploy log and fix what it shows | Developer | Render dashboard, `rtn-api`, Logs |
+| 16 | Delete the `BOOTSTRAP_ADMIN_*` values after the first officer sign-in; two-factor on the hosting accounts | Owner | `docs/DEPLOY_NOW.md` step 6 |
+| 17 | GitHub housekeeping: 11 Dependabot pull requests, two stuck runs, public or private repository | Owner | `docs/OWNER_ACTIONS.md` part D |
 
 Development work that is still open, in order of value:
 
 1. Keep browser tokens out of script reach (cookie-based sessions). Needs the site and API under one domain; design in `docs/THREAT_MODEL.md`.
 2. Rule gaps listed in `README.md` section 10 (pages that would not load or exist only as scans). Each needs the official text.
 3. DigiLocker field import, after the first real sandbox response.
-4. Not built from the earlier wish list: a partner portal for professionals, a document vault, per-licence landing pages, a support-ticket inbox. None blocks a launch.
+4. Nonce-based Content-Security-Policy; operator-delegation design; shared rate limiting for more than one instance.
+5. Not built from the earlier wish list: a partner portal for professionals, a document vault, per-licence landing pages, a support-ticket inbox. None blocks a launch. The full backlog is `docs/LAUNCH_CHECKLIST.md` section 7a.
 
 ## 5. Monthly running costs
 

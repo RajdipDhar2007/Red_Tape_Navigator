@@ -5,6 +5,8 @@ For a real launch (paid, with backups and a separate worker) use `render.product
 
 Only the owner can do the sign-ups below: they create accounts and accept each provider's terms. Everything else is already in the repo.
 
+> **State on 2026-11-12:** the owner has Render and Vercel accounts (both signed in with GitHub). Render read `render.yaml` without errors. The Blueprint has **not** been applied yet: it is waiting for six values only the owner can type. Nothing is live. Whether the Brevo (email sender) account exists is not confirmed. You are at step 2.3 below. Status of every step: `docs/OWNER_ACTIONS.md`.
+
 ## 0. What the free tier gives you, and what it does not
 
 | | Free trial (`render.yaml`) | Launch (`render.production.yaml`) |
@@ -45,7 +47,9 @@ Any SMTP provider works. On Render's free plan ports 25, 465 and 587 are blocked
 | `BOOTSTRAP_ADMIN_EMAIL` | your email: this becomes the first officer account |
 | `BOOTSTRAP_ADMIN_PASSWORD` | a new password of 12 or more characters |
 
-4. Click Apply. The first build takes 5 to 10 minutes. When `rtn-api` is Live, open `https://<rtn-api>.onrender.com/ready`: it must say `"status":"ready"`, `"demo_mode":false` and a `kb_claims` number above zero.
+4. Click Deploy Blueprint. The first build takes 5 to 10 minutes. Render shows the service's real address at the top of the `rtn-api` page.
+   It will not be `rtn-api.onrender.com` (that name belongs to another Render user), so Render adds a suffix: use the address it shows
+   wherever this guide says `<rtn-api>`. When `rtn-api` is Live, open `https://<rtn-api>.onrender.com/ready`: it must say `"status":"ready"`, `"demo_mode":false` and a `kb_claims` number above zero.
 5. In `rtn-api`, Environment, copy `FIELD_ENCRYPTION_KEY` into a password manager **now**. Losing it makes stored Aadhaar and PAN answers unreadable for ever.
 
 ## 3. The website on Vercel (5 minutes)

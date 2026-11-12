@@ -11,7 +11,7 @@ Decisions made without asking, so work could continue end to end. Revisit before
   `vector(256)` on PostgreSQL and search is hybrid (vector + keyword). Swap `kb/embedding.py` for a real model later.
 - Local Docker was not running on the development machine, so the container stack was verified in CI
   (`compose-smoke` job) instead of locally.
-- The repository is private. CodeQL is opt-in (code scanning is not enabled on the private repo); bandit/ruff provide SAST.
+- The repository has been public since November 2026 under a proprietary licence (see `LICENSE`); it was private before. CodeQL is still opt-in (`ENABLE_CODEQL` variable); bandit/ruff provide SAST.
 
 ## Data and content
 - **The rules knowledge base is a curated seed pack** (`backend/app/kb/catalog.py`) with real official source URLs, not

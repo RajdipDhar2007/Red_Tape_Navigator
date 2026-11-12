@@ -44,7 +44,7 @@ Backend 443 tests passing (about 95.8% coverage, gate 80%), evals pass (0 halluc
 against the real services. Seven Alembic migrations (0001 to 0007). **The product is free to use and charges no one (owner decision, 2026-11-10): do not add billing, prices, payments or paywalls** (`docs/BUSINESS_MODEL.md`; `tests/test_free_forever.py` enforces it).
 
 ## Step 0: get the code and run it
-1. Ask the owner (GitHub user `RajdipDhar2007`) to add you as a collaborator on the PRIVATE repo
+1. Ask the owner (GitHub user `RajdipDhar2007`) to add you as a collaborator on the repo (public since November 2026, proprietary licence: you still need the owner's approval to use it)
    `https://github.com/RajdipDhar2007/Red_Tape_Navigator`, then clone it. Work on branch `main`.
 2. Read, in this order: `README.md`, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md`, `docs/INTEGRATIONS.md`,
    `docs/DEPLOYMENT_VERCEL_RENDER.md`, `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/ASSUMPTIONS.md`, `docs/RUNBOOK.md`, `docs/LOAD_TEST.md`,
@@ -101,7 +101,8 @@ against the real services. Seven Alembic migrations (0001 to 0007). **The produc
 
 ## What is LEFT (your work, in this order; skip nothing)
 ### A. Production deployment (the human logs in and holds the secrets; you guide, check and fix)
-Follow the owner steps in `docs/LAUNCH_CHECKLIST.md` section 6 and `docs/DEPLOYMENT_VERCEL_RENDER.md`. After the human says it is live: check
+**Start with `docs/OWNER_ACTIONS.md` part A: it lists every step with its status.** On 2026-11-12 the owner's Render and Vercel accounts existed and the
+Render Blueprint form was waiting for six owner-typed values. Guide: `docs/DEPLOY_NOW.md` (trial) or `docs/DEPLOYMENT_VERCEL_RENDER.md` (launch). After the human says it is live: check
 `https://<api>/ready`, a real signup/login, a full business session, password-reset email, reminders, create the first officer, confirm database
 backups and an uptime monitor, run the load test in `docs/LOAD_TEST.md` (Locust) and fix what it finds. Render has no India region (Singapore); if
 the department needs in-India storage, move the backend to an Indian cloud and update `DATA_REGION` and the privacy text. Size the plans for traffic.
@@ -280,3 +281,18 @@ Owner instruction: finish everything pending, make the app ready to deploy, comm
 - Not done: cookie-based sessions (needs one domain for site and API; design in `docs/THREAT_MODEL.md`), the rule gaps in README section 10,
   partner portal, document vault. Next: the owner deploys, then run `verify_deploy.py --journey` and the hosted load test.
 
+### Session log: 2026-11-12 (continued: deployment started with the owner)
+
+- The owner signed up to Render and Vercel with GitHub. In the owner's Chrome, Render's New Blueprint page parsed `render.yaml` and showed
+  "Create database rtn-db" and "Create web service rtn-api" with the nine prompted values. The assistant filled the Blueprint name
+  (`red-tape-navigator`), `SMTP_HOST` (`smtp-relay.brevo.com`) and `https://placeholder.example` for `CORS_ORIGINS` and `WEB_BASE_URL`.
+  **Deploy Blueprint was not clicked**: six values (grievance contact, SMTP login, SMTP key, sender, first-officer email and password) are the owner's to type.
+- `https://rtn-api.onrender.com` answers with `x-render-routing: suspend-by-user`: the name belongs to another Render user. The real address will have a
+  suffix and is known only after the Blueprint is applied, so the Vercel build (`NEXT_PUBLIC_API_URL` is baked in) must wait for it.
+- An assistant may sign in to nothing with a password, create no accounts, and type no keys or passwords; with the owner signed in it may click through
+  Render and Vercel, fill non-secret values, read deploy logs and run `scripts/verify_deploy.py`.
+- Pending lists were consolidated: `docs/OWNER_ACTIONS.md` is the ordered list with a status per step; `docs/LAUNCH_CHECKLIST.md` section 6 (deployment)
+  and 7a (development backlog); `docs/HUMAN_TODO.md` for background and costs; `docs/FINAL_REPORT.md` section 4.
+- Next, the moment the owner says "deployed": read the API address from the `rtn-api` page, watch the first deploy log (first ever build on Render and first
+  start against Render PostgreSQL), deploy Vercel with root `frontend`, replace the two placeholders in Render, run `verify_deploy.py --journey`, then
+  write both live addresses into `README.md`, `docs/FINAL_REPORT.md` and the checklist.
