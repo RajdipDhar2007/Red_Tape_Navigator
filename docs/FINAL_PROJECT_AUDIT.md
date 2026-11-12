@@ -119,7 +119,7 @@ flowchart LR
 
 ## 4. Missing Features
 
-Comparing the codebase against `docs/HANDOFF_PROMPT.md` and the audit requirements:
+Comparing the codebase against the project handoff notes and the audit requirements:
 
 1. **Gemini API Provider in LLM Adapter (`backend/app/agent/llm.py`):**
    - (Resolved: `app/agent/llm.py` now supports Ollama, Gemini (REST via `httpx`, `GEMINI_API_KEY` + `GEMINI_MODEL`) and Anthropic, chosen by `LLM_PROVIDER`; see `backend/tests/test_llm_providers.py`.)

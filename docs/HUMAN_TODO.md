@@ -41,7 +41,7 @@ Send these in chat (no secrets). Anything you leave blank stays a labelled place
 
 ### A. Product decisions
 1. **Support**: channel (email, WhatsApp, form), hours, and who answers.
-2. **Product name, logo, brand colours**, and whether "Red Tape Navigator" is final. The team logo is in use (`Red_Tape_Navigator_Logo.png`); it shows the State Emblem of India on the robot's cap, which the 2005 Act restricts, so counsel must clear it or the cap badge must be replaced before launch.
+2. **Product name, logo, brand colours**, and whether "Red Tape Navigator" is final. The team logo is in use (`frontend/public/logo.png`); it shows the State Emblem of India on the robot's cap, which the 2005 Act restricts, so counsel must clear it or the cap badge must be replaced before launch.
 3. **Who funds the running costs** (own funds, grant, sponsor, department). I will not add any price, donation prompt or advertising without your explicit yes.
 4. **Partner (CA / consultant) features**: which free tools they need (client list, shared renewal calendar), client limits if any are needed to protect the servers.
 

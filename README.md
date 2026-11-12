@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="Red_Tape_Navigator_Logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="240" />
+<img src="frontend/public/logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="240" />
 
 # Red Tape Navigator
 
@@ -414,7 +414,6 @@ Red_Tape_Navigator/
 ├── README.md                    this overview
 ├── Problem_Statement.md         the hackathon problem statement, verbatim
 ├── LICENSE                      proprietary licence (Team Onyx)
-├── Red_Tape_Navigator_Logo.png  the team logo (source of every icon in the app)
 ├── Onyx_HackNPitch.pdf / .pptx  pitch deck;  Onyx_Demo_Video.mp4  demo video
 ├── Makefile                     one-word commands: setup, dev, test, lint, eval, e2e, migrate, seed
 ├── docker-compose.yml           local stack: database, cache, API, worker, web
@@ -495,7 +494,7 @@ Red_Tape_Navigator/
 | `lib/api.ts`, `format.ts`, `site.ts`, `types.ts` | API client with token refresh, language-aware dates, site settings, shared types. |
 | `messages/en.json`, `hi.json`, `bn.json` | Every interface string in English, Hindi and Bengali. |
 | `i18n/`, `middleware.ts` | Language routing and detection. |
-| `public/` | The logo, installable-app icons and the social-share image. |
+| `public/` | The team logo (`logo.png`), installable-app icons and the social-share image. |
 | `e2e/`, `tests/` | Playwright browser tests (13) and unit tests (10). |
 
 ### Everything else
@@ -782,7 +781,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 ## 📚 Documentation index
 
 **Start here:** [Developer and operations guide](docs/DEVELOPER_GUIDE.md) (architecture, phase history, configuration reference, lessons learned) ·
-[Owner actions](docs/OWNER_ACTIONS.md) · [Launch checklist](docs/LAUNCH_CHECKLIST.md) · [Handoff prompt](docs/HANDOFF_PROMPT.md)
+[Owner actions](docs/OWNER_ACTIONS.md) · [Launch checklist](docs/LAUNCH_CHECKLIST.md)
 
 | Topic | Documents |
 |---|---|

@@ -108,7 +108,7 @@ Render has no India region (Singapore); if the department needs in-India storage
       WhatsApp and UMANG adapters, more cities (Jaipur and Lucknow were left out because sources conflict).
 - [ ] `.github/workflows/deploy.yml` is still a template with placeholder steps; Render deploys from `main` after CI passes, so it is unused.
 
-- [ ] **Logo and the State Emblem of India:** the team logo (`Red_Tape_Navigator_Logo.png`) shows the national emblem on the robot's cap. The State Emblem of India (Prohibition of Improper Use) Act, 2005 restricts that. Before any public launch, get counsel's view and either obtain authorisation or replace the cap badge with a neutral one, then regenerate `frontend/public/*.png`, `frontend/app/icon.png`, `frontend/app/apple-icon.png`, the README screenshots and the deck.
+- [ ] **Logo and the State Emblem of India:** the team logo (`frontend/public/logo.png`) shows the national emblem on the robot's cap. The State Emblem of India (Prohibition of Improper Use) Act, 2005 restricts that. Before any public launch, get counsel's view and either obtain authorisation or replace the cap badge with a neutral one, then regenerate `frontend/public/*.png`, `frontend/app/icon.png`, `frontend/app/apple-icon.png`, the README screenshots and the deck.
 
 ## 8. Final docs, CI green, final report: DONE (2026-11-12)
 - [x] `docs/FINAL_REPORT.md`: what is real, what is simulated, what remains and who must do it, monthly running costs.

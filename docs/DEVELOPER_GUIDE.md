@@ -21,9 +21,9 @@ shows everything for review. **The citizen reviews, signs and submits. The syste
 
 ## READ THIS FIRST: a request to the next contributor
 
-This README and [`docs/HANDOFF_PROMPT.md`](HANDOFF_PROMPT.md) are the project's memory. Please follow them:
+This guide and the [README](../README.md) are the project's memory. Please follow them:
 
-1. **Read this whole README, then `docs/HANDOFF_PROMPT.md` and `docs/LAUNCH_CHECKLIST.md`, before changing anything.**
+1. **Read this whole README, then `docs/LAUNCH_CHECKLIST.md`, before changing anything.**
    The handoff prompt is written so you (or your AI coding assistant) can continue exactly from where the last person stopped.
 2. **Do not stop at "it runs on my machine".** The goal is a finished, launched product (section 11). Keep working through the
    pending list (section 10) in order until each item is done or blocked only by something a human must do. When you are blocked,
@@ -34,7 +34,7 @@ This README and [`docs/HANDOFF_PROMPT.md`](HANDOFF_PROMPT.md) are the project's 
    for anyone. Never create accounts, solve CAPTCHAs, or submit to a government portal.
 5. **Verify before you claim.** Run the quality gates (section 8) and report real results. Keep CI green. Push small, verified commits.
 6. **Keep the docs true.** When you change behaviour, update this README, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md`
-   and `docs/HANDOFF_PROMPT.md` in the same commit. The next person depends on them.
+   in the same commit. The next person depends on them.
 7. Do **not** add `.github/dependabot.yml` (it once opened 12 unwanted pull requests), and do not open PRs, repos or other GitHub
    actions unless the owner asks.
 
@@ -360,7 +360,7 @@ integration mocks (`test_digio.py`), browser e2e (`frontend/e2e`), evals (`backe
 ## 10. What is pending, how to do it, and what to use
 
 Work in this order. Items marked **HUMAN** need the owner or a third party; do everything else around them. Full click-by-click owner steps are in
-[`docs/LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) and [`docs/HANDOFF_PROMPT.md`](HANDOFF_PROMPT.md).
+[`docs/LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md).
 
 | # | Pending item | How to do it | What to use |
 | --- | --- | --- | --- |
@@ -413,7 +413,7 @@ without a webhook secret.
 OWASP mapping and controls are in [`docs/SECURITY.md`](SECURITY.md); DPDP Act mapping in [`docs/COMPLIANCE.md`](COMPLIANCE.md). Highlights:
 rotating refresh tokens with reuse detection, account lockout, rate limits, constant-cost login, Fernet encryption of Aadhaar / PAN / bank answers,
 hash-chained audit log, PII-redacting logs, allowlisted outbound fetching (SSRF defence), prompt-injection defences, signed provider webhooks,
-CSP and HSTS headers, non-root containers, dependency and secret scans in CI. The team logo (`Red_Tape_Navigator_Logo.png`) shows the State Emblem of India on the robot's cap: the 2005 Act restricts that, so get it cleared or replaced before public launch. Otherwise do not use the emblem; an
+CSP and HSTS headers, non-root containers, dependency and secret scans in CI. The team logo (`frontend/public/logo.png`) shows the State Emblem of India on the robot's cap: the 2005 Act restricts that, so get it cleared or replaced before public launch. Otherwise do not use the emblem; an
 authorised department may supply its own via `NEXT_PUBLIC_EMBLEM_URL`.
 
 ## 14. Lessons learned and gotchas
@@ -456,7 +456,7 @@ docs/             see below                     scripts/ placeholder forms, key 
 ```
 
 Documentation: **[Owner actions](OWNER_ACTIONS.md) (what is pending, in order, with status)** · [Deploy now](DEPLOY_NOW.md) · [Final report](FINAL_REPORT.md) ·
-[Threat model](THREAT_MODEL.md) · [Owner background and costs](HUMAN_TODO.md) · [Launch checklist](LAUNCH_CHECKLIST.md) (status of every go-live item) · [Handoff prompt](HANDOFF_PROMPT.md) ·
+[Threat model](THREAT_MODEL.md) · [Owner background and costs](HUMAN_TODO.md) · [Launch checklist](LAUNCH_CHECKLIST.md) (status of every go-live item) ·
 [Rules verification log](RULES_VERIFICATION.md) · [Reviewer worksheet](RULES_REVIEW_EXPORT.csv) · [Integrations](INTEGRATIONS.md) ·
 [Deploy on Vercel + Render](DEPLOYMENT_VERCEL_RENDER.md) · [Deployment (VPS)](DEPLOYMENT.md) · [Go-live notes](GO_LIVE.md) ·
 [Architecture](ARCHITECTURE.md) · [DPDP compliance](COMPLIANCE.md) · [Security / OWASP](SECURITY.md) · [Runbook](RUNBOOK.md) ·
