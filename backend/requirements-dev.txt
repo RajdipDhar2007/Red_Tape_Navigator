@@ -1,0 +1,13 @@
+# Development and test tooling, on top of the runtime dependencies.
+# Mirrors [project.optional-dependencies].dev in pyproject.toml.
+-r requirements.txt
+pytest>=8.3
+pytest-asyncio>=0.24
+pytest-cov>=5.0
+respx>=0.21
+ruff>=0.6
+mypy>=1.11
+pip-audit>=2.7
+bandit>=1.7
+types-PyYAML
+locust>=2.31

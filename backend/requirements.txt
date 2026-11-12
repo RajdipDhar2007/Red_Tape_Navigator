@@ -1,0 +1,32 @@
+# Runtime dependencies of the Red Tape Navigator backend (Python 3.12 or newer).
+# Mirrors [project].dependencies in pyproject.toml; backend/tests/test_requirements_sync.py fails if the two drift.
+# Install:  pip install -r requirements.txt     (or, for development:  pip install -r requirements-dev.txt)
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic[email]>=2.8
+pydantic-settings>=2.4
+sqlalchemy[asyncio]>=2.0.30
+aiosqlite>=0.20
+asyncpg>=0.29
+alembic>=1.13
+redis>=5.0
+arq>=0.26
+anthropic>=0.40
+httpx>=0.27
+trafilatura>=1.12
+playwright>=1.46
+pyyaml>=6.0
+pypdf>=4.3
+pymupdf>=1.24
+reportlab>=4.2
+cryptography>=43
+pyjwt>=2.9
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.0,<4.1
+python-multipart>=0.0.9
+prometheus-client>=0.20
+opentelemetry-api>=1.26
+opentelemetry-sdk>=1.26
+structlog>=24.4
+pgvector>=0.3
+opentelemetry-exporter-otlp-proto-http>=1.26

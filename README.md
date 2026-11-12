@@ -43,16 +43,40 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 
 ## Contents
 
-| | | |
-|---|---|---|
-| 1. [Hackathon and team](#-hackathon-and-team) | 7. [The workflow, step by step](#-the-workflow-step-by-step) | 13. [Challenges we faced and how we solved them](#-challenges-we-faced-and-how-we-solved-them) |
-| 2. [The problem statement in full](#-the-problem-statement-in-full) | 8. [How the app works: what does what](#-how-the-app-works-what-does-what) | 14. [Quality and testing](#-quality-and-testing) |
-| 3. [The problem, in real life](#-the-problem-in-real-life) | 9. [Every feature](#-every-feature) | 15. [Honest status](#-honest-status-real-simulated-untested) |
-| 4. [Who we are building this for](#-who-we-are-building-this-for) | 10. [Screenshots](#-screenshots-of-the-running-app) | 16. [Pending work and roadmap](#-pending-work-and-roadmap) |
-| 5. [How the Indian government context shaped us](#-how-the-indian-government-context-shaped-the-design) | 11. [Technology and tools](#-technology-and-tools-we-used) | 17. [Our vision](#-our-vision) |
-| 6. [Our approach and plan](#-our-approach-and-plan) | 12. [Architecture and pipelines](#-architecture-and-pipelines) | 18. [Quick start](#-quick-start) · [Docs](#-documentation-index) · [License](#-license) |
-| **+** [Where the agentic AI is](#-where-the-agentic-ai-is) | | |
-| **+** [Project structure](#-project-structure) | | |
+**About the project**
+
+1. [Hackathon and team](#-hackathon-and-team)
+2. [The problem statement in full](#-the-problem-statement-in-full)
+3. [The problem, in real life](#-the-problem-in-real-life)
+4. [Who we are building this for](#-who-we-are-building-this-for)
+5. [How the Indian government context shaped the design](#-how-the-indian-government-context-shaped-the-design)
+
+**Our approach and the agent**
+
+6. [Our approach and plan](#-our-approach-and-plan)
+7. [Where the agentic AI is](#-where-the-agentic-ai-is)
+8. [The workflow, step by step](#-the-workflow-step-by-step)
+9. [How the app works: what does what](#-how-the-app-works-what-does-what)
+10. [Project structure](#-project-structure)
+11. [Every feature](#-every-feature)
+12. [Screenshots of the running app](#-screenshots-of-the-running-app)
+
+**How it is built and how well**
+
+13. [Technology and tools we used](#-technology-and-tools-we-used)
+14. [Architecture and pipelines](#-architecture-and-pipelines)
+15. [Challenges we faced and how we solved them](#-challenges-we-faced-and-how-we-solved-them)
+16. [Quality and testing](#-quality-and-testing)
+17. [Honest status: real, simulated, untested](#-honest-status-real-simulated-untested)
+
+**Looking ahead and getting started**
+
+18. [Pending work and roadmap](#-pending-work-and-roadmap)
+19. [Our vision](#-our-vision)
+20. [Quick start](#-quick-start)
+21. [Documentation index](#-documentation-index)
+22. [Credits and acknowledgements](#-credits-and-acknowledgements)
+23. [License](#-license)
 
 ---
 
@@ -415,6 +439,7 @@ Red_Tape_Navigator/
 ├── Problem_Statement.md         the hackathon problem statement, verbatim
 ├── LICENSE                      proprietary licence (Team Onyx)
 ├── Onyx_HackNPitch.pdf / .pptx  pitch deck;  Onyx_Demo_Video.mp4  demo video
+├── requirements.txt             Python dependencies (points to backend/requirements.txt)
 ├── Makefile                     one-word commands: setup, dev, test, lint, eval, e2e, migrate, seed
 ├── docker-compose.yml           local stack: database, cache, API, worker, web
 ├── docker-compose.prod.yml      single-server production stack (with Caddy for HTTPS)
@@ -475,7 +500,8 @@ Red_Tape_Navigator/
 | `evals/` | `golden_cases.json` and `run.py`: the evaluation set that fails the build if the agent invents a fact. |
 | `config/sources.yaml`, `rule_verified.csv` | The allowlist of official domains, and which rules a reviewer has verified. |
 | `scripts/create_admin.py`, `entrypoint.sh` | Create an officer account; the container start-up script (migrate, load rules, run). |
-| `Dockerfile`, `pyproject.toml`, `alembic.ini` | Container image, dependencies and tool settings. |
+| `requirements.txt`, `requirements-dev.txt` | Python dependencies: what the app needs to run, and the extra test, lint and security tools. |
+| `Dockerfile`, `pyproject.toml`, `alembic.ini` | Container image, the package definition (the source of truth for dependencies) and tool settings. |
 
 ### Frontend (`frontend/`)
 
@@ -744,23 +770,38 @@ Three commitments guide every decision:
 
 ## 🚀 Quick start
 
-Prerequisites: Python 3.12+, Node 20+, Git. Docker is optional.
+### Installation and setup
 
-**Windows shortcut:** after the one-time setup, double-click `Start-Red-Tape-Navigator.bat`.
+**Prerequisites:** Python 3.12 or newer, Node.js 20 or newer, Git. Docker is optional.
+
+**Python dependencies** are listed in [`backend/requirements.txt`](backend/requirements.txt) (what the app needs to run) and
+[`backend/requirements-dev.txt`](backend/requirements-dev.txt) (adds the test, lint and security tools). A [`requirements.txt`](requirements.txt) in the
+repository root points to the backend one, so `pip install -r requirements.txt` also works from the top folder. They mirror `backend/pyproject.toml`, and a test
+fails if they ever differ.
 
 **Without Docker** (SQLite, no Redis, no model key needed):
 
 ```bash
+# 1. Get the code
+git clone https://github.com/RajdipDhar2007/Red_Tape_Navigator.git
+cd Red_Tape_Navigator
+
+# 2. Backend: virtual environment, dependencies, database, rules
 cd backend
 python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
-export DATABASE_URL=sqlite+aiosqlite:///./dev_local.db
+pip install -r requirements-dev.txt                 # run-only install: pip install -r requirements.txt
+export DATABASE_URL=sqlite+aiosqlite:///./dev_local.db   # Windows PowerShell: $env:DATABASE_URL="sqlite+aiosqlite:///./dev_local.db"
 alembic upgrade head && python -m app.kb.seed_loader
 uvicorn app.main:app --port 8000                     # API docs at /docs in dev
 
-cd ../frontend && npm ci
+# 3. Frontend (second terminal, from the repository root)
+cd frontend && npm ci
 npm run build && npm run start                       # http://localhost:3000
 ```
+
+Run the backend commands from inside `backend/`: the `app` package is found from that folder, so no `pip install -e .` is needed when you use the requirements files.
+(`pip install -e ".[dev]"` does the same job and is what the Makefile and CI use.) The optional JavaScript page renderer needs one extra step,
+`playwright install chromium`; the app works without it.
 
 Open <http://localhost:3000>, create an account (password of at least 10 characters), accept the data notice and describe a goal.
 With Docker: `make setup && make dev`.

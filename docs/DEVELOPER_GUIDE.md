@@ -299,7 +299,7 @@ Prerequisites: Python 3.12+, Node 20+ (CI uses 22), Git. Docker is optional.
 ```bash
 cd backend
 python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
+pip install -r requirements-dev.txt                 # equivalent: pip install -e ".[dev]"
 export DATABASE_URL=sqlite+aiosqlite:///./dev_local.db
 alembic upgrade head && python -m app.kb.seed_loader
 uvicorn app.main:app --port 8000                     # API (docs at /docs in dev)
