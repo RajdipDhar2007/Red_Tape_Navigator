@@ -13,7 +13,7 @@ shows everything for review. **The citizen reviews, signs and submits. The syste
 
 - **Project:** Red Tape Navigator
 - **Team:** Onyx (HackNPitch, Jadavpur University). Category: Software / AI and civic tech.
-- **Members:** Raktim Chakraborty (team leader), Anish Goswami, Rajdip Dhar, Imon Patra.
+- **Members:** Rajdip Dhar (team leader), Raktim Chakraborty, Anish Goswami, Imon Patra.
 
 ---
 
