@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an improvement or a new capability.
+title: "[Idea]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. Please remember the project's promises: a human always submits, every rule is cited to an official source, personal data stays protected, and the product stays free.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve, and for whom?
+      description: Describe the citizen, shop owner or officer and what is hard for them today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New city or state
+        - New business type or licence
+        - Language or translation
+        - Forms and documents
+        - Reminders and follow-up
+        - Teams and helpers
+        - Officer console
+        - Accessibility
+        - Other
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered (optional)

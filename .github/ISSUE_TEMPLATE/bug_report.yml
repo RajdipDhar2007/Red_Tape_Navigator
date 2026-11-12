@@ -1,0 +1,72 @@
+name: Bug report
+description: Something in Red Tape Navigator does not work as it should.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting this. **Please never paste real Aadhaar, PAN, bank details, passwords, one-time codes or personal documents.** Use fake values and hide personal data in screenshots.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The goal sentence you typed, the city, and each step you took.
+      placeholder: |
+        1. Open the app in English
+        2. Type "I want to open a small bakery in Kolkata"
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did it happen?
+      options:
+        - Goal and clarifying questions
+        - Plan / checklist
+        - Interview
+        - Forms and review
+        - Download / e-Sign
+        - Reminders
+        - Account, sign-in or two-factor
+        - Teams
+        - Document Vault
+        - Officer console
+        - Hindi or Bengali text
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Interface language
+      options: [English, Hindi, Bengali]
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 130 on Android 14 / Firefox on Windows 11
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or error messages
+      description: Remove or hide any personal data first.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before you submit
+      options:
+        - label: I have not included any real personal data or secrets.
+          required: true
+        - label: This is not a security problem (those go through the private security policy).
+          required: true

@@ -440,6 +440,7 @@ Red_Tape_Navigator/
 ├── README.md                    this overview
 ├── Problem_Statement.md         the hackathon problem statement, verbatim
 ├── LICENSE                      proprietary licence (Team Onyx)
+├── CODE_OF_CONDUCT.md, CONTRIBUTING.md, SECURITY.md, SUPPORT.md, ACCESSIBILITY.md   community and policy files
 ├── Onyx_HackNPitch.pdf / .pptx  pitch deck;  Onyx_Demo_Video.mp4  demo video
 ├── requirements.txt             Python dependencies (points to backend/requirements.txt)
 ├── Makefile                     one-word commands: setup, dev, test, lint, eval, e2e, migrate, seed
@@ -532,6 +533,7 @@ Red_Tape_Navigator/
 | `docs/` | Architecture, deployment, security, compliance, runbook, the owner's to-do list and reports; `docs/DEVELOPER_GUIDE.md` is the engineering handbook; `docs/media/` holds the README images. |
 | `scripts/` | `backup_restore_drill.sh`, `db_backup_restore.py` (backups), `loadtest/` (Locust), `export_rules_for_review.py`, `rule_freshness.py`, `verify_sources.py`, `verify_deploy.py`, `smoke_demo.py`, `rotate_encryption_key.py`, `make_placeholder_forms.py`. |
 | `infra/terraform/` | Terraform skeleton with modules for network, database, cache, secrets and app. |
+| `.github/ISSUE_TEMPLATE/`, `pull_request_template.md` | Issue forms (bug, rule correction, accessibility barrier, feature request) and the pull request checklist. |
 | `.github/workflows/` | `ci.yml` (the 7 CI jobs), `codeql.yml` (code scanning), `deploy.yml` (deployment template). |
 
 ---
@@ -832,6 +834,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 | **Rules and integrations** | [Rules verification log](docs/RULES_VERIFICATION.md) · [Reviewer worksheet](docs/RULES_REVIEW_EXPORT.csv) · [Integrations](docs/INTEGRATIONS.md) |
 | **Deploy and operate** | [Deploy now](docs/DEPLOY_NOW.md) · [Vercel and Render](docs/DEPLOYMENT_VERCEL_RENDER.md) · [VPS deployment](docs/DEPLOYMENT.md) · [Runbook](docs/RUNBOOK.md) · [Load test](docs/LOAD_TEST.md) · [Go-live notes](docs/GO_LIVE.md) |
 | **Security and compliance** | [Security (OWASP)](docs/SECURITY.md) · [Threat model](docs/THREAT_MODEL.md) · [DPDP compliance](docs/COMPLIANCE.md) |
+| **Community and policies** | [Code of Conduct](CODE_OF_CONDUCT.md) · [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md) · [Support](SUPPORT.md) · [Accessibility](ACCESSIBILITY.md) · [Licence](LICENSE) · [Issue forms](.github/ISSUE_TEMPLATE) · [Pull request template](.github/pull_request_template.md) |
 | **Status and reports** | [Final report](docs/FINAL_REPORT.md) · [Final project audit](docs/FINAL_PROJECT_AUDIT.md) · [Pilot plan](docs/PILOT_PLAN.md) · [Owner background and costs](docs/HUMAN_TODO.md) |
 
 ---

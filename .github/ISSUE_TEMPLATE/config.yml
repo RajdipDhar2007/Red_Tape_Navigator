@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem (private)
+    url: https://github.com/RajdipDhar2007/Red_Tape_Navigator/security/policy
+    about: Please do not open a public issue for security problems. Read the security policy and report privately.
+  - name: Get help using the project
+    url: https://github.com/RajdipDhar2007/Red_Tape_Navigator/blob/main/SUPPORT.md
+    about: Where to find answers and how to ask for help.

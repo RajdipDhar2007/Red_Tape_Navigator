@@ -1,0 +1,73 @@
+name: Rule or data correction
+description: A fee, timeline, authority, document list or licence in the plan looks wrong or out of date.
+title: "[Rule]: "
+labels: ["rules", "data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Correct information is the most important thing in this project. **We can only change a rule when it is backed by an official source**, so please link the official page or document. If you cannot, tell us where you found it and we will try to verify it.
+  - type: input
+    id: licence
+    attributes:
+      label: Licence or step
+      placeholder: e.g. FSSAI Food Business Registration / Licence
+    validations:
+      required: true
+  - type: input
+    id: city
+    attributes:
+      label: City or state
+      placeholder: e.g. Kolkata, West Bengal
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong?
+      options:
+        - Fee
+        - Timeline
+        - Issuing authority
+        - Documents required
+        - Order of steps
+        - A licence is missing
+        - A licence should not apply
+        - Out of date
+        - Translation (Hindi or Bengali)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: shown
+    attributes:
+      label: What the app shows
+      description: Copy the text exactly as shown.
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: What you believe is correct
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Official source (link)
+      description: The department or authority page, circular, gazette notification or rule.
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date of the source
+      description: When it was published or last updated, if shown.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before you submit
+      options:
+        - label: I have not included personal data.
+          required: true

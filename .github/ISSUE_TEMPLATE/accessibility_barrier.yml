@@ -1,0 +1,48 @@
+name: Accessibility barrier
+description: Something in Red Tape Navigator is hard or impossible to use because of a disability, a device or a language.
+title: "[Accessibility]: "
+labels: ["accessibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Barriers that stop someone completing a task are fixed first. See our [accessibility statement](https://github.com/RajdipDhar2007/Red_Tape_Navigator/blob/main/ACCESSIBILITY.md). **Please hide any personal data in screenshots.**
+  - type: input
+    id: page
+    attributes:
+      label: Page or screen
+      placeholder: e.g. Interview, Review, Document Vault, Help
+    validations:
+      required: true
+  - type: textarea
+    id: barrier
+    attributes:
+      label: What were you trying to do, and what got in the way?
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of barrier
+      multiple: true
+      options:
+        - Screen reader (cannot read or operate something)
+        - Keyboard only (cannot reach or use something)
+        - Low vision (contrast, text size, zoom)
+        - Colour (relies on colour alone)
+        - Motion or animation
+        - Hearing
+        - Cognitive (confusing wording or steps)
+        - Language (Hindi or Bengali text unclear)
+        - Voice input
+        - Small screen or touch target
+        - Other
+  - type: input
+    id: tech
+    attributes:
+      label: Browser, device and assistive technology
+      placeholder: e.g. NVDA + Firefox on Windows 11, TalkBack on Android 14
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What would help? (optional)
