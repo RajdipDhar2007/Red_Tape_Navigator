@@ -91,12 +91,12 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 
 ### Team members
 
-| | |
-|---|---|
-| **Rajdip Dhar** | **Team Leader** |
-| **Raktim Chakraborty** | Team member |
-| **Anish Goswami** | Team member |
-| **Imon Patra** | Team member |
+<table>
+<tr><td><b>Rajdip Dhar</b></td><td><b>Team Leader</b></td></tr>
+<tr><td><b>Raktim Chakraborty</b></td><td>Team member</td></tr>
+<tr><td><b>Anish Goswami</b></td><td>Team member</td></tr>
+<tr><td><b>Imon Patra</b></td><td>Team member</td></tr>
+</table>
 
 </td>
 </tr>
