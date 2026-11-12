@@ -9,7 +9,7 @@
 **An agentic AI assistant that turns one sentence, such as _"I want to open a small bakery in Kolkata"_, into a researched, cited, step-by-step licensing plan and filled-in paperwork, while the citizen stays in full control.**
 
 [![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#-hackathon-and-team)
-[![Hackathon](https://img.shields.io/badge/Hackathon-HackNPitch-FF9933?style=for-the-badge)](#-hackathon-and-team)
+[![Hackathon](https://img.shields.io/badge/Hackathon-HACK%3CN%3EPITCH-FF9933?style=for-the-badge)](#-hackathon-and-team)
 [![Track](https://img.shields.io/badge/Track-Agentic%20AI%20%C2%B7%20Civic%20Tech-138808?style=for-the-badge)](#-the-problem-statement-in-full)
 [![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)](#-license)
 
@@ -52,26 +52,22 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 | 5. [How the Indian government context shaped us](#-how-the-indian-government-context-shaped-the-design) | 11. [Technology and tools](#-technology-and-tools-we-used) | 17. [Our vision](#-our-vision) |
 | 6. [Our approach and plan](#-our-approach-and-plan) | 12. [Architecture and pipelines](#-architecture-and-pipelines) | 18. [Quick start](#-quick-start) · [Docs](#-documentation-index) · [License](#-license) |
 | **+** [Where the agentic AI is](#-where-the-agentic-ai-is) | | |
+| **+** [Project structure](#-project-structure) | | |
 
 ---
 
 ## 🏁 Hackathon and team
 
-<table>
-<tr>
-<td width="50%" valign="top">
+| | |
+|---|---|
+| **Hackathon** | **HACK&lt;N&gt;PITCH** |
+| **Institution** | Jadavpur University |
+| **Team name** | **Team Onyx** |
+| **Project** | Red Tape Navigator |
+| **Track** | Agentic AI, Software and Civic Tech |
+| **Problem statement** | *Agentic AI: The "Red Tape" Bureaucracy Navigator* |
 
-**Hackathon:** HackNPitch
-**Institution:** Jadavpur University
-**Team name:** **Team Onyx**
-**Project:** Red Tape Navigator
-**Track:** Agentic AI, Software and Civic Tech
-**Problem statement:** *Agentic AI: The "Red Tape" Bureaucracy Navigator*
-
-</td>
-<td width="50%" valign="top">
-
-**Team members**
+### Team members
 
 | Member | Role |
 |---|---|
@@ -79,10 +75,6 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 | **Raktim Chakraborty** | Team member |
 | **Anish Goswami** | Team member |
 | **Imon Patra** | Team member |
-
-</td>
-</tr>
-</table>
 
 Our submission materials live in this repository: the [pitch deck (PDF)](Onyx_HackNPitch.pdf), the [editable deck (PPTX)](Onyx_HackNPitch.pptx)
 and the [demo video](Onyx_Demo_Video.mp4).
@@ -147,15 +139,15 @@ Each of them is told to "get the licences" and then has to work out **which** on
 
 ### The pain, point by point
 
-| What the citizen faces today | What it costs them |
-|---|---|
-| Rules are scattered across **central, state and municipal** websites, each with its own layout. | Days spent just finding the right page. |
-| Forms are **outdated PDFs**, or portals that only accept typed input. | Re-typing the same name, PAN, Aadhaar and address into every form. |
-| Requirements **contradict** each other between departments and between cities. | Wrong documents, rejected applications, repeat visits. |
-| The order matters (for example Udyam first, then FSSAI, then trade licence) but nobody states it. | Applications filed in the wrong sequence and sent back. |
-| Fees and timelines are rarely written down in one place. | No budget and no schedule; a business that cannot plan its opening day. |
-| Language: official text is mostly English; many owners think in Hindi or Bengali. | Dependence on middlemen who charge for what should be free guidance. |
-| Sensitive identity data is handed to anyone who "helps". | Privacy and fraud risk. |
+| What the citizen faces today | What it costs them | What we fixed | How we fixed it |
+|---|---|---|---|
+| Rules are scattered across **central, state and municipal** websites, each with its own layout. | Days spent just finding the right page. | **One place, one plan** for the whole goal. | A curated rules knowledge base (9 cities, 120 business types, 16 licences, 438 rules), each rule cited to its official source; a guarded fetcher and `verify_sources` keep it checked against the live pages. |
+| Forms are **outdated PDFs**, or portals that only accept typed input. | Re-typing the same name, PAN, Aadhaar and address into every form. | **Forms filled for you**; answers typed only once. | A PDF filler (AcroForm fill or flat overlay) plus a **key-in sheet** for FoSCoS and Udyam. One interview feeds every form. |
+| Requirements **contradict** each other between departments and between cities. | Wrong documents, rejected applications, repeat visits. | **City- and state-specific answers**, with honesty where sources disagree. | `by_city` rules for all nine cities, state-specific licences (liquor, drugs, clinics, schools), cities with conflicting sources left out, and an officer review queue. |
+| The order matters (for example Udyam first, then FSSAI, then trade licence) but nobody states it. | Applications filed in the wrong sequence and sent back. | **The right order, spelled out.** | A planner orders the licences by dependency; the checklist numbers each step and marks "Next up". |
+| Fees and timelines are rarely written down in one place. | No budget and no schedule; a business that cannot plan its opening day. | **Fee, timeline and documents on every step.** | Each claim carries a source link, date checked, confidence and hash. The plan can be printed, copied or shared, and reminders are scheduled for status checks and renewals. |
+| Language: official text is mostly English; many owners think in Hindi or Bengali. | Dependence on middlemen who charge for what should be free guidance. | **English, Hindi and Bengali**, free for everyone. | A translation layer for all backend text, complete interface strings in three languages, voice input, and no paywall anywhere in the code. |
+| Sensitive identity data is handed to anyone who "helps". | Privacy and fraud risk. | **Your data stays yours.** | DPDP-style consent per purpose, Fernet encryption of Aadhaar, PAN and bank answers, redaction before any model call, a hash-chained audit log, and export, erase and retention purge. |
 
 ---
 
@@ -410,6 +402,110 @@ catalog.py (licences, 9 cities) + sourced_licences.py (read from official docume
       -> officer console review queue: verified / corrected / rejected, every decision audited
       -> optional live refresh: a claim is kept only if its quote appears verbatim on the page
 ```
+
+---
+
+## 🗂️ Project structure
+
+A monorepo with one folder per concern. The tree gives the map; the tables below it say what each file does.
+
+```text
+Red_Tape_Navigator/
+├── README.md                    this overview
+├── Problem_Statement.md         the hackathon problem statement, verbatim
+├── LICENSE                      proprietary licence (Team Onyx)
+├── Red_Tape_Navigator_Logo.png  the team logo (source of every icon in the app)
+├── Onyx_HackNPitch.pdf / .pptx  pitch deck;  Onyx_Demo_Video.mp4  demo video
+├── Makefile                     one-word commands: setup, dev, test, lint, eval, e2e, migrate, seed
+├── docker-compose.yml           local stack: database, cache, API, worker, web
+├── docker-compose.prod.yml      single-server production stack (with Caddy for HTTPS)
+├── render.yaml                  Render Blueprint, zero-cost trial
+├── render.production.yaml       Render Blueprint, paid launch setup
+├── .env.example / .env.prod.example   every setting, with safe placeholder values
+├── Start-Red-Tape-Navigator.bat       Windows double-click launcher
+├── .github/                     CI workflow (7 jobs), CodeQL scan, deploy template, code owners
+├── backend/                     the FastAPI server and the agent (Python)
+├── frontend/                    the Next.js web app (TypeScript)
+├── docs/                        guides, runbooks, compliance, reports (see the documentation index)
+├── scripts/                     operations and data tools (backups, load test, rule export, deploy check)
+├── infra/                       Terraform skeleton for cloud infrastructure
+└── deploy/                      Caddyfile for the single-server setup
+```
+
+### Backend (`backend/`)
+
+| Path | What it does |
+|---|---|
+| `app/main.py` | Builds the FastAPI app: routers, middleware, health and readiness endpoints, start-up tasks. |
+| `app/agent/intake.py` | Turns the citizen's sentence into business type, city and state (rules first, optional model second). |
+| `app/agent/planner.py` | Orders the licences by dependency. |
+| `app/agent/research.py` | Builds the cited plan; extracts claims from official pages and keeps one only if its quote appears word for word. |
+| `app/agent/llm.py` | The model wrapper: Ollama, Gemini or none; redacts personal data first; circuit breaker; rules-only fallback. |
+| `app/api/auth.py` | Sign-up, login, refresh tokens, password reset, email confirmation, two-factor sign-in. |
+| `app/api/consent.py` | Records and withdraws consent per purpose. |
+| `app/api/sessions.py` | The main journey: goal, clarify, plan, interview, forms, review, downloads, e-Sign, reminders, calendar export. |
+| `app/api/documents.py` | The Document Vault: upload, list, download, delete. |
+| `app/api/workspaces.py` | Teams, roles, invitation links, shared sessions. |
+| `app/api/privacy.py` | Data export and account erasure. |
+| `app/api/admin.py` | Officer console: rule review queue, official-form approval, readiness, audit check. |
+| `app/api/webhooks.py` | Receives signed Digio callbacks. |
+| `app/api/deps.py` | Shared request helpers (current user, database session, role checks). |
+| `app/core/config.py` | Reads every setting from the environment and refuses unsafe production settings. |
+| `app/core/security.py`, `crypto.py`, `totp.py` | Passwords and tokens; field encryption (Fernet); two-factor codes. |
+| `app/core/audit.py` | Hash-chained audit log. |
+| `app/core/middleware.py` | Security headers, rate limiting, request ids, metrics. |
+| `app/core/localize.py` | Translates backend JSON into Hindi or Bengali on the way out. |
+| `app/core/storage.py`, `scanner.py` | Vault storage (local or S3) and the malware-scan hook. |
+| `app/core/resilience.py`, `llm_http.py` | Retries, timeouts and circuit breaker; the HTTP calls to model providers. |
+| `app/core/cache.py`, `logging.py`, `metrics.py`, `tracing.py`, `errors.py` | Cache, structured logs with redaction, Prometheus metrics, OpenTelemetry, error tracking. |
+| `app/db/models.py`, `session.py`, `sqlite_upgrade.py` | Database tables, connections, and automatic column upgrades for old local files. |
+| `app/kb/catalog.py`, `sourced_licences.py`, `business_types.py` | The rules: licences, nine cities, state-specific rules read from official sources, 120 business types. |
+| `app/kb/seed_loader.py`, `store.py`, `confidence.py`, `embedding.py` | Loads rules into the knowledge base, stores versioned cited claims, scores confidence, supports search. |
+| `app/scraping/allowlist.py`, `fetcher.py`, `sanitizer.py` | Approved domains only, guarded fetching, and cleaning of page text before any model sees it. |
+| `app/interview/fields.py`, `validators.py`, `engine.py`, `memory.py` | The questions, answer checks (PAN, Aadhaar, PIN, IFSC, dates), the one-or-two-at-a-time engine, encrypted memory. |
+| `app/forms/registry.py`, `filler.py`, `context.py`, `transforms.py` | Which forms exist, filling the PDFs, derived values, value formatting. |
+| `app/forms/official.py`, `placeholder.py`, `templates/` | Fetching official PDFs with officer approval, the watermarked placeholder forms, and each form's field map (JSON) and PDF. |
+| `app/followup/checklist.py`, `reminders.py` | The submission checklist and reminder scheduling. |
+| `app/integrations/interfaces.py`, `mock.py`, `factory.py` | What each integration must do, labelled mocks, and which one is used. There is no "submit" method anywhere. |
+| `app/integrations/real/` | Real adapters: `digio.py` (e-Sign, DigiLocker), `msg91.py` (SMS), `smtp.py` (email); `messaging.py` and `umang.py` are stubs. |
+| `app/jobs/worker.py`, `inprocess.py` | Scheduled jobs: reminders, retention purge, weekly rule re-checks. |
+| `app/services/` | `session_service.py` (shared journey logic), `privacy.py` (export, erase, retention), `bootstrap.py` (first officer from settings). |
+| `app/i18n_content/` | Hindi and Bengali tables for backend text (`data_hi.py`, `data_bn.py`, aligned to `source.py`). |
+| `migrations/versions/` | Nine Alembic migrations, `0001` (initial schema) to `0009` (Document Vault). |
+| `tests/` | 28 test files: accounts and teams, API flow, catalogue integrity, vault, forms, translations, providers, and more. |
+| `evals/` | `golden_cases.json` and `run.py`: the evaluation set that fails the build if the agent invents a fact. |
+| `config/sources.yaml`, `rule_verified.csv` | The allowlist of official domains, and which rules a reviewer has verified. |
+| `scripts/create_admin.py`, `entrypoint.sh` | Create an officer account; the container start-up script (migrate, load rules, run). |
+| `Dockerfile`, `pyproject.toml`, `alembic.ini` | Container image, dependencies and tool settings. |
+
+### Frontend (`frontend/`)
+
+| Path | What it does |
+|---|---|
+| `app/[locale]/page.tsx`, `layout.tsx`, `template.tsx` | Home page, the shared page frame (header, footer, language), and page transitions. |
+| `app/[locale]/session/`, `account/`, `documents/`, `teams/`, `staff/`, `help/` | The journey screens, account and privacy, Document Vault, teams, officer console and help centre. |
+| `app/[locale]/invite/`, `reset/`, `verify-email/`, `privacy/`, `terms/` | Invitation, password reset, email confirmation, and the legal pages. |
+| `app/manifest.ts`, `robots.ts`, `sitemap.ts`, `icon.png`, `apple-icon.png` | Install manifest, search-engine files and the logo-based icons. |
+| `components/Header.tsx`, `Home.tsx`, `Icon.tsx`, `LogoMark.tsx` | Top bar with the logo, the landing page and dashboard, icons, the decorative wheel. |
+| `components/SessionView.tsx`, `ChecklistView.tsx`, `CitationLine.tsx` | The journey container, the cited plan, and the source line under every claim. |
+| `components/InterviewChat.tsx`, `VoiceInput.tsx` | The conversational interview and voice input. |
+| `components/ReviewView.tsx`, `DoneView.tsx`, `KeyInSheet.tsx` | Side-by-side review, downloads and e-Sign, and the key-in sheet for online-only portals. |
+| `components/AccountView.tsx`, `TeamsView.tsx`, `DocumentsView.tsx`, `StaffConsole.tsx`, `HelpView.tsx` | Account, teams, vault, officer console and help centre. |
+| `components/fx/` | Small motion helpers: progress ring, confetti, count-up, scroll reveal. |
+| `lib/api.ts`, `format.ts`, `site.ts`, `types.ts` | API client with token refresh, language-aware dates, site settings, shared types. |
+| `messages/en.json`, `hi.json`, `bn.json` | Every interface string in English, Hindi and Bengali. |
+| `i18n/`, `middleware.ts` | Language routing and detection. |
+| `public/` | The logo, installable-app icons and the social-share image. |
+| `e2e/`, `tests/` | Playwright browser tests (13) and unit tests (10). |
+
+### Everything else
+
+| Path | What it does |
+|---|---|
+| `docs/` | Architecture, deployment, security, compliance, runbook, the owner's to-do list and reports; `docs/DEVELOPER_GUIDE.md` is the engineering handbook; `docs/media/` holds the README images. |
+| `scripts/` | `backup_restore_drill.sh`, `db_backup_restore.py` (backups), `loadtest/` (Locust), `export_rules_for_review.py`, `rule_freshness.py`, `verify_sources.py`, `verify_deploy.py`, `smoke_demo.py`, `rotate_encryption_key.py`, `make_placeholder_forms.py`. |
+| `infra/terraform/` | Terraform skeleton with modules for network, database, cache, secrets and app. |
+| `.github/workflows/` | `ci.yml` (the 7 CI jobs), `codeql.yml` (code scanning), `deploy.yml` (deployment template). |
 
 ---
 
@@ -701,7 +797,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 ## 🙏 Credits and acknowledgements
 
 - **Team Onyx**: Rajdip Dhar (team leader), Raktim Chakraborty, Anish Goswami and Imon Patra.
-- **HackNPitch** and **Jadavpur University** for the platform and the problem.
+- **HACK&lt;N&gt;PITCH** and **Jadavpur University** for the platform and the problem.
 - **Official sources** we read and cite: the Ministry of MSME (Udyam), FSSAI (FoSCoS), the GST Council and GSTN, state and municipal authorities, state excise and
   drugs-control departments, the Bureau of Indian Standards, MeitY (DigiLocker, UMANG), and the text of the Digital Personal Data Protection Act, 2023. We are not affiliated
   with any of them.
@@ -787,7 +883,7 @@ To request permission, contact the repository owner through GitHub: RajdipDhar20
 
 <div align="center">
 
-**Red Tape Navigator** · Team Onyx · HackNPitch · Jadavpur University
+**Red Tape Navigator** · Team Onyx · HACK&lt;N&gt;PITCH · Jadavpur University
 
 *Built so that the next person who wants to open a bakery spends their time baking.*
 
