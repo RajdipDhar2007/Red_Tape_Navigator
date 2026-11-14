@@ -4,7 +4,7 @@ Where the product stands, what is real, what is simulated, what is left and what
 
 ## 1. In one paragraph
 
-Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**. **State on 2026-11-12:** the owner has Render and Vercel accounts (both signed in with GitHub). Render read `render.yaml` without errors. The Blueprint has **not** been applied yet: it is waiting for six values only the owner can type. Nothing is live. Whether the Brevo (email sender) account exists is not confirmed. The ordered list of what is left, with the status of each step, is `docs/OWNER_ACTIONS.md`. Everything a developer can do without those values is done. The remaining items need a person or an organisation outside the code: accounts, regulatory approvals (SMS, e-sign), FSSAI's permission, a lawyer, native-language reviewers, an officer to sign off rules, and a pilot with real shop owners.
+Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**. Nothing is live. Everything a developer can do without those values is done. The remaining items need a person or an organisation outside the code: accounts, regulatory approvals (SMS, e-sign), FSSAI's permission, a lawyer, native-language reviewers, an officer to sign off rules, and a pilot with real shop owners.
 
 ## 2. What is real and tested
 
@@ -18,7 +18,6 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**.
 | English, Hindi and Bengali for the whole interface and all rule text | Built and tested for completeness; wording not yet reviewed by native speakers |
 | 9 cities, 120 business types, 16 licences, 438 rules from official sources | Seeded; every rule shows "verify with the authority" until an officer signs it off |
 | Production safety checks at start-up | Built and tested: refuses dev secrets, SQLite, http origins, demo mode, missing email settings |
-| **One-file hosting set-up (new)**: `render.yaml` (free trial) and `render.production.yaml` (launch) | Written against Render's current Blueprint specification; unit-tested for typos and committed secrets; **not yet applied on a real Render account** |
 | **Scheduled jobs without a separate worker (new)** (`RUN_SCHEDULER=true`) | Built and tested |
 | **First officer account from environment variables (new)**, for hosts without a shell | Built and tested; can never overwrite an existing password |
 | **Live-deployment checker (new)**: `scripts/verify_deploy.py` | Written; run it against the real site after deploying |
@@ -42,23 +41,23 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**.
 
 | # | Item | Who | How |
 |---|---|---|---|
-| 1 | Finish the deployment: Render and Vercel accounts exist; type six values into the Render Blueprint form and click Deploy; then Vercel import and connecting the two | Owner for the six values, then owner or developer | `docs/OWNER_ACTIONS.md` part A, steps 2 to 8 |
+| 1 | Finish the deployment: set the production values and bring the stack up | Owner, then owner or developer | `docs/DEPLOYMENT.md` |
 | 2 | Copy `FIELD_ENCRYPTION_KEY` from Render into a password manager | Owner | Step 2.5 of the same guide |
 | 3 | Run `scripts/verify_deploy.py --journey` on the live site, test reset email | Owner or developer | One command |
 | 4 | Uptime monitor on `/ready` | Owner | UptimeRobot, 3 minutes |
 | 5 | Before day 30: upgrade the free database or move to the launch Blueprint | Owner | Needs a card |
 | 6 | Send the two drafted emails (FSSAI permission, Digio sandbox) after filling the bracketed parts | Owner | Gmail, Drafts |
-| 7 | MSG91 KYC and TRAI DLT registration | Owner | `docs/HUMAN_TODO.md` Part 1 item 8 |
+| 7 | MSG91 KYC and TRAI DLT registration | Owner | |
 | 8 | Lawyer reviews privacy, terms and consent text | Lawyer | Then switch the banner off |
-| 9 | Native Hindi and Bengali review | Two reviewers | Files listed in `docs/LAUNCH_CHECKLIST.md` section 7 |
+| 9 | Native Hindi and Bengali review | Two reviewers | `backend/app/i18n_content/`, `backend/app/kb/business_types.py` |
 | 10 | Officer signs off rules in the console | Someone with legal or CA knowledge | `docs/RULES_REVIEW_EXPORT.csv` is the worksheet |
 | 11 | Real-phone, slow-network, voice-input and screen-reader test | Owner | Needs devices |
 | 12 | Independent penetration test | Tester | `docs/THREAT_MODEL.md` lists what is open |
 | 13 | Pilot with 5 to 10 shop owners | Owner | `docs/PILOT_PLAN.md` |
 | 14 | Decisions: who funds running costs, support channel, on-call contact, custom domain | Owner | `docs/BUSINESS_MODEL.md` |
 | 15 | First build on Render has never run: watch the deploy log and fix what it shows | Developer | Render dashboard, `rtn-api`, Logs |
-| 16 | Delete the `BOOTSTRAP_ADMIN_*` values after the first officer sign-in; two-factor on the hosting accounts | Owner | `docs/DEPLOY_NOW.md` step 6 |
-| 17 | GitHub housekeeping: 11 Dependabot pull requests, two stuck runs, public or private repository | Owner | `docs/OWNER_ACTIONS.md` part D |
+| 16 | Delete the `BOOTSTRAP_ADMIN_*` values after the first officer sign-in; two-factor on the hosting accounts | Owner | `docs/DEPLOYMENT.md` |
+| 17 | GitHub housekeeping: 11 Dependabot pull requests, two stuck runs, public or private repository | Owner |  |
 
 Development work that is still open, in order of value:
 
@@ -66,7 +65,7 @@ Development work that is still open, in order of value:
 2. Rule gaps listed in `docs/DEVELOPER_GUIDE.md` section 10 (pages that would not load or exist only as scans). Each needs the official text.
 3. DigiLocker field import, after the first real sandbox response.
 4. Nonce-based Content-Security-Policy; operator-delegation design; shared rate limiting for more than one instance.
-5. Not built from the earlier wish list: a partner portal for professionals, per-licence landing pages, a support-ticket inbox. None blocks a launch. The full backlog is `docs/LAUNCH_CHECKLIST.md` section 7a.
+5. Not built from the earlier wish list: a partner portal for professionals, per-licence landing pages, a support-ticket inbox. None blocks a launch.
 
 ## 5. Monthly running costs
 
@@ -78,7 +77,7 @@ Render figures were read from <https://render.com/pricing> on 2026-11-12. Others
 | Worker (Render) | not used | US$7 (`0.5c-512mb`) | Render pricing page |
 | PostgreSQL (Render) | US$0 (`free`, **expires after 30 days**) | US$6 (`0.1c-256mb`) + US$0.30 per GB stored | Render pricing page |
 | Redis (Render Key Value) | not used | US$10 (`256mb`) | Render pricing page |
-| Website (Vercel) | US$0 (Hobby, non-commercial use) | US$20 per member (Pro), if the Hobby terms do not fit | Vercel pricing, as recorded in `docs/HUMAN_TODO.md`; not re-read today |
+| Website (Vercel) | US$0 (Hobby, non-commercial use) | US$20 per member (Pro), if the Hobby terms do not fit | Vercel pricing; not re-read today |
 | Email (Brevo) | US$0 (free plan, daily cap) | free plan or a paid plan by volume | Not verified today: confirm on Brevo's pricing page |
 | Uptime monitor | US$0 | US$0 | UptimeRobot free plan; not verified today |
 | **Total, fixed** | **US$0** | **about US$30 a month** (about US$50 with Vercel Pro) | |

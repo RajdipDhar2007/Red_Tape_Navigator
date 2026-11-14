@@ -21,7 +21,7 @@
 - [ ] The change is small and focused on one topic.
 - [ ] I added or updated tests (backend coverage stays at or above 80%).
 - [ ] `ruff`, `mypy`, `pytest`, the evaluation set, `eslint`, `tsc`, unit tests and the build all pass (paste results below).
-- [ ] I updated the docs: README, `docs/LAUNCH_CHECKLIST.md`, and anything else this change affects.
+- [ ] I updated the docs: the README, and anything else this change affects.
 - [ ] Interface text is in `frontend/messages/{en,hi,bn}.json`, and backend text has Hindi and Bengali entries.
 - [ ] **Rules only:** every new or changed rule has an official source I actually read, recorded in `docs/RULES_VERIFICATION.md`.
 - [ ] Nothing submits to a government portal automatically, and no protection (allowlist, consent, encryption, rate limit) was weakened.

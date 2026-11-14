@@ -15,7 +15,7 @@ Please do not copy, fork for reuse, or redistribute the project.
 ## Before you start
 
 1. Read the [README](README.md), then the [developer guide](docs/DEVELOPER_GUIDE.md) (architecture, phases, configuration, lessons learned).
-2. Check the [open items](docs/LAUNCH_CHECKLIST.md) so you do not repeat work.
+2. Check the open issues and the pending list in the [README](README.md) so you do not repeat work.
 3. Open or comment on an issue before starting anything large.
 
 ## Ground rules that protect users
@@ -45,7 +45,7 @@ cd ../frontend && npm ci
 1. Create a branch from `main` (for example `fix/trade-licence-fee-kolkata`).
 2. Keep the change small and focused. One topic per pull request.
 3. Add or update tests. Backend coverage must stay at or above 80% (it is about 95% now).
-4. Update the docs in the same pull request: the README, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md` when rules change, and translations.
+4. Update the docs in the same pull request: the README, `docs/RULES_VERIFICATION.md` when rules change, and translations.
 5. Run the checks below and paste the real results in the pull request.
 
 ### Checks to run

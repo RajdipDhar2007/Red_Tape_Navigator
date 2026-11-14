@@ -23,7 +23,7 @@ shows everything for review. **The citizen reviews, signs and submits. The syste
 
 This guide and the [README](../README.md) are the project's memory. Please follow them:
 
-1. **Read this whole README, then `docs/LAUNCH_CHECKLIST.md`, before changing anything.**
+1. **Read this whole guide and the root README before changing anything.**
    The handoff prompt is written so you (or your AI coding assistant) can continue exactly from where the last person stopped.
 2. **Do not stop at "it runs on my machine".** The goal is a finished, launched product (section 11). Keep working through the
    pending list (section 10) in order until each item is done or blocked only by something a human must do. When you are blocked,
@@ -33,7 +33,7 @@ This guide and the [README](../README.md) are the project's memory. Please follo
 4. **Never commit secrets** (`.env*` except `*.example`, `*.db`, keys, tokens). Never type a password, OTP, Aadhaar or PAN anywhere
    for anyone. Never create accounts, solve CAPTCHAs, or submit to a government portal.
 5. **Verify before you claim.** Run the quality gates (section 8) and report real results. Keep CI green. Push small, verified commits.
-6. **Keep the docs true.** When you change behaviour, update this README, `docs/LAUNCH_CHECKLIST.md`, `docs/RULES_VERIFICATION.md`
+6. **Keep the docs true.** When you change behaviour, update this README, `docs/RULES_VERIFICATION.md`
    in the same commit. The next person depends on them.
 7. Do **not** add `.github/dependabot.yml` (it once opened 12 unwanted pull requests), and do not open PRs, repos or other GitHub
    actions unless the owner asks.
@@ -156,15 +156,15 @@ catalog.py (licences, 9 cities)  +  sourced_licences.py (read from official docu
 ### 3.5 Deployment pipeline
 
 `git push main` -> GitHub Actions CI (7 jobs, section 8) -> manual deploy (autoDeploy is off on purpose):
-Render Blueprints (`render.yaml`: zero-cost trial with one `rtn-api` and Postgres; `render.production.yaml`: `rtn-api`, `rtn-worker`, Postgres, Redis; the container entrypoint runs `alembic upgrade head` and loads the
-rules pack) + Vercel (frontend, Root Directory `frontend`). Alternative: `docker-compose.prod.yml` + Caddy on a VPS. See
-[`docs/DEPLOYMENT_VERCEL_RENDER.md`](DEPLOYMENT_VERCEL_RENDER.md).
+`docker-compose.prod.yml` + Caddy on a VPS (the container entrypoint runs `alembic upgrade head` and loads the
+rules pack); the frontend is a Next.js app that can also be hosted separately (for example on Vercel, Root Directory `frontend`). See
+[`docs/DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ## 4. What is done, and how it was done
 
 The work happened in phases (November 2026). Each phase ended with tests, lint and CI green and a commit pushed to `main`.
 
-### Phase 1: the core product (10 steps, see `docs/TASKS.md`)
+### Phase 1: the core product (10 steps)
 
 - **How:** monorepo (`backend/`, `frontend/`, `docs/`, `infra/`), FastAPI + SQLAlchemy async + Alembic, Next.js App Router + next-intl.
 - Auth (JWT with rotating refresh tokens and reuse detection, RBAC), DPDP consent, hash-chained audit log, field encryption (Fernet).
@@ -177,7 +177,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 
 - Real SMTP email, password reset (single-use 30-minute links), change password, account lockout, privacy export/erase, retention purge.
 - Production config validation that refuses an unsafe start; officer bootstrap (`backend/scripts/create_admin.py`, inside the image).
-- Deployment files: `render.yaml` (free trial) and `render.production.yaml` (launch), `docs/DEPLOY_NOW.md`, `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh`, Vercel guide, `docker-compose.prod.yml` + Caddy, asyncpg URL normalisation for Render.
+- Deployment files: `scripts/verify_deploy.py`, `scripts/backup_restore_drill.sh`, `docker-compose.prod.yml` + Caddy, asyncpg URL normalisation for managed databases.
 - UI redesign (tricolour mark, saffron/navy/green palette), a hydration fix, accessibility basics, privacy/terms pages (en/hi/bn) that read
   retention period, hosting region and grievance contact live from the API.
 - MSG91 SMS adapter (Flow API), unit-tested with a mocked transport.
@@ -240,7 +240,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 - Hardening: PII redaction before text reaches a language model, resilient SMTP/MSG91/Digio adapters, audit-log and crypto improvements,
   migration 0008 (cascade on external requests), DPDP erasure now covers vault files, reminders can be listed with channel status and cancelled.
 - Help centre with search and categories (`/help`, en/hi/bn) that shows the live grievance contact; backup/restore tool `scripts/db_backup_restore.py`
-  with non-production safeguards; disaster-recovery runbook (`docs/RUNBOOK.md`); a code audit in `docs/FINAL_PROJECT_AUDIT.md`.
+  with non-production safeguards; disaster-recovery runbook (`docs/RUNBOOK.md`).
 
 ## 5. Technology and tools used
 
@@ -285,7 +285,7 @@ Numbers as of the last update: **491 backend tests** passing (about 95.4% covera
 | `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates | **Built and browser-tested**; private pages are excluded from search engines |
 | Help page with nine common questions (`/help`, linked in the footer) in English, Hindi and Bengali | **Built and browser-tested**; Hindi and Bengali wording awaits native review |
 | Backup-and-restore drill (`scripts/backup_restore_drill.sh`) | **Runs in CI** on every push against PostgreSQL |
-| Production deployment | **Not deployed; in progress.** The owner's Render and Vercel accounts exist and Render parsed `render.yaml` (2026-11-12). The Blueprint is waiting for six values only the owner can type; then Vercel and the live checks. Status of every step: `docs/OWNER_ACTIONS.md` |
+| Production deployment | **Not deployed.** Deployment steps: `docs/DEPLOYMENT.md` |
 | Load test, backup-restore test, pentest, real-device test, pilot | **Not done** |
 
 ## 7. Quick start
@@ -359,12 +359,12 @@ integration mocks (`test_digio.py`), browser e2e (`frontend/e2e`), evals (`backe
 
 ## 10. What is pending, how to do it, and what to use
 
-Work in this order. Items marked **HUMAN** need the owner or a third party; do everything else around them. Full click-by-click owner steps are in
-[`docs/LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md).
+Work in this order. Items marked **HUMAN** need the owner or a third party; do everything else around them.
+
 
 | # | Pending item | How to do it | What to use |
 | --- | --- | --- | --- |
-| A | **Production deployment** (**HUMAN** types six values; accounts exist since 2026-11-12; current step in `docs/OWNER_ACTIONS.md` part A) | Follow `docs/DEPLOY_NOW.md`: email-sender (Brevo) account, apply `render.yaml`, type nine values (Render generates `SECRET_KEY` and `FIELD_ENCRYPTION_KEY`; copy the encryption key to a password manager), set `CORS_ORIGINS` / `WEB_BASE_URL`, then run `scripts/verify_deploy.py --journey`, test the reset email, add an uptime monitor on `/ready`, and upgrade the free database before day 30. For launch use `render.production.yaml` and run the load test | `render.yaml`, `render.production.yaml`, `docs/DEPLOY_NOW.md`, `docs/DEPLOYMENT_VERCEL_RENDER.md`, `scripts/verify_deploy.py`, Brevo/SES/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
+| A | **Production deployment** (**HUMAN**) | Follow `docs/DEPLOYMENT.md`: email-sender account, set the production environment values, then run `scripts/verify_deploy.py --journey`, test the reset email, add an uptime monitor on `/ready`, and run the load test | `docs/DEPLOYMENT.md`, `scripts/verify_deploy.py`, Brevo/SES/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
 | B | **Digio sandbox then production** (**HUMAN** gets credentials) | Set `DIGIO_*` in Render, set the webhook URL and secret in Digio's enterprise dashboard, run the sandbox checklist in `docs/INTEGRATIONS.md`, fix any request-shape differences, **implement the DigiLocker result mapping from a real `detail_response=true` response** (answer keys with `source="document"`, encrypt sensitive values), then production credentials and IPs | `real/digio.py`, `api/webhooks.py`, `httpx.MockTransport` tests, Digio docs read in a browser |
 | C | **MSG91 SMS live** (**HUMAN** DLT KYC) | Complete DLT registration on an operator portal (Airtel / Vi / BSNL / STPL / Tata), register a 6-character header and the template `Red Tape Navigator reminder: {#var#}`, link it to a MSG91 Flow, put `MSG91_AUTHKEY` / `MSG91_TEMPLATE_ID` in Render, send a real test SMS, fix the adapter if the live shape differs (DLT errors 203/211 mean not approved) | `real/msg91.py`, MSG91 dashboard |
 | D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `OLLAMA_MODEL` (local, free) or `GEMINI_API_KEY` + `GEMINI_MODEL`, officer console `/en/staff` |
@@ -372,7 +372,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for all the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review). The officer console (`staff.*` strings) is already translated in `en`, `hi` and `bn`, pending the same native review | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
 | G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
 | H | **Business readiness** (**HUMAN** decisions) | Decide who funds the running costs (the product is free for every user and never charges anyone; see `docs/BUSINESS_MODEL.md`), support channel and response times, an on-call contact, a monthly cost estimate (Render plans, Postgres, SMTP, MSG91 per SMS, Digio per signature and DigiLocker call, LLM usage), custom domain, SPF/DKIM/DMARC, data-processing agreements with each provider; write the answers into `docs/` and wire any config they imply | `docs/RUNBOOK.md`, `docs/COMPLIANCE.md` |
-| J | **Development backlog** | Cookie-based sessions (needs one domain for site and API), nonce-based CSP, DigiLocker field import, FSSAI field maps, operator delegation design, shared rate limiting, partner portal, per-licence landing pages, support inbox | `docs/LAUNCH_CHECKLIST.md` section 7a, `docs/THREAT_MODEL.md` |
+| J | **Development backlog** | Cookie-based sessions (needs one domain for site and API), nonce-based CSP, DigiLocker field import, FSSAI field maps, operator delegation design, shared rate limiting, partner portal, per-licence landing pages, support inbox | `docs/THREAT_MODEL.md` |
 | I | **Optional features** | WhatsApp and UMANG real adapters (mocked today), more cities and business types, state forms for school and coaching registration, a UGC / university-affiliation checklist for colleges, analytics, e-Sign for additional forms | `integrations/interfaces.py`, `business_types.py`, `sourced_licences.py` |
 
 **Known rule gaps for item D** (all in `docs/RULES_VERIFICATION.md`). DONE so far: GST fee and timeline, FSSAI 2026 fee slabs, trade-licence
@@ -388,7 +388,7 @@ were considered as new cities and left out because the sources conflict.
 All tests, lint, types, evals, e2e and CI green; production live on HTTPS with real SMTP, MSG91 and Digio (sandbox-tested first); core rules
 verified by a reviewer and every other rule still labelled "verify with the authority"; official forms loaded with permission where available;
 privacy and terms approved and the draft banner off; no demo labels visible in production (`DEMO_MODE=false`); backups, uptime monitoring, load
-test and the security checklist done; pilot feedback addressed; docs updated; `docs/LAUNCH_CHECKLIST.md` fully resolved; everything committed and
+test and the security checklist done; pilot feedback addressed; docs updated; everything committed and
 pushed to `main`; and a written final report of what is live, what is simulated, what remains and the monthly running costs.
 
 ## 12. Configuration reference
@@ -450,18 +450,16 @@ backend/
     scraping/     allowlist, guarded fetcher, sanitizer
   migrations/     Alembic (0001 to 0009)      tests/  28 files      evals/  golden cases      config/sources.yaml  allowlist
 frontend/         Next.js App Router, next-intl messages (en/hi/bn), components, e2e (Playwright)
-infra/            Terraform skeleton            deploy/  Caddyfile      render.yaml, render.production.yaml  Render Blueprints
+infra/            Terraform skeleton            deploy/  Caddyfile
 docs/             see below                     scripts/ placeholder forms, key rotation, load test, rules export, source verification,
                                                          verify_deploy (live checks), backup_restore_drill
 ```
 
-Documentation: **[Owner actions](OWNER_ACTIONS.md) (what is pending, in order, with status)** · [Deploy now](DEPLOY_NOW.md) · [Final report](FINAL_REPORT.md) ·
-[Threat model](THREAT_MODEL.md) · [Owner background and costs](HUMAN_TODO.md) · [Launch checklist](LAUNCH_CHECKLIST.md) (status of every go-live item) ·
+Documentation: [Final report](FINAL_REPORT.md) · [Threat model](THREAT_MODEL.md) ·
 [Rules verification log](RULES_VERIFICATION.md) · [Reviewer worksheet](RULES_REVIEW_EXPORT.csv) · [Integrations](INTEGRATIONS.md) ·
-[Deploy on Vercel + Render](DEPLOYMENT_VERCEL_RENDER.md) · [Deployment (VPS)](DEPLOYMENT.md) · [Go-live notes](GO_LIVE.md) ·
-[Architecture](ARCHITECTURE.md) · [DPDP compliance](COMPLIANCE.md) · [Security / OWASP](SECURITY.md) · [Runbook](RUNBOOK.md) ·
+[Deployment (VPS)](DEPLOYMENT.md) · [Architecture](ARCHITECTURE.md) · [DPDP compliance](COMPLIANCE.md) · [Security / OWASP](SECURITY.md) · [Runbook](RUNBOOK.md) ·
 [Pilot plan](PILOT_PLAN.md) · [Demo script](DEMO_SCRIPT.md) · [Load test](LOAD_TEST.md) · [Assumptions](ASSUMPTIONS.md) ·
-[Task history](TASKS.md) · [Problem statement](../Problem_Statement.md)
+[Problem statement](../Problem_Statement.md)
 
 ---
 

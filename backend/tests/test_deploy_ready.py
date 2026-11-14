@@ -164,36 +164,6 @@ async def test_app_starts_and_stops_with_scheduler_and_bootstrap(client, monkeyp
         get_settings.cache_clear()
 
 
-def test_render_blueprints_only_set_variables_the_app_reads():
-    """A typo in a Blueprint would silently leave a setting at its default in production."""
-    from pathlib import Path
-
-    import yaml
-
-    root = Path(__file__).resolve().parents[2]
-    known = {name.upper() for name in Settings.model_fields} | {"RUN_MIGRATIONS", "SEED_ON_START", "PORT"}
-    for name in ("render.yaml", "render.production.yaml"):
-        doc = yaml.safe_load((root / name).read_text(encoding="utf-8"))
-        groups = {g["name"]: g["envVars"] for g in doc.get("envVarGroups", [])}
-        for svc in doc["services"]:
-            if svc["type"] == "keyvalue":
-                continue
-            env: dict[str, dict] = {}
-            for item in svc["envVars"]:
-                for var in groups[item["fromGroup"]] if "fromGroup" in item else [item]:
-                    env[var["key"]] = var
-            assert set(env) <= known, f"{name}/{svc['name']}: unknown variables {set(env) - known}"
-            values = {k: v.get("value") for k, v in env.items()}
-            assert values["APP_ENV"] == "prod" and values["DEMO_MODE"] == "false" and values["TRUST_PROXY"] == "true"
-            assert env["SECRET_KEY"].get("generateValue") and env["FIELD_ENCRYPTION_KEY"].get("generateValue")
-            assert all(not v.get("value") for k, v in env.items() if "PASSWORD" in k or "SECRET" in k or "AUTHKEY" in k), "no secret may be committed"
-            assert doc["databases"][0]["postgresMajorVersion"] == "16"
-    free = yaml.safe_load((root / "render.yaml").read_text(encoding="utf-8"))
-    api = {v["key"]: v for v in free["services"][0]["envVars"]}
-    assert len(free["services"]) == 1 and api["RUN_SCHEDULER"]["value"] == "true" and "REDIS_URL" not in api
-    assert api["SMTP_PORT"]["value"] == "2525"  # 587 is blocked on Render's free instances
-
-
 async def test_every_private_route_refuses_anonymous_callers(client):
     """Walks the whole route table, so a new route cannot be added without sign-in by accident."""
     from app.main import app

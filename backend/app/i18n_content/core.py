@@ -2,7 +2,7 @@
 
 The interface sends its language in ``Accept-Language``; ``localize_json`` then rewrites every string the tables know. Anything
 the tables do not know stays English (never guessed). Official names (FSSAI, GST, PAN, Aadhaar...) stay in Latin letters.
-Translations were written for clarity and are flagged for native-speaker review in docs/LAUNCH_CHECKLIST.md.
+Translations were written for clarity and are flagged for native-speaker review.
 """
 import logging
 import re

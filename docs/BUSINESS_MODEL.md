@@ -23,4 +23,4 @@ The owner, or someone the owner chooses. Nothing here is decided or asserted; th
 Any option that puts a price, a donation prompt or advertising in front of users is a product change and needs the owner's explicit decision first.
 
 ## Running costs (the owner's contracts; amounts are not asserted)
-Hosting and Postgres, email, SMS per message (MSG91, only if SMS reminders are switched on), Digio per signature and DigiLocker call (only if e-sign is switched on), and optional LLM usage. The free product works without SMS, e-sign and the LLM (rules-first mode). See `docs/HUMAN_TODO.md` Part 4 for indicative figures.
+Hosting and Postgres, email, SMS per message (MSG91, only if SMS reminders are switched on), Digio per signature and DigiLocker call (only if e-sign is switched on), and optional LLM usage. The free product works without SMS, e-sign and the LLM (rules-first mode).

@@ -10,7 +10,7 @@
 
 - [Installation and setup](README.md#-quick-start)
 - [Developer and operations guide](docs/DEVELOPER_GUIDE.md)
-- [Runbook](docs/RUNBOOK.md) for operating a deployment, and [Deploy now](docs/DEPLOY_NOW.md) for putting it online.
+- [Runbook](docs/RUNBOOK.md) for operating a deployment, and [Deployment](docs/DEPLOYMENT.md) for putting it online.
 
 ## Reporting something
 

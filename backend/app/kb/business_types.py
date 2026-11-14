@@ -171,7 +171,7 @@ for _id, _label, _licences, _keywords, _coverage in _TYPES:
 
 
 # Hindi and Bengali keywords for the types above (common spoken/written forms, lower-case matching as substrings; the longest
-# match wins). Native-speaker review is pending (docs/LAUNCH_CHECKLIST.md). Types not listed here keep English words only.
+# match wins). Native-speaker review is pending. Types not listed here keep English words only.
 _LOCAL_KEYWORDS: dict[str, list[str]] = {
     "gift_shop": ["गिफ्ट शॉप", "उपहार की दुकान", "গিফট শপ", "উপহারের দোকান"],
     "toy_shop": ["खिलौने की दुकान", "टॉय शॉप", "খেলনার দোকান"],

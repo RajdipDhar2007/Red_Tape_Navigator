@@ -207,7 +207,7 @@ or complies with. **We use them as sources and as guard-rails. We do not represe
 | **Digital Personal Data Protection Act, 2023 (DPDP)** | Explicit consent, purpose limitation, retention purge, export and erase, grievance contact, encrypted sensitive fields. See [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md). |
 | **Information Technology Act, 2000** and **Aadhaar (e-Sign) framework** | We integrate **Digio** for Aadhaar e-Sign and DigiLocker, with a signed webhook and a separate consent. |
 | **DigiLocker** and **UMANG** (MeitY, Digital India) | Document-fetch flow built against Digio's DigiLocker API; a UMANG adapter is mocked and labelled. |
-| **State Emblem of India (Prohibition of Improper Use) Act, 2005** | The team-designed logo shows the national emblem on the robot officer's cap. The 2005 Act restricts use of the emblem, so **before any public launch this must be reviewed by counsel and either authorised by the competent authority or replaced with a neutral cap badge**. Tracked in [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md). |
+| **State Emblem of India (Prohibition of Improper Use) Act, 2005** | The team-designed logo shows the national emblem on the robot officer's cap. The 2005 Act restricts use of the emblem, so **before any public launch this must be reviewed by counsel and either authorised by the competent authority or replaced with a neutral cap badge**. |
 | **Digital India, Ease of Doing Business and Startup India** | The wider push to make compliance simple is the reason this problem is worth solving. We are a citizen-side helper, not a replacement for any of these portals. |
 
 The product text is always written to be honest about its limits: where we could not read an official source, the app says so and routes the item to an officer review
@@ -446,8 +446,6 @@ Red_Tape_Navigator/
 ├── Makefile                     one-word commands: setup, dev, test, lint, eval, e2e, migrate, seed
 ├── docker-compose.yml           local stack: database, cache, API, worker, web
 ├── docker-compose.prod.yml      single-server production stack (with Caddy for HTTPS)
-├── render.yaml                  Render Blueprint, zero-cost trial
-├── render.production.yaml       Render Blueprint, paid launch setup
 ├── .env.example / .env.prod.example   every setting, with safe placeholder values
 ├── Start-Red-Tape-Navigator.bat       Windows double-click launcher
 ├── .github/                     CI workflow (7 jobs), CodeQL scan, deploy template, code owners
@@ -580,7 +578,7 @@ Red_Tape_Navigator/
 
 - **Health, liveness and readiness endpoints**, Prometheus metrics, OpenTelemetry, optional Sentry, JSON logs with request ids.
 - **Backup-and-restore drill in CI**, disaster-recovery runbook, scheduler inside the API for single-instance hosting.
-- **Deployment blueprints** for Render and Vercel, Docker Compose with Caddy, and a Terraform skeleton.
+- **Deployment files** for Docker Compose with Caddy and a Terraform skeleton.
 
 ---
 
@@ -627,7 +625,7 @@ All images below were captured from the real application running locally (Englis
 | **Quality** | pytest and coverage (gate 80%, actual about 95%), ruff, mypy, eslint, tsc, an evaluation set with a hallucination gate |
 | **Security scans** | pip-audit, bandit, npm audit, gitleaks, Trivy (container) |
 | **CI** | GitHub Actions, 7 jobs: backend, backend on PostgreSQL with Alembic up and down, frontend, Playwright end-to-end, security, container build and scan, compose smoke test |
-| **Hosting** | Render (API, Postgres) and Vercel (web); VPS alternative with Docker Compose and Caddy; Terraform skeleton |
+| **Hosting** | Docker Compose with Caddy on a VPS; Terraform skeleton |
 | **Third parties** | Digio (Aadhaar e-Sign and DigiLocker), MSG91 (SMS, with TRAI DLT), an SMTP provider |
 | **How we built it** | Claude Code as an engineering assistant, with the Claude in Chrome extension to read official sites and API documents read-only, the `gh` CLI for CI status, and PyMuPDF for PDF extraction |
 
@@ -661,8 +659,8 @@ flowchart TB
   API --> VT
 ```
 
-Deployment path: `git push main` triggers GitHub Actions (7 jobs), then the Render Blueprint (`render.yaml` for a zero-cost trial, `render.production.yaml` for launch)
-runs `alembic upgrade head` and loads the rules pack, and Vercel serves the web app. Details: [`docs/DEPLOY_NOW.md`](docs/DEPLOY_NOW.md).
+Deployment path: `git push main` triggers GitHub Actions (7 jobs); a manual deploy template builds and pushes the container images.
+The stack runs on Docker Compose with Caddy, and migrations run on start (`alembic upgrade head`). Details: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ---
 
@@ -681,7 +679,7 @@ runs `alembic upgrade head` and loads the rules pack, and Vercel serves the web 
 | 9 | **Tests that depended on a developer's own settings.** A personal `.env` once changed test results. | **Hermetic tests**: the suite ignores `backend/.env` and blanks every model key; browser tests run the API with the model off. |
 | 10 | **Local and CI database differences.** A SQLite-only statement failed the PostgreSQL CI job. | Dialect-guarded setup and a dedicated **PostgreSQL plus pgvector CI job** with migration up, down and up again. |
 | 11 | **UI bugs only a real browser shows**: the header and dashboard did not update after sign-in or log-out; download buttons showed raw file names; dates ignored the language; two consent buttons had the same accessible name. | We reviewed the live app in a real browser and fixed each: an `rtn:auth` event keeps the header and dashboard in sync, readable download labels, locale-aware dates, distinct accessible names, and a new end-to-end test. |
-| 12 | **Free hosting limits.** Render's free tier sleeps, has no shell and expires its database in 30 days. | A zero-cost trial Blueprint with an in-process scheduler, a first officer created from environment variables, and a documented upgrade path to a production Blueprint. |
+| 12 | **Free hosting limits.** Render's free tier sleeps, has no shell and expires its database in 30 days. | An in-process scheduler and a first officer created from environment variables, so a single free instance is enough to run it. |
 | 13 | **Merging two teammates' diverged work** (core product and the hardening and Document Vault branch). | A careful three-way merge with 12 conflicts resolved by hand, then the full test suite and CI to prove nothing regressed. |
 | 14 | **Dependency bots opening unwanted pull requests.** | We removed the Dependabot config and recorded it as a rule in the contributor notes. |
 
@@ -729,7 +727,7 @@ We would rather state our limits than hide them.
 
 | # | Item | Who | Notes |
 |---|---|---|---|
-| 1 | **Go live** on Render and Vercel | Owner | Follow [`docs/DEPLOY_NOW.md`](docs/DEPLOY_NOW.md); then run `scripts/verify_deploy.py`. |
+| 1 | **Go live** | Owner | Follow [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md); then run `scripts/verify_deploy.py`. |
 | 2 | **Rules verification** by a human reviewer | Reviewer | Mark each rule verified, corrected or rejected in the officer console; close the known gaps in `docs/RULES_VERIFICATION.md`. |
 | 3 | **Digio sandbox, then production** | Owner and third party | Run the sandbox checklist; implement DigiLocker mapping from a real response. |
 | 4 | **MSG91 SMS live** | Owner | Complete TRAI DLT registration. |
@@ -738,8 +736,6 @@ We would rather state our limits than hide them.
 | 7 | **Launch hardening** | Owner and counsel | Legal review of privacy and terms; real-phone, screen-reader and slow-network tests; penetration test; secret-rotation plan. |
 | 8 | **Pilot** with 5 to 10 shop owners | Team | See [`docs/PILOT_PLAN.md`](docs/PILOT_PLAN.md). |
 | 9 | **Rotate any key shared during development** | Owner | Standard hygiene before launch. |
-
-The owner's ordered, click-by-click list with a status for each step is [`docs/OWNER_ACTIONS.md`](docs/OWNER_ACTIONS.md); every go-live item is in [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).
 
 ### Future ideas (not built yet)
 
@@ -825,17 +821,16 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 
 ## 📚 Documentation index
 
-**Start here:** [Developer and operations guide](docs/DEVELOPER_GUIDE.md) (architecture, phase history, configuration reference, lessons learned) ·
-[Owner actions](docs/OWNER_ACTIONS.md) · [Launch checklist](docs/LAUNCH_CHECKLIST.md)
+**Start here:** [Developer and operations guide](docs/DEVELOPER_GUIDE.md) (architecture, phase history, configuration reference, lessons learned)
 
 | Topic | Documents |
 |---|---|
-| **Product and planning** | [Problem statement](Problem_Statement.md) · [Architecture](docs/ARCHITECTURE.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Task history](docs/TASKS.md) · [Business model](docs/BUSINESS_MODEL.md) · [Demo script](docs/DEMO_SCRIPT.md) |
+| **Product and planning** | [Problem statement](Problem_Statement.md) · [Architecture](docs/ARCHITECTURE.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Business model](docs/BUSINESS_MODEL.md) · [Demo script](docs/DEMO_SCRIPT.md) |
 | **Rules and integrations** | [Rules verification log](docs/RULES_VERIFICATION.md) · [Reviewer worksheet](docs/RULES_REVIEW_EXPORT.csv) · [Integrations](docs/INTEGRATIONS.md) |
-| **Deploy and operate** | [Deploy now](docs/DEPLOY_NOW.md) · [Vercel and Render](docs/DEPLOYMENT_VERCEL_RENDER.md) · [VPS deployment](docs/DEPLOYMENT.md) · [Runbook](docs/RUNBOOK.md) · [Load test](docs/LOAD_TEST.md) · [Go-live notes](docs/GO_LIVE.md) |
+| **Deploy and operate** | [VPS deployment](docs/DEPLOYMENT.md) · [Runbook](docs/RUNBOOK.md) · [Load test](docs/LOAD_TEST.md) |
 | **Security and compliance** | [Security (OWASP)](docs/SECURITY.md) · [Threat model](docs/THREAT_MODEL.md) · [DPDP compliance](docs/COMPLIANCE.md) |
 | **Community and policies** | [Code of Conduct](CODE_OF_CONDUCT.md) · [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md) · [Support](SUPPORT.md) · [Accessibility](ACCESSIBILITY.md) · [Licence](LICENSE) · [Issue forms](.github/ISSUE_TEMPLATE) · [Pull request template](.github/pull_request_template.md) |
-| **Status and reports** | [Final report](docs/FINAL_REPORT.md) · [Final project audit](docs/FINAL_PROJECT_AUDIT.md) · [Pilot plan](docs/PILOT_PLAN.md) · [Owner background and costs](docs/HUMAN_TODO.md) |
+| **Status and reports** | [Final report](docs/FINAL_REPORT.md) · [Pilot plan](docs/PILOT_PLAN.md) |
 
 ---
 
