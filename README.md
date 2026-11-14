@@ -1,31 +1,41 @@
 <div align="center">
 
-<img src="frontend/public/logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="240" />
+<img src="docs/assets/banner.svg" alt="Red Tape Navigator: a red ribbon of red tape being cut by scissors. Tell us your goal. We cut through the red tape." width="100%" />
 
-# ✂️ Red Tape Navigator
+<p>
+<a href="#-meet-meera-she-just-wants-to-bake">😤 The Story</a> &nbsp;·&nbsp;
+<a href="#-the-60-second-tour">⚡ 60-Second Tour</a> &nbsp;·&nbsp;
+<a href="#-where-the-agentic-ai-is">🤖 The Agent</a> &nbsp;·&nbsp;
+<a href="#-the-workflow-step-by-step">🔄 Workflow</a> &nbsp;·&nbsp;
+<a href="#-screenshots-of-the-running-app">🖼️ Screens</a> &nbsp;·&nbsp;
+<a href="#-honest-status-real-simulated-untested">🔎 Honest Status</a> &nbsp;·&nbsp;
+<a href="#-quick-start">🚀 Quick Start</a>
+</p>
 
 ### Type one sentence. Get your whole licence plan, with the forms already filled.
 
-> ## _"I want to open a small bakery in Kolkata."_
-> ↓ &nbsp;**one sentence in**&nbsp; ↓
-> **A cited, ordered, step-by-step plan** · **every fee, office and document** · **PDFs filled in** · **in English, हिन्दी or বাংলা**
-> ↓ &nbsp;**and you still press the final button**&nbsp; ↓
+```text
+ GOAL  ->  PLAN  ->  RESEARCH  ->  INTERVIEW  ->  FILL  ->  REVIEW  ->  YOU SIGN
+ "I want to open a small bakery in Kolkata"   ...and you still press the final button
+```
 
 **An agentic AI that researches the rules, interviews you for only what is missing, fills the paperwork, and then stops and hands you the pen.**
 Free for everyone. Honest about what it does not know. Never submits anything behind your back.
+
+<img src="frontend/public/logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="130" />
 
 [![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#-hackathon-and-team)
 [![Hackathon](https://img.shields.io/badge/Hackathon-HACK%3CN%3EPITCH-FF9933?style=for-the-badge)](#-hackathon-and-team)
 [![Track](https://img.shields.io/badge/Track-Agentic%20AI%20%C2%B7%20Civic%20Tech-138808?style=for-the-badge)](#-the-problem-statement-in-full)
 [![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)](#-license)
 
-![CI](https://img.shields.io/badge/CI-7%20jobs%20passing-138808?logo=githubactions&logoColor=white)
-![Backend tests](https://img.shields.io/badge/backend%20tests-491%20passing-138808)
-![Coverage](https://img.shields.io/badge/coverage-95%25-138808)
+![CI](https://img.shields.io/badge/CI-7%20jobs%20passing-138808?style=for-the-badge&logo=githubactions&logoColor=white)
+![Backend tests](https://img.shields.io/badge/backend%20tests-491%20passing-138808?style=for-the-badge)
+![Coverage](https://img.shields.io/badge/coverage-95%25-138808?style=for-the-badge)
 ![Languages](https://img.shields.io/badge/languages-English%20%C2%B7%20%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80%20%C2%B7%20%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE-0B1F4F)
-![Cities](https://img.shields.io/badge/cities-9-FF9933)
-![Licences](https://img.shields.io/badge/business%20types-120-FF9933)
-![Rules](https://img.shields.io/badge/cited%20rules-438-FF9933)
+![Cities](https://img.shields.io/badge/cities-9-FF9933?style=for-the-badge)
+![Business types](https://img.shields.io/badge/business%20types-120-FF9933?style=for-the-badge)
+![Rules](https://img.shields.io/badge/cited%20rules-438-FF9933?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
@@ -45,7 +55,7 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 
 </div>
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 😤 Meet Meera. She just wants to bake.
 
@@ -116,7 +126,7 @@ No Docker, no database server, no API key needed. Then start the web app and ope
 
 > 🧭 **Not sure where to look?** Watch the walkthrough GIF above, skim [the workflow](#-the-workflow-step-by-step), peek at the [screenshots](#-screenshots-of-the-running-app), or jump to [what is real and what is simulated](#-honest-status-real-simulated-untested).
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## Contents
 
@@ -146,7 +156,7 @@ No Docker, no database server, no API key needed. Then start the web app and ope
 |  | 22 | [Credits and acknowledgements](#-credits-and-acknowledgements) | People, sources, software, photos |
 |  | 23 | [License](#-license) | Proprietary licence, summary and full text |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🏁 Hackathon and team
 
@@ -182,7 +192,7 @@ No Docker, no database server, no API key needed. Then start the web app and ope
 Our submission materials live in this repository: the [pitch deck (PDF)](Onyx_HackNPitch.pdf), the [editable deck (PPTX)](Onyx_HackNPitch.pptx)
 and the [demo video](Onyx_Demo_Video.mp4). The closing slide of the deck links back to this repository.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 📜 The problem statement in full
 
@@ -210,7 +220,7 @@ and the [demo video](Onyx_Demo_Video.mp4). The closing slide of the deck links b
 | 3 | Document processing and form filling | A **PDF filler** (AcroForm fill or flat-PDF overlay) with per-field provenance, and a **key-in sheet** for online-only portals such as FoSCoS and Udyam. | `backend/app/forms/` |
 | 4 | Transparency and review checkpoint | A side-by-side **review screen** with editable fields, a plain-language summary and an explicit consent tick-box. Any later edit invalidates the review. **No code path submits to a government portal** (a test fails if one is added). | `frontend/components/ReviewView.tsx`, `backend/app/api/sessions.py` |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🌆 The problem, in real life
 
@@ -252,7 +262,7 @@ Each of them is told to "get the licences" and then has to work out **which** on
 | Language: official text is mostly English; many owners think in Hindi or Bengali. | Dependence on middlemen who charge for what should be free guidance. | **English, Hindi and Bengali**, free for everyone. | A translation layer for all backend text, complete interface strings in three languages, voice input, and no paywall anywhere in the code. |
 | Sensitive identity data is handed to anyone who "helps". | Privacy and fraud risk. | **Your data stays yours.** | DPDP-style consent per purpose, Fernet encryption of Aadhaar, PAN and bank answers, redaction before any model call, a hash-chained audit log, and export, erase and retention purge. |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🎯 Who we are building this for
 
@@ -265,7 +275,7 @@ Each of them is told to "get the licences" and then has to work out **which** on
 | **The Common Service Centre (CSC) operator and professional helper** | Files for many citizens every day. | Teams and workspaces to share a case with a colleague; reminders; downloadable plans. |
 | **The government officer or reviewer** | Wants the information the public sees to be correct. | An officer console where every rule is **verified, corrected or rejected**, with an audit trail. |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🇮🇳 How the Indian government context shaped the design
 
@@ -290,7 +300,7 @@ or complies with. **We use them as sources and as guard-rails. We do not represe
 The product text is always written to be honest about its limits: where we could not read an official source, the app says so and routes the item to an officer review
 instead of inventing a rule.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🧭 Our approach and plan
 
@@ -326,7 +336,7 @@ A bureaucracy agent that invents a fee or files a wrong form is worse than no ag
 | **8. Hardening and the Document Vault** | Safe document storage and provider readiness. | Private vault with magic-byte checks, redaction before any model call, resilient adapters, help centre, disaster-recovery runbook. |
 | **9. AI provider choice** | Optional model help, free to run. | One switch for a local Ollama model or Google Gemini, with a circuit breaker and a deterministic rules-only fallback. |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🤖 Where the agentic AI is
 
@@ -358,7 +368,7 @@ flowchart LR
 
 **Which model?** One switch (`LLM_PROVIDER`) selects a local Ollama model or Google Gemini. Personal data is redacted before any model call, a circuit breaker keeps a slow model from blocking the user, and if no model is available the agent still works in its deterministic rules-only mode.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🔄 The workflow, step by step
 
@@ -437,7 +447,7 @@ Download the filled PDF, optionally **e-Sign with Aadhaar** (Digio), follow the 
 </tr>
 </table>
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## ⚙️ How the app works: what does what
 
@@ -506,7 +516,7 @@ catalog.py (licences, 9 cities) + sourced_licences.py (read from official docume
       -> optional live refresh: a claim is kept only if its quote appears verbatim on the page
 ```
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🗂️ Project structure
 
@@ -620,7 +630,7 @@ Red_Tape_Navigator/
 
 </details>
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## ✨ Every feature
 
@@ -666,7 +676,7 @@ Red_Tape_Navigator/
 - **Backup-and-restore drill in CI**, disaster-recovery runbook, scheduler inside the API for single-instance hosting.
 - **Deployment files** for Docker Compose with Caddy and a Terraform skeleton.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🖼️ Screenshots of the running app
 
@@ -695,7 +705,7 @@ All images below were captured from the real application running locally (Englis
 > The form shown is a **watermarked placeholder** ("not an official government document, do not submit"). Real FSSAI and department forms are loaded only after the
 > authority gives permission. The identity numbers in these screenshots are test values that pass the checksums.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🧰 Technology and tools we used
 
@@ -715,7 +725,7 @@ All images below were captured from the real application running locally (Englis
 | **Third parties** | Digio (Aadhaar e-Sign and DigiLocker), MSG91 (SMS, with TRAI DLT), an SMTP provider |
 | **How we built it** | Claude Code as an engineering assistant, with the Claude in Chrome extension to read official sites and API documents read-only, the `gh` CLI for CI status, and PyMuPDF for PDF extraction |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🏗️ Architecture and pipelines
 
@@ -748,7 +758,7 @@ flowchart TB
 Deployment path: `git push main` triggers GitHub Actions (7 jobs); a manual deploy template builds and pushes the container images.
 The stack runs on Docker Compose with Caddy, and migrations run on start (`alembic upgrade head`). Details: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🧗 Challenges we faced and how we solved them
 
@@ -769,7 +779,7 @@ The stack runs on Docker Compose with Caddy, and migrations run on start (`alemb
 | 13 | **Merging two teammates' diverged work** (core product and the hardening and Document Vault branch). | A careful three-way merge with 12 conflicts resolved by hand, then the full test suite and CI to prove nothing regressed. |
 | 14 | **Dependency bots opening unwanted pull requests.** | We removed the Dependabot config and recorded it as a rule in the contributor notes. |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🧪 Quality and testing
 
@@ -786,7 +796,7 @@ The stack runs on Docker Compose with Caddy, and migrations run on start (`alemb
 
 Run it yourself: `make test`, `make lint`, `make eval`, `make e2e`. Full details: [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md#8-quality-gates-ci-and-testing).
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🔎 Honest status: real, simulated, untested
 
@@ -805,7 +815,7 @@ We would rather state our limits than hide them.
 | Live deployment | ⏳ **Not deployed yet**: the deployment files are ready and waiting for the owner's account values |
 | Load test, penetration test, real-device test, pilot | ⏳ **Not done** |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🛣️ Pending work and roadmap
 
@@ -835,7 +845,7 @@ We would rather state our limits than hide them.
 - **DigiLocker field import** so a citizen's verified documents fill the forms with one tap.
 - **A government-side API** so departments can publish their rules directly, replacing our scraping with first-party data.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🔭 Our vision
 
@@ -852,7 +862,7 @@ Three commitments guide every decision:
 2. **Inclusion by default.** Free for everyone, in local languages, working on a phone.
 3. **Privacy and consent.** The citizen's data is theirs; we collect the minimum and erase it on request.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🚀 Quick start
 
@@ -903,7 +913,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 | `make e2e` | Playwright browser tests |
 | `make verify-sources` | check cited sources against the live official sites |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 📚 Documentation index
 
@@ -918,7 +928,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 | **Community and policies** | [Code of Conduct](CODE_OF_CONDUCT.md) · [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md) · [Support](SUPPORT.md) · [Accessibility](ACCESSIBILITY.md) · [Licence](LICENSE) · [Issue forms](.github/ISSUE_TEMPLATE) · [Pull request template](.github/pull_request_template.md) |
 | **Status and reports** | [Final report](docs/FINAL_REPORT.md) · [Pilot plan](docs/PILOT_PLAN.md) |
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 🙏 Credits and acknowledgements
 
@@ -932,7 +942,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
   Sunnya343 and Kritzolina (CC BY-SA 4.0) and McKay Savage (CC BY 2.0). They are shown from their original locations and remain the property of their authors.
 - **Screenshots** and the walkthrough animation are original captures of this project.
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## 📄 License
 
@@ -1005,12 +1015,10 @@ To request permission, contact the repository owner through GitHub: RajdipDhar20
 
 </details>
 
----
+<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 <div align="center">
 
-**Red Tape Navigator** · Team Onyx · HACK&lt;N&gt;PITCH · Jadavpur University
-
-*Built so that the next person who wants to open a bakery spends their time baking.*
+<img src="docs/assets/footer.svg" alt="Less paperwork. More baking. Team Onyx, HACK&lt;N&gt;PITCH, Jadavpur University." width="100%" />
 
 </div>
