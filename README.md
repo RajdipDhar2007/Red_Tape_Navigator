@@ -103,7 +103,7 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 </table>
 
 Our submission materials live in this repository: the [pitch deck (PDF)](Onyx_HackNPitch.pdf), the [editable deck (PPTX)](Onyx_HackNPitch.pptx)
-and the [demo video](Onyx_Demo_Video.mp4).
+and the [demo video](Onyx_Demo_Video.mp4). The closing slide of the deck links back to this repository.
 
 ---
 
