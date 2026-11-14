@@ -62,7 +62,7 @@ This guide and the [README](../README.md) are the project's memory. Please follo
 
 ## 1. The problem and the plan
 
-**Problem** (full text in [`ps.md`](../Problem_Statement.md)): citizens and small businesses lose weeks to scattered departmental sites, outdated PDF
+**Problem** (full text in [`ps.md`](Problem_Statement.md)): citizens and small businesses lose weeks to scattered departmental sites, outdated PDF
 forms and contradictory requirements. They need to know *which* licences apply, *in what order*, *with which documents*, *what it costs*,
 and then fill the forms correctly.
 
@@ -459,7 +459,7 @@ Documentation: [Final report](FINAL_REPORT.md) · [Threat model](THREAT_MODEL.md
 [Rules verification log](RULES_VERIFICATION.md) · [Reviewer worksheet](RULES_REVIEW_EXPORT.csv) · [Integrations](INTEGRATIONS.md) ·
 [Deployment (VPS)](DEPLOYMENT.md) · [Architecture](ARCHITECTURE.md) · [DPDP compliance](COMPLIANCE.md) · [Security / OWASP](SECURITY.md) · [Runbook](RUNBOOK.md) ·
 [Pilot plan](PILOT_PLAN.md) · [Demo script](DEMO_SCRIPT.md) · [Load test](LOAD_TEST.md) · [Assumptions](ASSUMPTIONS.md) ·
-[Problem statement](../Problem_Statement.md)
+[Problem statement](Problem_Statement.md)
 
 ---
 

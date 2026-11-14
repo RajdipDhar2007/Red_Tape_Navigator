@@ -32,7 +32,7 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 <img src="docs/media/demo-walkthrough.gif" alt="Animated walkthrough of Red Tape Navigator: goal, plan, interview, review, download, Hindi and Bengali" width="880" />
 
 <sub>The real app, recorded from a local run: goal, plan, interview, review, download, then the same journey in Hindi and Bengali.
-Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &nbsp;·&nbsp; Pitch deck: <a href="Onyx_HackNPitch.pdf">Onyx_HackNPitch.pdf</a></sub>
+Full-length demo video: <a href="submission/Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &nbsp;·&nbsp; Pitch deck: <a href="submission/Onyx_HackNPitch.pdf">Onyx_HackNPitch.pdf</a></sub>
 
 <br />
 
@@ -104,14 +104,14 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 </tr>
 </table>
 
-Our submission materials live in this repository: the [pitch deck (PDF)](Onyx_HackNPitch.pdf), the [editable deck (PPTX)](Onyx_HackNPitch.pptx)
-and the [demo video](Onyx_Demo_Video.mp4). The closing slide of the deck links back to this repository.
+Our submission materials live in this repository: the [pitch deck (PDF)](submission/Onyx_HackNPitch.pdf), the [editable deck (PPTX)](submission/Onyx_HackNPitch.pptx)
+and the [demo video](submission/Onyx_Demo_Video.mp4). The closing slide of the deck links back to this repository.
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## The problem statement in full
 
-> The text below is the problem statement we were given, reproduced in full. The same text is kept in [`Problem_Statement.md`](Problem_Statement.md).
+> The text below is the problem statement we were given, reproduced in full. The same text is kept in [`docs/Problem_Statement.md`](docs/Problem_Statement.md).
 
 ### Agentic AI: The "Red Tape" Bureaucracy Navigator
 
@@ -440,10 +440,9 @@ A monorepo with one folder per concern. The tree gives the map; the tables below
 ```text
 Red_Tape_Navigator/
 ├── README.md                    this overview
-├── Problem_Statement.md         the hackathon problem statement, verbatim
 ├── LICENSE                      proprietary licence (Team Onyx)
 ├── CODE_OF_CONDUCT.md, CONTRIBUTING.md, SECURITY.md, SUPPORT.md, ACCESSIBILITY.md   community and policy files
-├── Onyx_HackNPitch.pdf / .pptx  pitch deck;  Onyx_Demo_Video.mp4  demo video
+├── submission/                  hackathon pitch deck (PDF and PPTX) and demo video
 ├── requirements.txt             Python dependencies (points to backend/requirements.txt)
 ├── Makefile                     one-word commands: setup, dev, test, lint, eval, e2e, migrate, seed
 ├── docker-compose.yml           local stack: database, cache, API, worker, web
@@ -836,7 +835,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 
 | Topic | Documents |
 |---|---|
-| **Product and planning** | [Problem statement](Problem_Statement.md) · [Architecture](docs/ARCHITECTURE.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Business model](docs/BUSINESS_MODEL.md) · [Demo script](docs/DEMO_SCRIPT.md) |
+| **Product and planning** | [Problem statement](docs/Problem_Statement.md) · [Architecture](docs/ARCHITECTURE.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Business model](docs/BUSINESS_MODEL.md) · [Demo script](docs/DEMO_SCRIPT.md) |
 | **Rules and integrations** | [Rules verification log](docs/RULES_VERIFICATION.md) · [Reviewer worksheet](docs/RULES_REVIEW_EXPORT.csv) · [Integrations](docs/INTEGRATIONS.md) |
 | **Deploy and operate** | [VPS deployment](docs/DEPLOYMENT.md) · [Runbook](docs/RUNBOOK.md) · [Load test](docs/LOAD_TEST.md) |
 | **Security and compliance** | [Security (OWASP)](docs/SECURITY.md) · [Threat model](docs/THREAT_MODEL.md) · [DPDP compliance](docs/COMPLIANCE.md) |
