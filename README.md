@@ -3,31 +3,25 @@
 <img src="docs/assets/banner.svg" alt="Red Tape Navigator: a red ribbon of red tape being cut by scissors. Tell us your goal. We cut through the red tape." width="100%" />
 
 <p>
-<a href="#-meet-meera-she-just-wants-to-bake">😤 The Story</a> &nbsp;·&nbsp;
-<a href="#-the-60-second-tour">⚡ 60-Second Tour</a> &nbsp;·&nbsp;
-<a href="#-where-the-agentic-ai-is">🤖 The Agent</a> &nbsp;·&nbsp;
-<a href="#-the-workflow-step-by-step">🔄 Workflow</a> &nbsp;·&nbsp;
-<a href="#-screenshots-of-the-running-app">🖼️ Screens</a> &nbsp;·&nbsp;
-<a href="#-honest-status-real-simulated-untested">🔎 Honest Status</a> &nbsp;·&nbsp;
-<a href="#-quick-start">🚀 Quick Start</a>
+<a href="#hackathon-and-team">About</a> &nbsp;|&nbsp;
+<a href="#the-problem-in-real-life">The problem</a> &nbsp;|&nbsp;
+<a href="#where-the-agentic-ai-is">The agent</a> &nbsp;|&nbsp;
+<a href="#the-workflow-step-by-step">Workflow</a> &nbsp;|&nbsp;
+<a href="#screenshots-of-the-running-app">Screenshots</a> &nbsp;|&nbsp;
+<a href="#honest-status-real-simulated-untested">Status</a> &nbsp;|&nbsp;
+<a href="#quick-start">Quick start</a>
 </p>
 
-### Type one sentence. Get your whole licence plan, with the forms already filled.
-
-```text
- GOAL  ->  PLAN  ->  RESEARCH  ->  INTERVIEW  ->  FILL  ->  REVIEW  ->  YOU SIGN
- "I want to open a small bakery in Kolkata"   ...and you still press the final button
-```
-
-**An agentic AI that researches the rules, interviews you for only what is missing, fills the paperwork, and then stops and hands you the pen.**
-Free for everyone. Honest about what it does not know. Never submits anything behind your back.
+An agentic AI assistant for citizens and small businesses in India. Describe a goal in one sentence, such as *"I want to open a small bakery in Kolkata"*.
+It researches the rules, interviews you for only what is missing, fills in the paperwork, and stops at a human review checkpoint.
+Free to use, available in English, Hindi and Bengali, and it never submits anything on your behalf.
 
 <img src="frontend/public/logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="130" />
 
-[![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#-hackathon-and-team)
-[![Hackathon](https://img.shields.io/badge/Hackathon-HACK%3CN%3EPITCH-FF9933?style=for-the-badge)](#-hackathon-and-team)
-[![Track](https://img.shields.io/badge/Track-Agentic%20AI%20%C2%B7%20Civic%20Tech-138808?style=for-the-badge)](#-the-problem-statement-in-full)
-[![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)](#-license)
+[![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#hackathon-and-team)
+[![Hackathon](https://img.shields.io/badge/Hackathon-HACK%3CN%3EPITCH-FF9933?style=for-the-badge)](#hackathon-and-team)
+[![Track](https://img.shields.io/badge/Track-Agentic%20AI%20%C2%B7%20Civic%20Tech-138808?style=for-the-badge)](#the-problem-statement-in-full)
+[![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)](#license)
 
 ![CI](https://img.shields.io/badge/CI-7%20jobs%20passing-138808?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Backend tests](https://img.shields.io/badge/backend%20tests-491%20passing-138808?style=for-the-badge)
@@ -57,108 +51,37 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 😤 Meet Meera. She just wants to bake.
-
-Meera has the recipes, the oven and a lease on a small shop. Then someone says the words every new owner dreads: *"Get the licences."*
-
-| Without Red Tape Navigator | With Red Tape Navigator |
-|---|---|
-| 🔍 Hunts through central, state and municipal sites, each laid out differently | 🎯 Types **one sentence** |
-| 📄 Downloads outdated PDFs and re-types her name, PAN and address into each | 🗺️ Gets **one ordered plan**: Udyam, then FSSAI, then trade licence |
-| 🤷 Cannot tell which office, which fee, which document comes first | 🧾 Sees **authority, fee, timeline and documents** on every step, **each with its source link** |
-| 💸 Pays a middleman for what should be free guidance | 💬 Answers **only the questions that are missing**, never the same one twice |
-| 😰 Hands her Aadhaar to anyone who "helps" | 🔐 Keeps her data **encrypted, consented and erasable** |
-| 🌐 Reads English-only official text | 🇮🇳 Uses the whole app in **her own language** |
-
-> **Same goal. Same shop. One sentence instead of weeks of wandering.**
-
-## ⚡ The 60-second tour
-
-```text
- 1️⃣  Say it          "I want to open a small bakery in Kolkata"      (or in Hindi, or Bengali, or by voice)
- 2️⃣  See the plan    Udyam → FSSAI → Trade licence → ...             every line cited, dated, with a confidence score
- 3️⃣  Answer a little The interview asks one or two things at a time   PAN, Aadhaar, PIN, IFSC all validated on the spot
- 4️⃣  Review          Side-by-side forms, editable fields             nothing moves until you tick the consent box
- 5️⃣  Download & sign Filled PDFs, optional Aadhaar e-Sign            you submit on the official portal yourself
- 6️⃣  Relax           Reminders for status checks and renewals        rules re-checked weekly, in your language
-```
-
-## 🏆 Why this one is different
-
-<table>
-<tr>
-<td width="33%" valign="top" align="center">
-
-### 🧠 It is a real agent
-Plans, researches, remembers, fills forms, checks its own work, schedules follow-ups. The language model is *optional*.
-
-</td>
-<td width="33%" valign="top" align="center">
-
-### 🧾 It never makes things up
-A fact survives only if its quote appears **word for word** on the official page. CI fails the build if it invents one.
-
-</td>
-<td width="33%" valign="top" align="center">
-
-### 🛑 It cannot submit for you
-No interface in the code has a "submit" method, and **a test fails if anyone adds one**. You stay in charge.
-
-</td>
-</tr>
-</table>
-
-## 📊 By the numbers
-
-| 🏙️ **9** cities | 🥖 **120** business types | 📜 **438** cited rules | 🗣️ **3** languages |
-|:---:|:---:|:---:|:---:|
-| **491** backend tests | **95%** coverage | **26** golden eval cases, **0** hallucinations | **7/7** CI jobs green |
-
-## 🚀 Try it in three commands
-
-```bash
-git clone https://github.com/RajdipDhar2007/Red_Tape_Navigator.git && cd Red_Tape_Navigator
-cd backend && python -m venv .venv && . .venv/bin/activate && pip install -r requirements-dev.txt
-alembic upgrade head && python -m app.kb.seed_loader && uvicorn app.main:app --port 8000
-```
-
-No Docker, no database server, no API key needed. Then start the web app and open <http://localhost:3000>; the [full Quick start](#-quick-start) has every step, including Windows.
-
-> 🧭 **Not sure where to look?** Watch the walkthrough GIF above, skim [the workflow](#-the-workflow-step-by-step), peek at the [screenshots](#-screenshots-of-the-running-app), or jump to [what is real and what is simulated](#-honest-status-real-simulated-untested).
-
-<img src="docs/assets/divider.svg" width="100%" alt="" />
-
 ## Contents
 
 | Part | # | Section | What you will find |
 |---|---|---|---|
-| **About the project** | 1 | [Hackathon and team](#-hackathon-and-team) | Hackathon, institution, team name, track, members |
-|  | 2 | [The problem statement in full](#-the-problem-statement-in-full) | The brief, verbatim, and how each requirement is met |
-|  | 3 | [The problem, in real life](#-the-problem-in-real-life) | Real people, real photos, and the pain point by point with our fixes |
-|  | 4 | [Who we are building this for](#-who-we-are-building-this-for) | The people this helps |
-|  | 5 | [How the Indian government context shaped the design](#-how-the-indian-government-context-shaped-the-design) | Official systems and laws the product points to |
-| **Approach and the agent** | 6 | [Our approach and plan](#-our-approach-and-plan) | Principles and the phase-by-phase plan |
-|  | 7 | [Where the agentic AI is](#-where-the-agentic-ai-is) | How the agent plans, uses tools, remembers and checks itself |
-|  | 8 | [The workflow, step by step](#-the-workflow-step-by-step) | The citizen journey with screenshots |
-|  | 9 | [How the app works: what does what](#-how-the-app-works-what-does-what) | System view, pipelines and the role of each part |
-|  | 10 | [Project structure](#-project-structure) | Folder tree and what every file does |
-|  | 11 | [Every feature](#-every-feature) | Complete feature list |
-|  | 12 | [Screenshots of the running app](#-screenshots-of-the-running-app) | The real app in English, Hindi, Bengali and on a phone |
-| **Build and quality** | 13 | [Technology and tools we used](#-technology-and-tools-we-used) | Languages, frameworks, services |
-|  | 14 | [Architecture and pipelines](#-architecture-and-pipelines) | Component diagram and the deployment path |
-|  | 15 | [Challenges we faced and how we solved them](#-challenges-we-faced-and-how-we-solved-them) | Problems met and how we dealt with each |
-|  | 16 | [Quality and testing](#-quality-and-testing) | Tests, coverage, CI, security scans |
-|  | 17 | [Honest status: real, simulated, untested](#-honest-status-real-simulated-untested) | What is finished and what is not |
-| **Looking ahead and getting started** | 18 | [Pending work and roadmap](#-pending-work-and-roadmap) | What is left and future ideas |
-|  | 19 | [Our vision](#-our-vision) | Where this is going |
-|  | 20 | [Quick start](#-quick-start) | Installation and setup, commands |
-|  | 21 | [Documentation index](#-documentation-index) | Every guide, runbook and report |
-|  | 22 | [Credits and acknowledgements](#-credits-and-acknowledgements) | People, sources, software, photos |
-|  | 23 | [License](#-license) | Proprietary licence, summary and full text |
+| **About the project** | 1 | [Hackathon and team](#hackathon-and-team) | Hackathon, institution, team name, track, members |
+|  | 2 | [The problem statement in full](#the-problem-statement-in-full) | The brief, verbatim, and how each requirement is met |
+|  | 3 | [The problem, in real life](#the-problem-in-real-life) | Real people, real photos, and the pain point by point with our fixes |
+|  | 4 | [Who we are building this for](#who-we-are-building-this-for) | The people this helps |
+|  | 5 | [How the Indian government context shaped the design](#how-the-indian-government-context-shaped-the-design) | Official systems and laws the product points to |
+| **Approach and the agent** | 6 | [Our approach and plan](#our-approach-and-plan) | Principles and the phase-by-phase plan |
+|  | 7 | [Where the agentic AI is](#where-the-agentic-ai-is) | How the agent plans, uses tools, remembers and checks itself |
+|  | 8 | [The workflow, step by step](#the-workflow-step-by-step) | The citizen journey with screenshots |
+|  | 9 | [How the app works: what does what](#how-the-app-works-what-does-what) | System view, pipelines and the role of each part |
+|  | 10 | [Project structure](#project-structure) | Folder tree and what every file does |
+|  | 11 | [Every feature](#every-feature) | Complete feature list |
+|  | 12 | [Screenshots of the running app](#screenshots-of-the-running-app) | The real app in English, Hindi, Bengali and on a phone |
+| **Build and quality** | 13 | [Technology and tools we used](#technology-and-tools-we-used) | Languages, frameworks, services |
+|  | 14 | [Architecture and pipelines](#architecture-and-pipelines) | Component diagram and the deployment path |
+|  | 15 | [Challenges we faced and how we solved them](#challenges-we-faced-and-how-we-solved-them) | Problems met and how we dealt with each |
+|  | 16 | [Quality and testing](#quality-and-testing) | Tests, coverage, CI, security scans |
+|  | 17 | [Honest status: real, simulated, untested](#honest-status-real-simulated-untested) | What is finished and what is not |
+| **Looking ahead and getting started** | 18 | [Pending work and roadmap](#pending-work-and-roadmap) | What is left and future ideas |
+|  | 19 | [Our vision](#our-vision) | Where this is going |
+|  | 20 | [Quick start](#quick-start) | Installation and setup, commands |
+|  | 21 | [Documentation index](#documentation-index) | Every guide, runbook and report |
+|  | 22 | [Credits and acknowledgements](#credits-and-acknowledgements) | People, sources, software, photos |
+|  | 23 | [License](#license) | Proprietary licence, summary and full text |
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🏁 Hackathon and team
+## Hackathon and team
 
 <table width="100%">
 <tr>
@@ -194,7 +117,7 @@ and the [demo video](Onyx_Demo_Video.mp4). The closing slide of the deck links b
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 📜 The problem statement in full
+## The problem statement in full
 
 > The text below is the problem statement we were given, reproduced in full. The same text is kept in [`Problem_Statement.md`](Problem_Statement.md).
 
@@ -222,7 +145,7 @@ and the [demo video](Onyx_Demo_Video.mp4). The closing slide of the deck links b
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🌆 The problem, in real life
+## The problem, in real life
 
 Behind the statement are real people: a baker in Mysuru, a sweet-maker in a Kolkata lane, a tea-stall owner in Madhya Pradesh, a wholesaler in Burrabazar.
 Each of them is told to "get the licences" and then has to work out **which** ones, **in what order**, **from which office**, **with which documents**, **at what cost**.
@@ -264,7 +187,7 @@ Each of them is told to "get the licences" and then has to work out **which** on
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🎯 Who we are building this for
+## Who we are building this for
 
 | Persona | A day in their life | What Red Tape Navigator gives them |
 |---|---|---|
@@ -277,7 +200,7 @@ Each of them is told to "get the licences" and then has to work out **which** on
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🇮🇳 How the Indian government context shaped the design
+## How the Indian government context shaped the design
 
 Red Tape Navigator is built around the way Indian public services actually work. The references below are the official systems and laws the product points to
 or complies with. **We use them as sources and as guard-rails. We do not represent any government body, and this is not an official service.**
@@ -302,7 +225,7 @@ instead of inventing a rule.
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🧭 Our approach and plan
+## Our approach and plan
 
 ### The question we asked first
 
@@ -338,7 +261,7 @@ A bureaucracy agent that invents a fee or files a wrong form is worse than no ag
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🤖 Where the agentic AI is
+## Where the agentic AI is
 
 Red Tape Navigator is an **agent**, not a chatbot. You give it a **goal** ("open a small bakery in Kolkata"); it then decides what to do, uses tools to do it, remembers what you told it, checks its own work, and stops at a human checkpoint. The language model is one optional tool inside that loop, not the whole product.
 
@@ -370,7 +293,7 @@ flowchart LR
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🔄 The workflow, step by step
+## The workflow, step by step
 
 <table>
 <tr>
@@ -449,7 +372,7 @@ Download the filled PDF, optionally **e-Sign with Aadhaar** (Digio), follow the 
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## ⚙️ How the app works: what does what
+## How the app works: what does what
 
 ### System view
 
@@ -518,7 +441,7 @@ catalog.py (licences, 9 cities) + sourced_licences.py (read from official docume
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🗂️ Project structure
+## Project structure
 
 A monorepo with one folder per concern. The tree gives the map; the tables below it say what each file does.
 
@@ -545,7 +468,7 @@ Red_Tape_Navigator/
 ```
 
 <details>
-<summary><b>🔧 Backend (<code>backend/</code>): every file, one line each (click to expand)</b></summary>
+<summary><b>Backend (<code>backend/</code>): every file, one line each (click to expand)</b></summary>
 
 | Path | What it does |
 |---|---|
@@ -595,7 +518,7 @@ Red_Tape_Navigator/
 </details>
 
 <details>
-<summary><b>🎨 Frontend (<code>frontend/</code>): every file, one line each (click to expand)</b></summary>
+<summary><b>Frontend (<code>frontend/</code>): every file, one line each (click to expand)</b></summary>
 
 | Path | What it does |
 |---|---|
@@ -618,7 +541,7 @@ Red_Tape_Navigator/
 </details>
 
 <details>
-<summary><b>📦 Everything else: docs, scripts, infra, CI (click to expand)</b></summary>
+<summary><b>Everything else: docs, scripts, infra, CI (click to expand)</b></summary>
 
 | Path | What it does |
 |---|---|
@@ -632,7 +555,7 @@ Red_Tape_Navigator/
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## ✨ Every feature
+## Every feature
 
 ### For the citizen
 
@@ -678,7 +601,7 @@ Red_Tape_Navigator/
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🖼️ Screenshots of the running app
+## Screenshots of the running app
 
 All images below were captured from the real application running locally (English unless stated).
 
@@ -707,7 +630,7 @@ All images below were captured from the real application running locally (Englis
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🧰 Technology and tools we used
+## Technology and tools we used
 
 | Area | Used |
 |---|---|
@@ -727,7 +650,7 @@ All images below were captured from the real application running locally (Englis
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🏗️ Architecture and pipelines
+## Architecture and pipelines
 
 ```mermaid
 flowchart TB
@@ -760,7 +683,7 @@ The stack runs on Docker Compose with Caddy, and migrations run on start (`alemb
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🧗 Challenges we faced and how we solved them
+## Challenges we faced and how we solved them
 
 | # | Challenge | How we dealt with it |
 |---|---|---|
@@ -781,7 +704,7 @@ The stack runs on Docker Compose with Caddy, and migrations run on start (`alemb
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🧪 Quality and testing
+## Quality and testing
 
 | Check | Result |
 |---|---|
@@ -798,26 +721,26 @@ Run it yourself: `make test`, `make lint`, `make eval`, `make e2e`. Full details
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🔎 Honest status: real, simulated, untested
+## Honest status: real, simulated, untested
 
 We would rather state our limits than hide them.
 
 | Area | Status |
 |---|---|
-| Intake, research, rules, interview, validators, encrypted memory, review, downloads, checklist, reminders | ✅ **Built and tested** |
-| Accounts, two-factor sign-in, teams, officer console, privacy export and erase, Document Vault | ✅ **Built and tested** (real email needs SMTP credentials; not yet tried with a physical authenticator app) |
-| Rules content | 🟡 **Seeded from official sources, every rule flagged "verify with the authority"**; none signed off by a human reviewer yet |
-| Official PDFs | 🟡 **Watermarked placeholders** until the authorities permit the real forms |
-| Digio e-Sign and DigiLocker | 🟡 **Built and tested against mocks**; never run against the real sandbox; DigiLocker field mapping deliberately not guessed |
-| MSG91 SMS | 🟡 **Built, never sent live** (needs TRAI DLT approval) |
-| UMANG and WhatsApp | ⚪ **Mocked and labelled** |
-| Hindi and Bengali | 🟡 **Complete in code and tests; native-speaker review pending** |
-| Live deployment | ⏳ **Not deployed yet**: the deployment files are ready and waiting for the owner's account values |
-| Load test, penetration test, real-device test, pilot | ⏳ **Not done** |
+| Intake, research, rules, interview, validators, encrypted memory, review, downloads, checklist, reminders | **Built and tested** |
+| Accounts, two-factor sign-in, teams, officer console, privacy export and erase, Document Vault | **Built and tested** (real email needs SMTP credentials; not yet tried with a physical authenticator app) |
+| Rules content | **Seeded from official sources, every rule flagged "verify with the authority"**; none signed off by a human reviewer yet |
+| Official PDFs | **Watermarked placeholders** until the authorities permit the real forms |
+| Digio e-Sign and DigiLocker | **Built and tested against mocks**; never run against the real sandbox; DigiLocker field mapping deliberately not guessed |
+| MSG91 SMS | **Built, never sent live** (needs TRAI DLT approval) |
+| UMANG and WhatsApp | **Mocked and labelled** |
+| Hindi and Bengali | **Complete in code and tests; native-speaker review pending** |
+| Live deployment | **Not deployed yet**: the deployment files are ready and waiting for the owner's account values |
+| Load test, penetration test, real-device test, pilot | **Not done** |
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🛣️ Pending work and roadmap
+## Pending work and roadmap
 
 ### Pending (in priority order)
 
@@ -847,7 +770,7 @@ We would rather state our limits than hide them.
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🔭 Our vision
+## Our vision
 
 > **Nobody in India should need a middleman to understand what their own government requires of them.**
 
@@ -864,7 +787,7 @@ Three commitments guide every decision:
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🚀 Quick start
+## Quick start
 
 ### Installation and setup
 
@@ -915,7 +838,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 📚 Documentation index
+## Documentation index
 
 **Start here:** [Developer and operations guide](docs/DEVELOPER_GUIDE.md) (architecture, phase history, configuration reference, lessons learned)
 
@@ -930,7 +853,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 🙏 Credits and acknowledgements
+## Credits and acknowledgements
 
 - **Team Onyx**: Rajdip Dhar (team leader), Raktim Chakraborty, Anish Goswami and Imon Patra.
 - **HACK&lt;N&gt;PITCH** and **Jadavpur University** for the platform and the problem.
@@ -938,13 +861,13 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
   drugs-control departments, the Bureau of Indian Standards, MeitY (DigiLocker, UMANG), and the text of the Digital Personal Data Protection Act, 2023. We are not affiliated
   with any of them.
 - **Open-source software** this project stands on: FastAPI, SQLAlchemy, Alembic, Pydantic, Next.js, React, next-intl, Tailwind CSS, PyMuPDF, pypdf, reportlab, Playwright, pytest and many more.
-- **Photographs** in [the problem section](#-the-problem-in-real-life) are from Wikimedia Commons under Creative Commons licences, credited under each image: Salil Kumar Mukherjee,
+- **Photographs** in [the problem section](#the-problem-in-real-life) are from Wikimedia Commons under Creative Commons licences, credited under each image: Salil Kumar Mukherjee,
   Sunnya343 and Kritzolina (CC BY-SA 4.0) and McKay Savage (CC BY 2.0). They are shown from their original locations and remain the property of their authors.
 - **Screenshots** and the walkthrough animation are original captures of this project.
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## 📄 License
+## License
 
 **Proprietary, all rights reserved.** Copyright © 2026 **Team Onyx** (owner: RajdipDhar2007).
 
@@ -1019,6 +942,6 @@ To request permission, contact the repository owner through GitHub: RajdipDhar20
 
 <div align="center">
 
-<img src="docs/assets/footer.svg" alt="Less paperwork. More baking. Team Onyx, HACK&lt;N&gt;PITCH, Jadavpur University." width="100%" />
+<img src="docs/assets/footer.svg" alt="Clear rules. Cited sources. The citizen decides. Team Onyx, HACK&lt;N&gt;PITCH, Jadavpur University." width="100%" />
 
 </div>

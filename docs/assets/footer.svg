@@ -13,7 +13,7 @@
   </defs>
   <rect width="1200" height="160" rx="18" fill="url(#bg)"/>
   <rect x="0" y="152" width="1200" height="8" rx="4" fill="url(#tri)"/>
-  <text x="600" y="62" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Less paperwork. More baking.</text>
-  <text x="600" y="98" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="19" fill="#FF9933">Built so the next person who wants to open a bakery spends their time baking.</text>
+  <text x="600" y="62" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Clear rules. Cited sources. The citizen decides.</text>
+  <text x="600" y="98" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="19" fill="#FF9933">Free, multilingual guidance through Indian government licensing.</text>
   <text x="600" y="130" text-anchor="middle" font-family="Consolas, Menlo, monospace" font-size="15" fill="#BFD0FF">Team Onyx  ·  HACK&lt;N&gt;PITCH  ·  Jadavpur University</text>
 </svg>
