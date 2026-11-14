@@ -2,11 +2,17 @@
 
 <img src="frontend/public/logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="240" />
 
-# Red Tape Navigator
+# ✂️ Red Tape Navigator
 
-### Tell us your goal. We cut through the red tape.
+### Type one sentence. Get your whole licence plan, with the forms already filled.
 
-**An agentic AI assistant that turns one sentence, such as _"I want to open a small bakery in Kolkata"_, into a researched, cited, step-by-step licensing plan and filled-in paperwork, while the citizen stays in full control.**
+> ## _"I want to open a small bakery in Kolkata."_
+> ↓ &nbsp;**one sentence in**&nbsp; ↓
+> **A cited, ordered, step-by-step plan** · **every fee, office and document** · **PDFs filled in** · **in English, हिन्दी or বাংলা**
+> ↓ &nbsp;**and you still press the final button**&nbsp; ↓
+
+**An agentic AI that researches the rules, interviews you for only what is missing, fills the paperwork, and then stops and hands you the pen.**
+Free for everyone. Honest about what it does not know. Never submits anything behind your back.
 
 [![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#-hackathon-and-team)
 [![Hackathon](https://img.shields.io/badge/Hackathon-HACK%3CN%3EPITCH-FF9933?style=for-the-badge)](#-hackathon-and-team)
@@ -38,6 +44,77 @@ Full-length demo video: <a href="Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &n
 > **The citizen reviews, signs and submits. The system never submits anything to a government portal on its own.**
 
 </div>
+
+---
+
+## 😤 Meet Meera. She just wants to bake.
+
+Meera has the recipes, the oven and a lease on a small shop. Then someone says the words every new owner dreads: *"Get the licences."*
+
+| Without Red Tape Navigator | With Red Tape Navigator |
+|---|---|
+| 🔍 Hunts through central, state and municipal sites, each laid out differently | 🎯 Types **one sentence** |
+| 📄 Downloads outdated PDFs and re-types her name, PAN and address into each | 🗺️ Gets **one ordered plan**: Udyam, then FSSAI, then trade licence |
+| 🤷 Cannot tell which office, which fee, which document comes first | 🧾 Sees **authority, fee, timeline and documents** on every step, **each with its source link** |
+| 💸 Pays a middleman for what should be free guidance | 💬 Answers **only the questions that are missing**, never the same one twice |
+| 😰 Hands her Aadhaar to anyone who "helps" | 🔐 Keeps her data **encrypted, consented and erasable** |
+| 🌐 Reads English-only official text | 🇮🇳 Uses the whole app in **her own language** |
+
+> **Same goal. Same shop. One sentence instead of weeks of wandering.**
+
+## ⚡ The 60-second tour
+
+```text
+ 1️⃣  Say it          "I want to open a small bakery in Kolkata"      (or in Hindi, or Bengali, or by voice)
+ 2️⃣  See the plan    Udyam → FSSAI → Trade licence → ...             every line cited, dated, with a confidence score
+ 3️⃣  Answer a little The interview asks one or two things at a time   PAN, Aadhaar, PIN, IFSC all validated on the spot
+ 4️⃣  Review          Side-by-side forms, editable fields             nothing moves until you tick the consent box
+ 5️⃣  Download & sign Filled PDFs, optional Aadhaar e-Sign            you submit on the official portal yourself
+ 6️⃣  Relax           Reminders for status checks and renewals        rules re-checked weekly, in your language
+```
+
+## 🏆 Why this one is different
+
+<table>
+<tr>
+<td width="33%" valign="top" align="center">
+
+### 🧠 It is a real agent
+Plans, researches, remembers, fills forms, checks its own work, schedules follow-ups. The language model is *optional*.
+
+</td>
+<td width="33%" valign="top" align="center">
+
+### 🧾 It never makes things up
+A fact survives only if its quote appears **word for word** on the official page. CI fails the build if it invents one.
+
+</td>
+<td width="33%" valign="top" align="center">
+
+### 🛑 It cannot submit for you
+No interface in the code has a "submit" method, and **a test fails if anyone adds one**. You stay in charge.
+
+</td>
+</tr>
+</table>
+
+## 📊 By the numbers
+
+| 🏙️ **9** cities | 🥖 **120** business types | 📜 **438** cited rules | 🗣️ **3** languages |
+|:---:|:---:|:---:|:---:|
+| **491** backend tests | **95%** coverage | **26** golden eval cases, **0** hallucinations | **7/7** CI jobs green |
+
+## 🚀 Try it in three commands
+
+```bash
+git clone https://github.com/RajdipDhar2007/Red_Tape_Navigator.git && cd Red_Tape_Navigator
+cd backend && python -m venv .venv && . .venv/bin/activate && pip install -r requirements-dev.txt
+alembic upgrade head && python -m app.kb.seed_loader && uvicorn app.main:app --port 8000
+```
+
+No Docker, no database server, no API key needed. Then start the web app and open <http://localhost:3000>; the [full Quick start](#-quick-start) has every step, including Windows.
+
+> 🧭 **Not sure where to look?** Watch the walkthrough GIF above, skim [the workflow](#-the-workflow-step-by-step), peek at the [screenshots](#-screenshots-of-the-running-app), or jump to [what is real and what is simulated](#-honest-status-real-simulated-untested).
 
 ---
 
@@ -457,7 +534,8 @@ Red_Tape_Navigator/
 └── deploy/                      Caddyfile for the single-server setup
 ```
 
-### Backend (`backend/`)
+<details>
+<summary><b>🔧 Backend (<code>backend/</code>): every file, one line each (click to expand)</b></summary>
 
 | Path | What it does |
 |---|---|
@@ -504,7 +582,10 @@ Red_Tape_Navigator/
 | `requirements.txt`, `requirements-dev.txt` | Python dependencies: what the app needs to run, and the extra test, lint and security tools. |
 | `Dockerfile`, `pyproject.toml`, `alembic.ini` | Container image, the package definition (the source of truth for dependencies) and tool settings. |
 
-### Frontend (`frontend/`)
+</details>
+
+<details>
+<summary><b>🎨 Frontend (<code>frontend/</code>): every file, one line each (click to expand)</b></summary>
 
 | Path | What it does |
 |---|---|
@@ -524,7 +605,10 @@ Red_Tape_Navigator/
 | `public/` | The team logo (`logo.png`), installable-app icons and the social-share image. |
 | `e2e/`, `tests/` | Playwright browser tests (13) and unit tests (10). |
 
-### Everything else
+</details>
+
+<details>
+<summary><b>📦 Everything else: docs, scripts, infra, CI (click to expand)</b></summary>
 
 | Path | What it does |
 |---|---|
@@ -533,6 +617,8 @@ Red_Tape_Navigator/
 | `infra/terraform/` | Terraform skeleton with modules for network, database, cache, secrets and app. |
 | `.github/ISSUE_TEMPLATE/`, `pull_request_template.md` | Issue forms (bug, rule correction, accessibility barrier, feature request) and the pull request checklist. |
 | `.github/workflows/` | `ci.yml` (the 7 CI jobs), `codeql.yml` (code scanning), `deploy.yml` (deployment template). |
+
+</details>
 
 ---
 
