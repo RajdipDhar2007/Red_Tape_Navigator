@@ -1,22 +1,14 @@
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="Red Tape Navigator: a red ribbon of red tape being cut by scissors. Tell us your goal. We cut through the red tape." width="100%" />
+<img src="frontend/public/logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="360" />
 
-<p>
-<a href="#hackathon-and-team">About</a> &nbsp;|&nbsp;
-<a href="#the-problem-in-real-life">The problem</a> &nbsp;|&nbsp;
-<a href="#where-the-agentic-ai-is">The agent</a> &nbsp;|&nbsp;
-<a href="#the-workflow-step-by-step">Workflow</a> &nbsp;|&nbsp;
-<a href="#screenshots-of-the-running-app">Screenshots</a> &nbsp;|&nbsp;
-<a href="#honest-status-real-simulated-untested">Status</a> &nbsp;|&nbsp;
-<a href="#quick-start">Quick start</a>
-</p>
+# Red Tape Navigator
 
-An agentic AI assistant for citizens and small businesses in India. Describe a goal in one sentence, such as *"I want to open a small bakery in Kolkata"*.
-It researches the rules, interviews you for only what is missing, fills in the paperwork, and stops at a human review checkpoint.
-Free to use, available in English, Hindi and Bengali, and it never submits anything on your behalf.
+### Type one sentence. Get your whole licence plan, with the forms already filled.
 
-<img src="frontend/public/logo.png" alt="Red Tape Navigator logo: a friendly robot officer cutting through red tape with a checklist and a compass" width="130" />
+**An agentic AI assistant for citizens and small businesses in India.** Describe a goal such as *"I want to open a small bakery in Kolkata"*;
+it researches the rules, interviews you for only what is missing, fills in the paperwork and stops at a human review checkpoint.
+Free to use, in English, Hindi and Bengali. It never submits anything on your behalf.
 
 [![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#hackathon-and-team)
 [![Hackathon](https://img.shields.io/badge/Hackathon-HACK%3CN%3EPITCH-FF9933?style=for-the-badge)](#hackathon-and-team)
