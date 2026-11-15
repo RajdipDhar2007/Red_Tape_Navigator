@@ -1,4 +1,4 @@
-# Final report (2026-11-12)
+# Final report (updated 2026-11-15)
 
 Where the product stands, what is real, what is simulated, what is left and what it costs to run.
 
@@ -24,7 +24,7 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**.
 | **Backup-and-restore drill (new)**: `scripts/backup_restore_drill.sh` | Runs in CI on every push against PostgreSQL |
 | **Search-engine and install basics (new)**: `robots.txt`, `sitemap.xml`, web-app manifest, icon, language alternates, social preview tags | Built and browser-tested; private pages are excluded from search engines |
 | **Help page (new)**: nine common questions at `/help`, in all three languages | Built and browser-tested |
-| Quality gates | Backend: lint, types, 491 tests (about 95% coverage), evaluation set with zero invented facts. Frontend: lint, types, unit tests, production build, 13 browser tests. 7 CI jobs |
+| Quality gates | Backend: lint, types, 494 tests (about 95% coverage), evaluation set with zero invented facts. Frontend: lint, types, unit tests, production build, 13 browser tests. 7 CI jobs |
 
 ## 3. What is simulated or switched off
 
@@ -34,7 +34,7 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**.
 | SMS reminders (MSG91) | Code written and unit-tested; never sent | TRAI DLT registration and MSG91 KYC by the owner (needs business documents and a fee) |
 | WhatsApp, UMANG | Labelled mock only | A provider contract; no adapter is written |
 | Official PDFs (FSSAI Form A/B, trade licence, Udyam) | Watermarked placeholders plus key-in sheets | FSSAI's written permission (request drafted in the owner's Gmail), then an officer fetches and approves each form in the console |
-| Live rules refresh with an AI model | Off (`LLM_PROVIDER=none` on the trial) | A Gemini key or a local Ollama model; the product works without it |
+| Google Gemini (intake gap-filling, live rule checks) | Built and tested; runs once `GEMINI_API_KEY` and `GEMINI_MODEL` are set. Without them the rules-first path runs | A Gemini API key in the host's environment |
 | Legal pages | Shown with a "draft, pending legal review" banner | A lawyer's approval, then `NEXT_PUBLIC_LEGAL_REVIEWED=true` |
 
 ## 4. What remains, and who must do it
@@ -42,10 +42,10 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**.
 | # | Item | Who | How |
 |---|---|---|---|
 | 1 | Finish the deployment: set the production values and bring the stack up | Owner, then owner or developer | `docs/DEPLOYMENT.md` |
-| 2 | Copy `FIELD_ENCRYPTION_KEY` from Render into a password manager | Owner | Step 2.5 of the same guide |
+| 2 | Copy `FIELD_ENCRYPTION_KEY` from the host's secret store into a password manager | Owner | Section 1 of the same guide |
 | 3 | Run `scripts/verify_deploy.py --journey` on the live site, test reset email | Owner or developer | One command |
 | 4 | Uptime monitor on `/ready` | Owner | UptimeRobot, 3 minutes |
-| 5 | Before day 30: upgrade the free database or move to the launch Blueprint | Owner | Needs a card |
+| 5 | Before day 30: move off the free database tier (free Render databases expire after 30 days) | Owner | Needs a card |
 | 6 | Send the two drafted emails (FSSAI permission, Digio sandbox) after filling the bracketed parts | Owner | Gmail, Drafts |
 | 7 | MSG91 KYC and TRAI DLT registration | Owner | |
 | 8 | Lawyer reviews privacy, terms and consent text | Lawyer | Then switch the banner off |
@@ -55,9 +55,9 @@ Red Tape Navigator is built, tested and ready to deploy. It is **not live yet**.
 | 12 | Independent penetration test | Tester | `docs/THREAT_MODEL.md` lists what is open |
 | 13 | Pilot with 5 to 10 shop owners | Owner | `docs/PILOT_PLAN.md` |
 | 14 | Decisions: who funds running costs, support channel, on-call contact, custom domain | Owner | `docs/BUSINESS_MODEL.md` |
-| 15 | First build on Render has never run: watch the deploy log and fix what it shows | Developer | Render dashboard, `rtn-api`, Logs |
+| 15 | The first deploy to Vercel and Render has never run: watch both deploy logs and fix what they show | Developer | Vercel and Render dashboards, Logs |
 | 16 | Delete the `BOOTSTRAP_ADMIN_*` values after the first officer sign-in; two-factor on the hosting accounts | Owner | `docs/DEPLOYMENT.md` |
-| 17 | GitHub housekeeping: 11 Dependabot pull requests, two stuck runs, public or private repository | Owner |  |
+| 17 | GitHub housekeeping: the open Dependabot pull requests, and whether the repository stays public | Owner |  |
 
 Development work that is still open, in order of value:
 
@@ -84,7 +84,7 @@ Render figures were read from <https://render.com/pricing> on 2026-11-12. Others
 | SMS (MSG91) | off | per message, plus a one-time DLT fee of roughly Rs 5,900 | Secondary sources only; confirm before paying |
 | e-Sign and DigiLocker (Digio) | off | per signature and per call | Not known: ask Digio (in the drafted email) |
 | Domain name | none | yearly fee | Not checked |
-| AI model for rules refresh | off | free tier of Gemini or a local model | Optional |
+| AI model (Gemini) | free tier while volume is low | per-token pricing beyond the free tier | Confirm on Google's pricing page |
 
 A smaller launch is possible: keep `RUN_SCHEDULER=true` and one API instance, drop the worker and Redis, and pay about US$13 a month (API + database). Use the worker and Redis when you run more than one API instance.
 

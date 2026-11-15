@@ -62,7 +62,7 @@ This guide and the [README](../README.md) are the project's memory. Please follo
 
 ## 1. The problem and the plan
 
-**Problem** (full text in [`ps.md`](Problem_Statement.md)): citizens and small businesses lose weeks to scattered departmental sites, outdated PDF
+**Problem** (full text in [`docs/Problem_Statement.md`](Problem_Statement.md)): citizens and small businesses lose weeks to scattered departmental sites, outdated PDF
 forms and contradictory requirements. They need to know *which* licences apply, *in what order*, *with which documents*, *what it costs*,
 and then fill the forms correctly.
 
@@ -106,7 +106,7 @@ flowchart LR
   W -->|HTTPS, bearer token| A[FastAPI API on Render]
   A --> P[(PostgreSQL + pgvector)]
   A --> R[(Redis)]
-  A -.-> L[Claude API, optional]
+  A -->|PII redacted, schema-validated| L[Google Gemini]
   A -->|HTTPS allowlisted, read only| G[Official government pages]
   A -->|upload PDF, status| D[Digio: eSign + DigiLocker]
   D -->|signed webhook| A
@@ -155,9 +155,9 @@ catalog.py (licences, 9 cities)  +  sourced_licences.py (read from official docu
 
 ### 3.5 Deployment pipeline
 
-`git push main` -> GitHub Actions CI (7 jobs, section 8) -> manual deploy (autoDeploy is off on purpose):
-`docker-compose.prod.yml` + Caddy on a VPS (the container entrypoint runs `alembic upgrade head` and loads the
-rules pack); the frontend is a Next.js app that can also be hosted separately (for example on Vercel, Root Directory `frontend`). See
+`git push main` -> GitHub Actions CI (7 jobs, section 8) -> manual deploy (automatic deploys are off on purpose). The web app is prepared for
+Vercel (Root Directory `frontend`) and the API and worker for Render (Docker, from `backend/Dockerfile`); the alternative is
+`docker-compose.prod.yml` + Caddy on a VPS. The container entrypoint runs `alembic upgrade head` and loads the rules pack. See
 [`docs/DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ## 4. What is done, and how it was done
@@ -248,7 +248,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 | --- | --- |
 | Backend | Python 3.12+ (3.13 works), FastAPI, Uvicorn, Pydantic v2, SQLAlchemy 2 (async), Alembic, asyncpg / aiosqlite, ARQ worker, Redis, httpx |
 | Database | PostgreSQL with pgvector (production), SQLite (local dev and tests) |
-| AI | Optional and free to run: a local Ollama model (`OLLAMA_MODEL`) or Google Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`), through one provider switch in `app/agent/llm.py` (`LLM_PROVIDER`); model names come from env, never hard-coded; deterministic rules-first mode needs no model at all |
+| AI | Google Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`) through `app/agent/llm.py`: JSON-schema output validated with Pydantic, PII redacted first, circuit breaker; the model name comes from env, never hard-coded; a deterministic rules-first path takes over if Gemini is unreachable |
 | PDFs and scraping | PyMuPDF, pypdf, reportlab, trafilatura, Playwright (optional JS rendering), PyYAML allowlist |
 | Security | passlib/bcrypt, PyJWT, cryptography (Fernet / MultiFernet), structlog with PII redaction, in-process sliding-window rate limiter in `core/middleware.py` |
 | Observability | Prometheus metrics, OpenTelemetry, optional Sentry, JSON logs with request ids |
@@ -256,13 +256,13 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 | Quality | pytest + pytest-asyncio + coverage (gate 80%, actual ~95.4%), ruff, mypy, eslint, tsc, evals (golden cases, hallucination gate) |
 | Security scans | pip-audit, bandit, npm audit, gitleaks, Trivy (container), CodeQL (opt-in) |
 | CI | GitHub Actions: 7 jobs (backend, backend on Postgres + pgvector with Alembic up/down/up, frontend, Playwright e2e, security, container build + scan, compose smoke) |
-| Hosting | Render (API, worker, Postgres, Redis; Singapore, no India region), Vercel (web); VPS alternative with Docker Compose + Caddy; Terraform skeleton in `infra/` |
+| Hosting | Prepared for Render (API, worker, Postgres, Redis; Singapore, no India region) and Vercel (web); VPS alternative with Docker Compose + Caddy; Terraform skeleton in `infra/`; not live yet |
 | Third parties | Digio (eSign + DigiLocker), MSG91 (SMS, TRAI DLT), an SMTP provider (SES / Brevo / SendGrid / NIC mail), UptimeRobot-style monitor |
 | How the work was done | Claude Code as the engineering assistant, with the Claude in Chrome extension to read official sites and API docs read-only, `gh` CLI for CI status, local PyMuPDF for PDFs |
 
 ## 6. Current status: real, simulated, untested
 
-Numbers as of the last update: **491 backend tests** passing (about 95.4% coverage), 10 frontend unit tests, 13 browser e2e tests, **9 cities**,
+Numbers as of the last update: **494 backend tests** passing (about 95.4% coverage), 10 frontend unit tests, 13 browser e2e tests, **9 cities**,
 **120 business types**, **16 licences** (2 state-specific by city), **438 seeded rules**, **3 languages**, **7 CI jobs** green.
 
 | Area | Status |
@@ -367,7 +367,7 @@ Work in this order. Items marked **HUMAN** need the owner or a third party; do e
 | A | **Production deployment** (**HUMAN**) | Follow `docs/DEPLOYMENT.md`: email-sender account, set the production environment values, then run `scripts/verify_deploy.py --journey`, test the reset email, add an uptime monitor on `/ready`, and run the load test | `docs/DEPLOYMENT.md`, `scripts/verify_deploy.py`, Brevo/SES/SendGrid/NIC mail, UptimeRobot, Locust (`docs/LOAD_TEST.md`) |
 | B | **Digio sandbox then production** (**HUMAN** gets credentials) | Set `DIGIO_*` in Render, set the webhook URL and secret in Digio's enterprise dashboard, run the sandbox checklist in `docs/INTEGRATIONS.md`, fix any request-shape differences, **implement the DigiLocker result mapping from a real `detail_response=true` response** (answer keys with `source="document"`, encrypt sensitive values), then production credentials and IPs | `real/digio.py`, `api/webhooks.py`, `httpx.MockTransport` tests, Digio docs read in a browser |
 | C | **MSG91 SMS live** (**HUMAN** DLT KYC) | Complete DLT registration on an operator portal (Airtel / Vi / BSNL / STPL / Tata), register a 6-character header and the template `Red Tape Navigator reminder: {#var#}`, link it to a MSG91 Flow, put `MSG91_AUTHKEY` / `MSG91_TEMPLATE_ID` in Render, send a real test SMS, fix the adapter if the live shape differs (DLT errors 203/211 mean not approved) | `real/msg91.py`, MSG91 dashboard |
-| D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `OLLAMA_MODEL` (local, free) or `GEMINI_API_KEY` + `GEMINI_MODEL`, officer console `/en/staff` |
+| D | **Rules verification** (most important for trust) | Close the gaps below only from official pages read in a browser (or pasted by a human); add them to `sourced_licences.py` / `catalog.py` with sources; a reviewer then marks each rule verified / corrected / rejected in the officer console using `docs/RULES_REVIEW_EXPORT.csv`; optionally run the grounded LLM refresh | `docs/RULES_VERIFICATION.md`, `make verify-sources`, `POST /admin/refresh` with `GEMINI_API_KEY` + `GEMINI_MODEL` set, officer console `/en/staff` |
 | E | **Official forms** (**HUMAN** FSSAI permission) | Email `helpdesk-foscos@fssai.gov.in` for permission to reproduce Form A and Form B; then officers fetch the PDFs through the console (allowlisted URLs), you write the field-map JSON in `backend/app/forms/templates/`, an officer approves; keep the key-in sheet for FoSCoS and Udyam | `docs/INTEGRATIONS.md` (field-map procedure), `backend/app/forms/official.py` |
 | F | **Language quality** (**HUMAN** native speakers) | Native Hindi and Bengali review of `data_hi.py`, `data_bn.py`, `frontend/messages/*.json`, especially legal and fee wording. Hindi and Bengali keywords for all the business types are DONE (`_LOCAL_KEYWORDS` in `business_types.py`, pending native review). The officer console (`staff.*` strings) is already translated in `en`, `hi` and `bn`, pending the same native review | `backend/app/i18n_content/`, `ACTIVITY_KEYWORDS`, optional LLM intake mapping |
 | G | **Launch hardening** (**HUMAN** counsel, devices, testers) | Counsel reviews privacy, terms and DPDP consent text, then set `NEXT_PUBLIC_LEGAL_REVIEWED=true`; real-phone, slow-network, voice-input and screen-reader tests; penetration test or the `docs/SECURITY.md` checklist; backup-restore drill; secrets-rotation plan; move browser tokens from `sessionStorage` to httpOnly cookies behind a BFF; consider MFA / OIDC; design CSC-operator delegation; decide LLM egress and data residency with counsel; pilot with 5 to 10 shop owners | `docs/SECURITY.md`, `docs/COMPLIANCE.md`, `docs/PILOT_PLAN.md`, `docs/RUNBOOK.md` |
@@ -401,7 +401,7 @@ Everything is environment-driven; see [`.env.example`](../.env.example) and [`.e
 | Email | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_STARTTLS` |
 | SMS | `MSG91_AUTHKEY`, `MSG91_TEMPLATE_ID`, `MSG91_TEXT_VAR` |
 | Digio | `DIGIO_CLIENT_ID`, `DIGIO_CLIENT_SECRET`, `DIGIO_ENV` (`sandbox` / `production`), `DIGIO_WEBHOOK_SECRET`, `DIGIO_WEBHOOK_IPS`, `DIGIO_DIGILOCKER_TEMPLATE` |
-| AI (optional) | `LLM_PROVIDER` (`auto`/`ollama`/`gemini`/`none`), `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `GEMINI_API_KEY`, `GEMINI_MODEL` |
+| AI | `GEMINI_API_KEY`, `GEMINI_MODEL`, and `LLM_PROVIDER` (`auto` picks Gemini when both are set; `none` forces the rules-only path) |
 | Ops | `SENTRY_DSN`, `METRICS_TOKEN`, `RATE_LIMIT_PER_MINUTE`, `AUTH_RATE_LIMIT_PER_MINUTE`, `INTEGRATIONS_MODE`, `RUN_SCHEDULER` (run the scheduled jobs inside a single API instance instead of the worker), `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (first officer on hosts without a shell; delete after first sign-in) |
 | Frontend | `NEXT_PUBLIC_API_URL` (baked in at build), `NEXT_PUBLIC_SITE_URL` (public address for the sitemap and canonical links; on Vercel it is detected), `NEXT_PUBLIC_LEGAL_REVIEWED`, `NEXT_PUBLIC_EMBLEM_URL` |
 

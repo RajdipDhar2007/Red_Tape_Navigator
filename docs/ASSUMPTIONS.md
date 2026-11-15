@@ -25,8 +25,8 @@ Decisions made without asking, so work could continue end to end. Revisit before
 - Real government form PDFs could not be fetched/redistributed offline. The three templates (FSSAI Form A, Udyam
   details sheet, municipal trade licence) use **clearly marked placeholder PDFs**; JSON field maps are real and
   documented so the official PDFs can be dropped in (docs/INTEGRATIONS.md).
-- Without `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL` the system uses deterministic rules for intake/research and says so in
-  the UI ("rules_fallback", research mode label). The LLM code paths are tested with fakes, not against the live API.
+- Google Gemini (`GEMINI_API_KEY` + `GEMINI_MODEL`) does the language work. Without them, or if Gemini is unreachable, the system uses deterministic rules for intake/research and says so in
+  the UI ("rules_fallback", research mode label). The Gemini code paths are tested with mocked HTTP responses in CI; a live call needs a real key.
 - Live scraping of portals was not exercised against real sites (no network guarantees in CI). The fetcher, robots,
   allowlist, redirect re-checks and change detection are unit-tested with fakes.
 

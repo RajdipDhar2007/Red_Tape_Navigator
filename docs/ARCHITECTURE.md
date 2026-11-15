@@ -10,7 +10,7 @@ flowchart LR
   API --> AUTH[Auth/RBAC + Consent + Audit]
   API --> ORCH[Session orchestrator]
   ORCH --> INTAKE[A. Goal intake]
-  ORCH --> RES[B. Research agent<br/>Claude tool-use loop]
+  ORCH --> RES[B. Research agent<br/>Gemini + verbatim-quote check]
   ORCH --> PLAN[C. Checklist planner]
   ORCH --> INT[D. Interview engine + memory]
   ORCH --> FILL[E. Form filler]
@@ -34,15 +34,15 @@ flowchart LR
 
 1. **No autonomous submission.** There is no adapter method or route that posts to a government portal.
    The final step produces PDFs + a checklist; the citizen performs submission. Enforced by tests
-   (`tests/test_no_submission.py`) that scan the code for submit capability.
+   (`test_no_code_path_submits_to_government_portal` in `backend/tests/test_api_flow.py`) that scan the code for submit capability.
 2. **No claim without a citation.** `Claim` requires `source_url`, `fetched_at`, `content_hash`; the DB
    column is NOT NULL and the evaluation harness fails on uncited claims.
 3. **Scraped content is data.** Fetched text passes the sanitizer, is delimited in prompts, and the LLM has
    no tool that can act on it beyond constrained, allowlisted tools.
 4. **Never guess values.** The form filler emits `missing`/`doubtful`/`unmapped` flags instead of defaults.
 5. **Sensitive fields (Aadhaar, PAN) are Fernet-encrypted at rest and redacted in logs.**
-6. **Graceful degradation.** Without an `ANTHROPIC_API_KEY` the agent falls back to a deterministic
-   rules-pack (curated seed KB) so the demo works offline; this is labelled in the UI.
+6. **Graceful degradation.** Google Gemini does the language work (intake gap-filling and live rule checks). If `GEMINI_API_KEY` is unset or Gemini
+   cannot be reached, the agent falls back to a deterministic rules-pack (curated seed KB); this is labelled in the UI.
 
 ## Backend layout
 

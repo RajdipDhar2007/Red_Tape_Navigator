@@ -20,8 +20,8 @@ WhatsApp are simulated, and the forms are placeholders."** (The yellow banner sa
 | 4:50 | Open `/docs` or the terminal: `make eval` result and the audit chain. | "26 golden cases, 100 % citation coverage, zero hallucinations gate in CI; hash-chained audit log; DPDP export and erase endpoints." |
 
 ## Backup moves
-* If asked "does it use an LLM?": yes when `ANTHROPIC_API_KEY`/`ANTHROPIC_MODEL` are set (intake gap-filling and live
-  extraction with verbatim-quote grounding); without them a deterministic fallback runs and the UI says so.
+* If asked "does it use an LLM?": yes, Google Gemini (`GEMINI_API_KEY`/`GEMINI_MODEL`) for intake gap-filling and live
+  extraction with verbatim-quote grounding; if it is not configured or not reachable, a deterministic fallback runs and the UI says so.
 * If asked about prompt injection: show `docs/SECURITY.md` — domain allowlist in code, untrusted-content delimiters,
   grounding rule, no tool that acts on the world.
 * If asked "what's real?": README table. Seed data, mocked integrations, placeholder forms — all labelled.

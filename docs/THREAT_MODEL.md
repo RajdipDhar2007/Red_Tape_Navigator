@@ -39,4 +39,4 @@ Short on purpose. Controls and the OWASP mapping are in `docs/SECURITY.md`; this
 
 ## Checked on 2026-11-12 (automated, in the test suite)
 
-Anonymous access refused on every private route; another user's session, reminders and calendar file answer 404; a calendar title cannot inject calendar properties; the first-officer environment variables cannot overwrite an existing password; no secret has a committed value in either Render Blueprint; production refuses to start with demo mode, dev secrets, SQLite, http origins or missing email settings.
+Anonymous access refused on every private route; another user's session, reminders and calendar file answer 404; a calendar title cannot inject calendar properties; the first-officer environment variables cannot overwrite an existing password; no secret has a committed value anywhere in the repository; production refuses to start with demo mode, dev secrets, SQLite, http origins or missing email settings.

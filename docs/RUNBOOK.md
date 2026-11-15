@@ -110,7 +110,7 @@ CONFIRM_NON_PROD_RESTORE=YES_RESTORE_NON_PROD \
 
 ## 5. Redis, Cache & Background Worker Operations
 
-**Without a worker (free-trial Blueprint):** with `RUN_SCHEDULER=true` the same four routine jobs run inside the single API instance, so no worker or Redis is needed.
+**Without a worker (single small instance):** with `RUN_SCHEDULER=true` the same four routine jobs run inside the single API instance, so no worker or Redis is needed.
 Each run writes an audit entry `job.<name>` with `ok: true/false`; the last entry decides when the job is next due, so restarts do not repeat work.
 Never set `RUN_SCHEDULER=true` on more than one instance. On a brand-new deployment the two weekly jobs wait one week before their first run
 (audit detail `deferred: true`); an admin can run them at once with `POST /admin/refresh` and `POST /admin/forms/refresh`.
@@ -160,9 +160,9 @@ Never set `RUN_SCHEDULER=true` on more than one instance. On a brand-new deploym
 4. **Verification:** Check `/admin/readiness` (`storage.configured: true`) and test uploading/downloading a small test PDF in `/documents`.
 5. **Escalation:** Cloud Infrastructure Owner.
 
-### Incident 5: External Provider Outage (Anthropic, SMTP, MSG91, Digio)
+### Incident 5: External Provider Outage (Gemini, SMTP, MSG91, Digio)
 1. **Detection:**
-   - **Anthropic LLM:** `rtn_llm_calls_total{outcome="error"}` spikes; circuit breaker opens after 3 failures for 45 seconds.
+   - **Gemini:** `rtn_llm_calls_total{outcome="error"}` spikes; the circuit breaker opens after 2 failures for 60 seconds.
    - **SMTP / MSG91 / Digio:** Structured warning logs (`smtp_send_failed`, `msg91_network_error`, `digio_http_error`) with status/error type (no PII).
 2. **Immediate Containment:** Automatic—no manual intervention required to protect core uptime:
    - LLM outage automatically falls back to deterministic rules intake/planner (`agent_mode: "rules_fallback"`).

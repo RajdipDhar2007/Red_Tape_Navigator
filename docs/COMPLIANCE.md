@@ -6,7 +6,7 @@ This is an engineering checklist, **not legal advice**. A qualified lawyer must 
 ## Roles
 The deployer is the **Data Fiduciary**. Citizens are **Data Principals**. A CSC operator acting for a citizen is a
 processor/assistant under the fiduciary's instructions (their sessions and consents are logged under their own account;
-document the arrangement in the operator agreement). Anthropic's API (when enabled) and the cloud host are sub-processors.
+document the arrangement in the operator agreement). Google (the Gemini API) and the cloud host are sub-processors.
 
 ## Checklist
 
@@ -44,7 +44,7 @@ document the arrangement in the operator agreement). Anthropic's API (when enabl
 Set `DATA_REGION` to document the deployment region (surfaced at `/ready`). Deploy the database, Redis and API in an
 Indian region (Terraform default `ap-south-1` Mumbai; `ap-south-2` Hyderabad is an alternative). Backups stay in-region.
 Egress to the LLM provider is the main residency question; options are an in-region hosted endpoint, or running with
-`ANTHROPIC_API_KEY` unset (deterministic mode, no LLM egress). Decide with counsel.
+`GEMINI_API_KEY` unset (deterministic mode, no LLM egress). Decide with counsel.
 
 ## Pre-pilot actions (organisational)
 1. Appoint DPO / grievance officer; publish privacy policy matching `GET /consent/notice`.

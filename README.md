@@ -16,7 +16,7 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 [![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)](#license)
 
 ![CI](https://img.shields.io/badge/CI-7%20jobs%20passing-138808?style=for-the-badge&logo=githubactions&logoColor=white)
-![Backend tests](https://img.shields.io/badge/backend%20tests-491%20passing-138808?style=for-the-badge)
+![Backend tests](https://img.shields.io/badge/backend%20tests-494%20passing-138808?style=for-the-badge)
 ![Coverage](https://img.shields.io/badge/coverage-95%25-138808?style=for-the-badge)
 ![Languages](https://img.shields.io/badge/languages-English%20%C2%B7%20%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80%20%C2%B7%20%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE-0B1F4F)
 ![Cities](https://img.shields.io/badge/cities-9-FF9933?style=for-the-badge)
@@ -242,20 +242,20 @@ A bureaucracy agent that invents a fee or files a wrong form is worse than no ag
 |---|---|---|
 | **0. Understand** | Read the problem and real government sites; decide what "correct" means. | Assumptions, architecture and task plan (`docs/ASSUMPTIONS.md`, `docs/ARCHITECTURE.md`). |
 | **1. Core product** | Goal in, cited plan out, forms filled, human reviews. | Auth, consent, audit log, scraping guard, research agent, rules KB, interview engine, form filler, review checkpoint, officer console. |
-| **2. Production readiness** | Make it safe to run for real people. | Email, password reset, lockout, privacy export and erase, retention purge, deployment blueprints, UI redesign. |
+| **2. Production readiness** | Make it safe to run for real people. | Email, password reset, lockout, privacy export and erase, retention purge, Docker Compose and Terraform deployment files, UI redesign. |
 | **3. Integrations** | Real signing and identity. | Digio e-Sign and DigiLocker adapters with a signed webhook, tested against mocks. |
 | **4. Rules and coverage** | Replace generic rules with sourced ones. | 120 business types, 9 cities, 16 licences, 438 rules, state-specific liquor, drug, clinic and school rules. |
 | **5. Quality and CI** | Trust the build. | 7 CI jobs, PostgreSQL parity, security scans, browser end-to-end tests, evaluation set with a hallucination gate. |
 | **6. Language** | Reach people in their own language. | Complete Hindi and Bengali (interface **and** backend text). |
 | **7. Delight** | Make the journey feel good. | Progress ring, confetti when the checklist is done, print and WhatsApp share, reduced-motion support. |
 | **8. Hardening and the Document Vault** | Safe document storage and provider readiness. | Private vault with magic-byte checks, redaction before any model call, resilient adapters, help centre, disaster-recovery runbook. |
-| **9. AI provider choice** | Optional model help, free to run. | One switch for a local Ollama model or Google Gemini, with a circuit breaker and a deterministic rules-only fallback. |
+| **9. Google Gemini** | Language understanding and live rule checks. | Gemini behind a strict JSON schema, personal data redacted before every call, a circuit breaker, and a deterministic rules-first fallback if Gemini cannot be reached. |
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## Where the agentic AI is
 
-Red Tape Navigator is an **agent**, not a chatbot. You give it a **goal** ("open a small bakery in Kolkata"); it then decides what to do, uses tools to do it, remembers what you told it, checks its own work, and stops at a human checkpoint. The language model is one optional tool inside that loop, not the whole product.
+Red Tape Navigator is an **agent**, not a chatbot. You give it a **goal** ("open a small bakery in Kolkata"); it then decides what to do, uses tools to do it, remembers what you told it, checks its own work, and stops at a human checkpoint. Google Gemini is the language model inside that loop; the rules, validators and the human checkpoint around it keep it honest.
 
 ```mermaid
 flowchart LR
@@ -273,7 +273,7 @@ flowchart LR
 
 | Agentic ability | How we implemented it | Where |
 |---|---|---|
-| **Goal understanding** | Turns free text into a business type, city and state. It is rules-first (keywords, typos, regulated-sector checks); an optional model fills gaps, and its answer is validated against our catalogue so it cannot invent a business type. | `backend/app/agent/intake.py` |
+| **Goal understanding** | Turns free text into a business type, city and state. It is rules-first (keywords, typos, regulated-sector checks); Google Gemini fills the gaps, and its answer is validated against our catalogue so it cannot invent a business type. | `backend/app/agent/intake.py` |
 | **Planning** | Breaks the goal into an ordered, dependency-aware list of licences (for example Udyam, then FSSAI, then trade licence). | `backend/app/agent/planner.py` |
 | **Tool use** | Calls tools on its own: a guarded web fetcher for official pages, a page reader that extracts claims, a PDF form filler, an e-Sign adapter, email and SMS adapters. | `backend/app/scraping/`, `backend/app/forms/`, `backend/app/integrations/` |
 | **Memory** | Remembers every answer, encrypts the sensitive ones, and never asks the same question twice. | `backend/app/interview/` |
@@ -281,7 +281,7 @@ flowchart LR
 | **Proactive follow-up** | Without being asked, it schedules status checks and renewal reminders, and re-checks rules every week. | `backend/app/jobs/`, `backend/app/followup/` |
 | **Bounded autonomy** | It may research, ask, fill and remind. It may **not** submit: no interface has a submit method, and a test fails if one is added. | `backend/app/integrations/interfaces.py` |
 
-**Which model?** One switch (`LLM_PROVIDER`) selects a local Ollama model or Google Gemini. Personal data is redacted before any model call, a circuit breaker keeps a slow model from blocking the user, and if no model is available the agent still works in its deterministic rules-only mode.
+**Which model?** Google Gemini, called through its REST API with a strict JSON schema (`GEMINI_API_KEY`, `GEMINI_MODEL`). Personal data is redacted before every call, the answer is validated before it is used, and a circuit breaker keeps a slow reply from blocking the citizen. If Gemini cannot be reached, the agent falls back to its deterministic rules-first path and says so.
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
@@ -374,7 +374,7 @@ flowchart LR
   W -->|HTTPS, bearer token| A[FastAPI API]
   A --> P[(PostgreSQL + pgvector)]
   A --> R[(Redis, optional)]
-  A -.->|optional, PII redacted| L[Ollama or Gemini]
+  A -->|PII redacted, schema-validated| L[Google Gemini]
   A -->|allowlisted, read only| G[Official government pages]
   A -->|upload PDF, status| D[Digio: eSign + DigiLocker]
   D -->|signed webhook| A
@@ -389,7 +389,7 @@ flowchart LR
 
 ```text
 goal text
-  -> intake        rules first (keywords incl. typos, regulated-sector check, city and state); an optional model fills gaps, then is validated against the catalogue
+  -> intake        rules first (keywords incl. typos, regulated-sector check, city and state); Gemini fills gaps, then is validated against the catalogue
   -> clarify       asks place, then business type; keeps earlier answers
   -> research      plan = licences in dependency order + cited claims from the knowledge base; adds notes and officer-review items
   -> interview     only the missing fields; validators; encrypted memory
@@ -407,7 +407,7 @@ goal text
 | **Intake agent** | `backend/app/agent/intake.py` | Turns free text into business type, city and state; handles typos and regulated sectors. |
 | **Planner** | `backend/app/agent/planner.py` | Orders licences by dependency. |
 | **Research agent** | `backend/app/agent/research.py` | Builds the plan with cited claims; seeds missing licences on demand. |
-| **LLM wrapper** | `backend/app/agent/llm.py` | One switch (`LLM_PROVIDER`) for Ollama, Gemini or none; redacts personal data first; circuit breaker and fail-fast retries; deterministic fallback. |
+| **LLM wrapper** | `backend/app/agent/llm.py` | Calls Google Gemini with a JSON schema; redacts personal data first; circuit breaker and fail-fast retries; deterministic fallback. |
 | **Rules knowledge base** | `backend/app/kb/` | Catalogue of licences, 9 cities, 120 business types, sourced licences; claims carry source, hash, confidence. |
 | **Scraping guard** | `backend/app/scraping/` | Allowlist, robots.txt, redirect re-checks, size caps, sanitiser. SSRF and prompt-injection defence. |
 | **Interview engine** | `backend/app/interview/` | Field definitions, validators, question engine, encrypted memory. |
@@ -428,7 +428,7 @@ catalog.py (licences, 9 cities) + sourced_licences.py (read from official docume
       -> seed_loader.py -> claims (text, source_url, hash, confidence)
       -> verify_sources.py  reports which numbers appear on the live official page (never marks anything verified by itself)
       -> officer console review queue: verified / corrected / rejected, every decision audited
-      -> optional live refresh: a claim is kept only if its quote appears verbatim on the page
+      -> live refresh with Gemini: a claim is kept only if its quote appears verbatim on the page
 ```
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
@@ -464,10 +464,10 @@ Red_Tape_Navigator/
 | Path | What it does |
 |---|---|
 | `app/main.py` | Builds the FastAPI app: routers, middleware, health and readiness endpoints, start-up tasks. |
-| `app/agent/intake.py` | Turns the citizen's sentence into business type, city and state (rules first, optional model second). |
+| `app/agent/intake.py` | Turns the citizen's sentence into business type, city and state (rules first, Gemini second). |
 | `app/agent/planner.py` | Orders the licences by dependency. |
 | `app/agent/research.py` | Builds the cited plan; extracts claims from official pages and keeps one only if its quote appears word for word. |
-| `app/agent/llm.py` | The model wrapper: Ollama, Gemini or none; redacts personal data first; circuit breaker; rules-only fallback. |
+| `app/agent/llm.py` | The model wrapper for Google Gemini; redacts personal data first; schema validation; circuit breaker; rules-first fallback. |
 | `app/api/auth.py` | Sign-up, login, refresh tokens, password reset, email confirmation, two-factor sign-in. |
 | `app/api/consent.py` | Records and withdraws consent per purpose. |
 | `app/api/sessions.py` | The main journey: goal, clarify, plan, interview, forms, review, downloads, e-Sign, reminders, calendar export. |
@@ -499,7 +499,7 @@ Red_Tape_Navigator/
 | `app/services/` | `session_service.py` (shared journey logic), `privacy.py` (export, erase, retention), `bootstrap.py` (first officer from settings). |
 | `app/i18n_content/` | Hindi and Bengali tables for backend text (`data_hi.py`, `data_bn.py`, aligned to `source.py`). |
 | `migrations/versions/` | Nine Alembic migrations, `0001` (initial schema) to `0009` (Document Vault). |
-| `tests/` | 28 test files: accounts and teams, API flow, catalogue integrity, vault, forms, translations, providers, and more. |
+| `tests/` | 29 test files: accounts and teams, API flow, catalogue integrity, vault, forms, translations, providers, and more. |
 | `evals/` | `golden_cases.json` and `run.py`: the evaluation set that fails the build if the agent invents a fact. |
 | `config/sources.yaml`, `rule_verified.csv` | The allowlist of official domains, and which rules a reviewer has verified. |
 | `scripts/create_admin.py`, `entrypoint.sh` | Create an officer account; the container start-up script (migrate, load rules, run). |
@@ -536,7 +536,7 @@ Red_Tape_Navigator/
 
 | Path | What it does |
 |---|---|
-| `docs/` | Architecture, deployment, security, compliance, runbook, the owner's to-do list and reports; `docs/DEVELOPER_GUIDE.md` is the engineering handbook; `docs/media/` holds the README images. |
+| `docs/` | Architecture, deployment (single server, Vercel and Render), security, compliance, runbook and reports; `docs/DEVELOPER_GUIDE.md` is the engineering handbook; `docs/media/` holds the README images. |
 | `scripts/` | `backup_restore_drill.sh`, `db_backup_restore.py` (backups), `loadtest/` (Locust), `export_rules_for_review.py`, `rule_freshness.py`, `verify_sources.py`, `verify_deploy.py`, `smoke_demo.py`, `rotate_encryption_key.py`, `make_placeholder_forms.py`. |
 | `infra/terraform/` | Terraform skeleton with modules for network, database, cache, secrets and app. |
 | `.github/ISSUE_TEMPLATE/`, `pull_request_template.md` | Issue forms (bug, rule correction, accessibility barrier, feature request) and the pull request checklist. |
@@ -627,7 +627,7 @@ All images below were captured from the real application running locally (Englis
 |---|---|
 | **Backend** | Python 3.12+, FastAPI, Uvicorn, Pydantic v2, SQLAlchemy 2 (async), Alembic (nine migrations), asyncpg and aiosqlite, ARQ worker, Redis, httpx |
 | **Database** | PostgreSQL with pgvector (production), SQLite (local development and tests) |
-| **AI (optional, free to run)** | A local **Ollama** model or **Google Gemini** through one provider switch; model names come from environment variables; a deterministic rules-first mode needs no model at all |
+| **AI** | **Google Gemini** (REST, JSON-schema output validated with Pydantic, PII redacted first, circuit breaker); the model name comes from an environment variable; a deterministic rules-first path takes over if Gemini is unreachable |
 | **PDFs and scraping** | PyMuPDF, pypdf, reportlab, trafilatura, Playwright (optional JavaScript rendering), a YAML domain allowlist |
 | **Security** | bcrypt, PyJWT, `cryptography` (Fernet), structlog with PII redaction, sliding-window rate limiter |
 | **Observability** | Prometheus, OpenTelemetry, optional Sentry, JSON logs |
@@ -635,7 +635,7 @@ All images below were captured from the real application running locally (Englis
 | **Quality** | pytest and coverage (gate 80%, actual about 95%), ruff, mypy, eslint, tsc, an evaluation set with a hallucination gate |
 | **Security scans** | pip-audit, bandit, npm audit, gitleaks, Trivy (container) |
 | **CI** | GitHub Actions, 7 jobs: backend, backend on PostgreSQL with Alembic up and down, frontend, Playwright end-to-end, security, container build and scan, compose smoke test |
-| **Hosting** | Docker Compose with Caddy on a VPS; Terraform skeleton |
+| **Hosting** | Prepared for **Vercel** (web app) and **Render** (API, worker, PostgreSQL, Redis); single-server Docker Compose with Caddy; Terraform skeleton for Indian cloud regions; not live yet |
 | **Third parties** | Digio (Aadhaar e-Sign and DigiLocker), MSG91 (SMS, with TRAI DLT), an SMTP provider |
 | **How we built it** | Claude Code as an engineering assistant, with the Claude in Chrome extension to read official sites and API documents read-only, the `gh` CLI for CI status, and PyMuPDF for PDF extraction |
 
@@ -669,8 +669,9 @@ flowchart TB
   API --> VT
 ```
 
-Deployment path: `git push main` triggers GitHub Actions (7 jobs); a manual deploy template builds and pushes the container images.
-The stack runs on Docker Compose with Caddy, and migrations run on start (`alembic upgrade head`). Details: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+Deployment path: `git push main` triggers GitHub Actions (7 jobs); a manual deploy workflow builds and pushes the API and web container images.
+The web app is prepared for **Vercel** and the API, worker, PostgreSQL and Redis for **Render** (the same images and environment variables); the single-server alternative is Docker Compose with Caddy,
+and a Terraform skeleton covers Indian cloud regions. Migrations run on start (`alembic upgrade head`). Details: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
@@ -679,8 +680,8 @@ The stack runs on Docker Compose with Caddy, and migrations run on start (`alemb
 | # | Challenge | How we dealt with it |
 |---|---|---|
 | 1 | **Government sites are hostile to automation.** Many reset connections, block non-browser clients, hide content behind JavaScript, or publish scanned PDFs. | We read pages in a **real browser, read-only**, extracted PDFs locally with PyMuPDF, recorded every attempt (including dead ends) in `docs/RULES_VERIFICATION.md`, and never bypassed a firewall or CAPTCHA. Where we could not read a source we say so in the product. |
-| 2 | **An agent that hallucinates fees is dangerous.** | Rules-first design: the model is optional, every claim needs a source URL and hash, a live refresh keeps a claim only if its quote appears **verbatim** on the page, and an **evaluation set with a hallucination gate** runs in CI (26 golden cases, zero invented facts). |
-| 3 | **Sensitive identity data meeting a language model.** | **Redaction** before any model call, field-level encryption at rest, redacted logs, a separate consent for identity providers, and a deterministic fallback so the product works with no model at all. |
+| 2 | **An agent that hallucinates fees is dangerous.** | Rules-first design: Gemini never decides alone, every claim needs a source URL and hash, a live refresh keeps a claim only if its quote appears **verbatim** on the page, and an **evaluation set with a hallucination gate** runs in CI (26 golden cases, zero invented facts). |
+| 3 | **Sensitive identity data meeting a language model.** | **Redaction** before any model call, field-level encryption at rest, redacted logs, a separate consent for identity providers, and a deterministic rules-first fallback if Gemini is unreachable. |
 | 4 | **"Autonomous" versus "safe".** The brief says auto-fill for submission; the law and common sense say a human must sign. | A **review checkpoint** with an explicit consent box, invalidated by any edit, and an architectural rule that **no interface has a submit method**, enforced by a test. |
 | 5 | **We cannot legally ship official forms without permission.** | Three **watermarked placeholder forms** now, a fetch-and-approve workflow for officers, and a request to the authority for permission. |
 | 6 | **Rules differ by state and city** (liquor, drugs, clinics, schools). | State-specific `by_city` entries for all nine cities, an explicit "no ordinary private route" notice where true, and catalogue-integrity tests that fail on gaps. |
@@ -699,7 +700,7 @@ The stack runs on Docker Compose with Caddy, and migrations run on start (`alemb
 
 | Check | Result |
 |---|---|
-| Backend tests (pytest) | **491 passing**, coverage **95.4%** (gate 80%) |
+| Backend tests (pytest) | **494 passing**, coverage **95.4%** (gate 80%) |
 | Static analysis | ruff clean, mypy clean (87 source files) |
 | AI evaluation set | 26 golden cases, **0 hallucinations**, full citation coverage |
 | Rule freshness | 438 of 438 rules checked in CI |
@@ -726,7 +727,8 @@ We would rather state our limits than hide them.
 | MSG91 SMS | **Built, never sent live** (needs TRAI DLT approval) |
 | UMANG and WhatsApp | **Mocked and labelled** |
 | Hindi and Bengali | **Complete in code and tests; native-speaker review pending** |
-| Live deployment | **Not deployed yet**: the deployment files are ready and waiting for the owner's account values |
+| Google Gemini | **Built and tested**; needs `GEMINI_API_KEY` and `GEMINI_MODEL` in the environment, otherwise the rules-first path runs |
+| Live deployment | **Not deployed yet**: the Docker images, Compose files and Terraform skeleton are ready; Vercel and Render accounts and values are the owner's step |
 | Load test, penetration test, real-device test, pilot | **Not done** |
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
@@ -789,7 +791,7 @@ Three commitments guide every decision:
 repository root points to the backend one, so `pip install -r requirements.txt` also works from the top folder. They mirror `backend/pyproject.toml`, and a test
 fails if they ever differ.
 
-**Without Docker** (SQLite, no Redis, no model key needed):
+**Without Docker** (SQLite, no Redis; add a Gemini key to switch the AI parts on):
 
 ```bash
 # 1. Get the code
@@ -816,7 +818,7 @@ Run the backend commands from inside `backend/`: the `app` package is found from
 Open <http://localhost:3000>, create an account (password of at least 10 characters), accept the data notice and describe a goal.
 With Docker: `make setup && make dev`.
 
-**Optional AI:** set `LLM_PROVIDER=gemini` with `GEMINI_API_KEY` and `GEMINI_MODEL`, or `LLM_PROVIDER=ollama` with `OLLAMA_MODEL`. Leave it unset for the rules-only mode.
+**AI:** set `GEMINI_API_KEY` and `GEMINI_MODEL` (and `LLM_PROVIDER=gemini` if you want to pin the provider). Without a key the app still runs on its rules-first path.
 Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
 
 | Command | What it does |

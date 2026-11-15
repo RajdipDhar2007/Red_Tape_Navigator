@@ -14,7 +14,7 @@ infra/terraform/
     network/      VPC, private subnets, egress rules (allow only needed outbound)   [TODO]
     database/     PostgreSQL 16 + pgvector (RDS/Aurora, encrypted, PITR, in-region backups) [TODO]
     cache/        Redis (ElastiCache), in-transit + at-rest encryption               [TODO]
-    secrets/      Secrets Manager entries: SECRET_KEY, FIELD_ENCRYPTION_KEY, ANTHROPIC_API_KEY, DB URL [TODO]
+    secrets/      Secrets Manager entries: SECRET_KEY, FIELD_ENCRYPTION_KEY, GEMINI_API_KEY, DB URL [TODO]
     app/          container service for api / worker / web behind an ALB with TLS    [TODO]
 ```
 
