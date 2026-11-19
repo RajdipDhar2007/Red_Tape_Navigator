@@ -4,7 +4,17 @@ import { useTranslations } from "next-intl";
 import type { Tracker } from "@/lib/types";
 import Icon from "./Icon";
 
-export default function ProgressTracker({ tracker }: { tracker: Tracker }) {
+export default function ProgressTracker({
+  tracker,
+  onSelect,
+  selectable = [],
+}: {
+  tracker: Tracker;
+  /** Called with the step id when a selectable step is clicked. */
+  onSelect?: (id: string) => void;
+  /** Step ids the user may jump to (e.g. checklist, interview, review). */
+  selectable?: string[];
+}) {
   const t = useTranslations("tracker");
   return (
     <nav aria-label={t("label")} className="mb-6 overflow-x-auto rounded-2xl bg-white p-4 shadow-card ring-1 ring-slate-200">
@@ -23,7 +33,17 @@ export default function ProgressTracker({ tracker }: { tracker: Tracker }) {
             >
               {s.done ? <Icon name="check" size={18} /> : i + 1}
             </span>
-            <span className={`text-sm font-semibold ${s.active ? "text-navy-900" : s.done ? "text-indgreen-800" : "text-slate-600"}`}>{t(s.id)}</span>
+            {onSelect && selectable.includes(s.id) ? (
+              <button
+                type="button"
+                onClick={() => onSelect(s.id)}
+                className={`rounded text-sm font-semibold underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 ${s.active ? "text-navy-900" : s.done ? "text-indgreen-800" : "text-slate-600"}`}
+              >
+                {t(s.id)}
+              </button>
+            ) : (
+              <span className={`text-sm font-semibold ${s.active ? "text-navy-900" : s.done ? "text-indgreen-800" : "text-slate-600"}`}>{t(s.id)}</span>
+            )}
             <span className="sr-only">{s.active ? t("current") : s.done ? t("done") : ""}</span>
             {i < tracker.steps.length - 1 && <span className="mx-1 hidden h-0.5 flex-1 overflow-hidden rounded bg-slate-200 sm:block" aria-hidden="true"><span className={`block h-full bg-indgreen-600 transition-all duration-700 ${s.done ? "w-full" : "w-0"}`} /></span>}
           </li>

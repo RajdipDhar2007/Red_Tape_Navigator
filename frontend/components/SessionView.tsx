@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { api, ApiError, patch, post } from "@/lib/api";
 import { Link } from "@/i18n/navigation";
-import type { Session } from "@/lib/types";
+import type { Session, Tracker } from "@/lib/types";
 import ProgressTracker from "./ProgressTracker";
 import ChecklistView from "./ChecklistView";
 import InterviewChat from "./InterviewChat";
@@ -13,6 +13,7 @@ import DoneView from "./DoneView";
 import VoiceInput from "./VoiceInput";
 
 type Phase = "clarify" | "research" | "checklist" | "interview" | "review" | "done";
+const PHASE_STEP: Record<Phase, string> = { clarify: "goal", research: "research", checklist: "checklist", interview: "interview", review: "review", done: "submit" };
 const FROM_TRACKER: Record<string, Phase> = {
   goal: "clarify",
   research: "research",
@@ -129,13 +130,24 @@ export default function SessionView({ id }: { id: string }) {
   if (!s) return <p aria-live="polite">{t("app.loading")}</p>;
 
   const hasPlan = (s.plan?.steps?.length ?? 0) > 0;
+  // The stepper is the only navigation, so it must follow the screen the citizen is on, not only the server's progress.
+  const activeId = PHASE_STEP[phase];
+  const ids = s.tracker.steps.map((x) => x.id);
+  const tracker: Tracker = {
+    current: activeId,
+    steps: s.tracker.steps.map((x, i) => ({ ...x, active: x.id === activeId, done: i < ids.indexOf(activeId) })),
+  };
 
   return (
     <div className="animate-fade-up">
       <Link href="/" className="btn-ghost mb-2">
         ← {t("nav.applications")}
       </Link>
-      <ProgressTracker tracker={s.tracker} />
+      <ProgressTracker
+        tracker={tracker}
+        selectable={hasPlan && phase !== "clarify" && phase !== "research" ? ["checklist", "interview", "review", ...(s.reviewed ? ["submit"] : [])] : []}
+        onSelect={(id) => setPhase(id === "submit" ? "done" : (id as Phase))}
+      />
 
       <div aria-live="polite" className="mb-4 rounded-xl border-l-4 border-saffron-500 bg-white px-4 py-3 text-lg font-medium text-navy-900 shadow-card">
         {!renaming ? (
@@ -185,41 +197,6 @@ export default function SessionView({ id }: { id: string }) {
           </form>
         )}
       </div>
-
-      {hasPlan && phase !== "clarify" && phase !== "research" && (
-        <nav aria-label={t("tracker.label")} className="mb-5 flex flex-wrap gap-2">
-          <button
-            type="button"
-            className={phase === "checklist" ? "btn !py-1.5 text-sm" : "btn-secondary !py-1.5 text-sm"}
-            onClick={() => setPhase("checklist")}
-          >
-            1. {t("tracker.checklist")}
-          </button>
-          <button
-            type="button"
-            className={phase === "interview" ? "btn !py-1.5 text-sm" : "btn-secondary !py-1.5 text-sm"}
-            onClick={() => setPhase("interview")}
-          >
-            2. {t("tracker.interview")}
-          </button>
-          <button
-            type="button"
-            className={phase === "review" ? "btn !py-1.5 text-sm" : "btn-secondary !py-1.5 text-sm"}
-            onClick={() => setPhase("review")}
-          >
-            3. {t("tracker.review")}
-          </button>
-          {s.reviewed && (
-            <button
-              type="button"
-              className={phase === "done" ? "btn !py-1.5 text-sm" : "btn-secondary !py-1.5 text-sm"}
-              onClick={() => setPhase("done")}
-            >
-              4. {t("tracker.submit")}
-            </button>
-          )}
-        </nav>
-      )}
 
       {phase === "clarify" && (
         <form
