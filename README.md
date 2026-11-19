@@ -10,9 +10,6 @@
 it researches the rules, interviews you for only what is missing, fills in the paperwork and stops at a human review checkpoint.
 Free to use, in English, Hindi and Bengali. It never submits anything on your behalf.
 
-[![Team](https://img.shields.io/badge/Team-Onyx-0B1F4F?style=for-the-badge)](#hackathon-and-team)
-[![Hackathon](https://img.shields.io/badge/Hackathon-HACK%3CN%3EPITCH-FF9933?style=for-the-badge)](#hackathon-and-team)
-[![Track](https://img.shields.io/badge/Track-Agentic%20AI%20%C2%B7%20Civic%20Tech-138808?style=for-the-badge)](#the-problem-statement-in-full)
 [![License](https://img.shields.io/badge/License-Proprietary-B91C1C?style=for-the-badge)](#license)
 
 ![CI](https://img.shields.io/badge/CI-7%20jobs%20passing-138808?style=for-the-badge&logo=githubactions&logoColor=white)
@@ -31,8 +28,7 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 
 <img src="docs/media/demo-walkthrough.gif" alt="Animated walkthrough of Red Tape Navigator: goal, plan, interview, review, download, Hindi and Bengali" width="880" />
 
-<sub>The real app, recorded from a local run: goal, plan, interview, review, download, then the same journey in Hindi and Bengali.
-Full-length demo video: <a href="submission/Onyx_Demo_Video.mp4">Onyx_Demo_Video.mp4</a> &nbsp;·&nbsp; Pitch deck: <a href="submission/Onyx_HackNPitch.pdf">Onyx_HackNPitch.pdf</a></sub>
+<sub>The real app, recorded from a local run: goal, plan, interview, review, download, then the same journey in Hindi and Bengali.</sub>
 
 <br />
 
@@ -47,95 +43,57 @@ Full-length demo video: <a href="submission/Onyx_Demo_Video.mp4">Onyx_Demo_Video
 
 | Part | # | Section | What you will find |
 |---|---|---|---|
-| **About the project** | 1 | [Hackathon and team](#hackathon-and-team) | Hackathon, institution, team name, track, members |
-|  | 2 | [The problem statement in full](#the-problem-statement-in-full) | The brief, verbatim, and how each requirement is met |
-|  | 3 | [The problem, in real life](#the-problem-in-real-life) | Real people, real photos, and the pain point by point with our fixes |
-|  | 4 | [Who we are building this for](#who-we-are-building-this-for) | The people this helps |
-|  | 5 | [How the Indian government context shaped the design](#how-the-indian-government-context-shaped-the-design) | Official systems and laws the product points to |
-| **Approach and the agent** | 6 | [Our approach and plan](#our-approach-and-plan) | Principles and the phase-by-phase plan |
-|  | 7 | [Where the agentic AI is](#where-the-agentic-ai-is) | How the agent plans, uses tools, remembers and checks itself |
-|  | 8 | [The workflow, step by step](#the-workflow-step-by-step) | The citizen journey with screenshots |
-|  | 9 | [How the app works: what does what](#how-the-app-works-what-does-what) | System view, pipelines and the role of each part |
-|  | 10 | [Project structure](#project-structure) | Folder tree and what every file does |
-|  | 11 | [Every feature](#every-feature) | Complete feature list |
-|  | 12 | [Screenshots of the running app](#screenshots-of-the-running-app) | The real app in English, Hindi, Bengali and on a phone |
-| **Build and quality** | 13 | [Technology and tools we used](#technology-and-tools-we-used) | Languages, frameworks, services |
-|  | 14 | [Architecture and pipelines](#architecture-and-pipelines) | Component diagram and the deployment path |
-|  | 15 | [Challenges we faced and how we solved them](#challenges-we-faced-and-how-we-solved-them) | Problems met and how we dealt with each |
-|  | 16 | [Quality and testing](#quality-and-testing) | Tests, coverage, CI, security scans |
-|  | 17 | [Honest status: real, simulated, untested](#honest-status-real-simulated-untested) | What is finished and what is not |
-| **Looking ahead and getting started** | 18 | [Pending work and roadmap](#pending-work-and-roadmap) | What is left and future ideas |
-|  | 19 | [Our vision](#our-vision) | Where this is going |
-|  | 20 | [Quick start](#quick-start) | Installation and setup, commands |
-|  | 21 | [Documentation index](#documentation-index) | Every guide, runbook and report |
-|  | 22 | [Credits and acknowledgements](#credits-and-acknowledgements) | People, sources, software, photos |
-|  | 23 | [License](#license) | Proprietary licence, summary and full text |
+| **About the project** | 1 | [Project and author](#project-and-author) | Project, track, author |
+|  | 2 | [The problem, in real life](#the-problem-in-real-life) | Real people, real photos, and the pain point by point with our fixes |
+|  | 3 | [Who we are building this for](#who-we-are-building-this-for) | The people this helps |
+|  | 4 | [How the Indian government context shaped the design](#how-the-indian-government-context-shaped-the-design) | Official systems and laws the product points to |
+| **Approach and the agent** | 5 | [Our approach and plan](#our-approach-and-plan) | Principles and the phase-by-phase plan |
+|  | 6 | [Where the agentic AI is](#where-the-agentic-ai-is) | How the agent plans, uses tools, remembers and checks itself |
+|  | 7 | [The workflow, step by step](#the-workflow-step-by-step) | The citizen journey with screenshots |
+|  | 8 | [How the app works: what does what](#how-the-app-works-what-does-what) | System view, pipelines and the role of each part |
+|  | 9 | [Project structure](#project-structure) | Folder tree and what every file does |
+|  | 10 | [Every feature](#every-feature) | Complete feature list |
+|  | 11 | [Screenshots of the running app](#screenshots-of-the-running-app) | The real app in English, Hindi, Bengali and on a phone |
+| **Build and quality** | 12 | [Technology and tools we used](#technology-and-tools-we-used) | Languages, frameworks, services |
+|  | 13 | [Architecture and pipelines](#architecture-and-pipelines) | Component diagram and the deployment path |
+|  | 14 | [Challenges we faced and how we solved them](#challenges-we-faced-and-how-we-solved-them) | Problems met and how we dealt with each |
+|  | 15 | [Quality and testing](#quality-and-testing) | Tests, coverage, CI, security scans |
+|  | 16 | [Honest status: real, simulated, untested](#honest-status-real-simulated-untested) | What is finished and what is not |
+| **Looking ahead and getting started** | 17 | [Pending work and roadmap](#pending-work-and-roadmap) | What is left and future ideas |
+|  | 18 | [Our vision](#our-vision) | Where this is going |
+|  | 19 | [Quick start](#quick-start) | Installation and setup, commands |
+|  | 20 | [Documentation index](#documentation-index) | Every guide, runbook and report |
+|  | 21 | [Credits and acknowledgements](#credits-and-acknowledgements) | People, sources, software, photos |
+|  | 22 | [License](#license) | Proprietary licence, summary and full text |
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## Hackathon and team
+## Project and author
 
 <table width="100%">
 <tr>
 <td width="58%" valign="top">
 
-### Hackathon details
+### Project details
 
-**Hackathon:** **HACK&lt;N&gt;PITCH**<br />
-**Institution:** Jadavpur University<br />
-**Team name:** **Team Onyx**<br />
 **Project:** Red Tape Navigator<br />
 **Track:** Agentic AI, Software and Civic Tech<br />
-**Problem statement:** *Agentic AI: The "Red Tape" Bureaucracy Navigator*
 
 </td>
 <td width="42%" valign="top">
 
-### Team members
+### Author
 
 <table>
-<tr><td><b>Rajdip Dhar</b></td><td><b>Team Leader</b></td></tr>
-<tr><td><b>Raktim Chakraborty</b></td><td>Team member</td></tr>
-<tr><td><b>Anish Goswami</b></td><td>Team member</td></tr>
-<tr><td><b>Imon Patra</b></td><td>Team member</td></tr>
+<tr><td><b>Rajdip Dhar</b></td><td><b>Owner</b></td></tr>
 </table>
 
 </td>
 </tr>
 </table>
 
-Our submission materials live in this repository: the [pitch deck (PDF)](submission/Onyx_HackNPitch.pdf), the [editable deck (PPTX)](submission/Onyx_HackNPitch.pptx)
-and the [demo video](submission/Onyx_Demo_Video.mp4). The closing slide of the deck links back to this repository.
-
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## The problem statement in full
-
-> The text below is the problem statement we were given, reproduced in full. The same text is kept in [`docs/Problem_Statement.md`](docs/Problem_Statement.md).
-
-### Agentic AI: The "Red Tape" Bureaucracy Navigator
-
-**Problem Statement.** Everyday citizens and small business owners waste weeks trying to navigate the maze of local government bureaucracy. Whether applying for a neighbourhood food vendor license, securing residential zoning permits, or accessing agricultural grants, the process is usually buried in confusing departmental websites, outdated PDF forms, and contradictory requirements that require a legal or administrative background to understand.
-
-**Challenge.** Build an autonomous "Red Tape" AI Agent that acts as a proactive legal-administrative assistant. The agent should take a simple, natural language goal (e.g., "I want to open a small bakery in my town") and independently research local regulations, fetch the correct forms, interview the user for missing details, and auto-fill the required paperwork for submission.
-
-**Key Requirements.**
-
-1. A web-scraping and reasoning agent capable of navigating unstructured, text-heavy government or municipal portals to extract accurate, up-to-date compliance steps.
-2. An interactive memory system that allows the agent to conduct a conversational "interview" with the user, asking only for the specific personal or business details needed for the application.
-3. Document processing tools that allow the agent to map the collected information and autonomously populate official PDF forms or digital web portals.
-4. A transparency and review checkpoint where the agent presents the finalized, filled-out forms and a summary of the regulations to the user for final signature and submission.
-
-### How each requirement is met
-
-| # | Requirement | What we built | Where it lives |
-|---|---|---|---|
-| 1 | Scraping and reasoning agent over text-heavy portals | A **guarded fetcher** (HTTPS only, domain allowlist re-checked on every redirect, `robots.txt`, rate limit, size cap, CAPTCHA or login means a human hand-off), a **sanitiser** against prompt injection, and a **research agent** that builds a dependency-ordered plan from a cited rules knowledge base. A live-refresh mode keeps a claim only if its quote appears **verbatim** on the official page. | `backend/app/scraping/`, `backend/app/agent/`, `backend/app/kb/` |
-| 2 | Interactive memory and a conversational interview | An **interview engine** that asks one or two questions at a time, validates every answer (PAN, Aadhaar checksum, PIN, IFSC, dates), never asks twice, and stores sensitive answers **encrypted**. | `backend/app/interview/` |
-| 3 | Document processing and form filling | A **PDF filler** (AcroForm fill or flat-PDF overlay) with per-field provenance, and a **key-in sheet** for online-only portals such as FoSCoS and Udyam. | `backend/app/forms/` |
-| 4 | Transparency and review checkpoint | A side-by-side **review screen** with editable fields, a plain-language summary and an explicit consent tick-box. Any later edit invalidates the review. **No code path submits to a government portal** (a test fails if one is added). | `frontend/components/ReviewView.tsx`, `backend/app/api/sessions.py` |
-
-<img src="docs/assets/divider.svg" width="100%" alt="" />
 
 ## The problem, in real life
 
@@ -209,7 +167,7 @@ or complies with. **We use them as sources and as guard-rails. We do not represe
 | **Digital Personal Data Protection Act, 2023 (DPDP)** | Explicit consent, purpose limitation, retention purge, export and erase, grievance contact, encrypted sensitive fields. See [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md). |
 | **Information Technology Act, 2000** and **Aadhaar (e-Sign) framework** | We integrate **Digio** for Aadhaar e-Sign and DigiLocker, with a signed webhook and a separate consent. |
 | **DigiLocker** and **UMANG** (MeitY, Digital India) | Document-fetch flow built against Digio's DigiLocker API; a UMANG adapter is mocked and labelled. |
-| **State Emblem of India (Prohibition of Improper Use) Act, 2005** | The team-designed logo shows the national emblem on the robot officer's cap. The 2005 Act restricts use of the emblem, so **before any public launch this must be reviewed by counsel and either authorised by the competent authority or replaced with a neutral cap badge**. |
+| **State Emblem of India (Prohibition of Improper Use) Act, 2005** | The project logo shows the national emblem on the robot officer's cap. The 2005 Act restricts use of the emblem, so **before any public launch this must be reviewed by counsel and either authorised by the competent authority or replaced with a neutral cap badge**. |
 | **Digital India, Ease of Doing Business and Startup India** | The wider push to make compliance simple is the reason this problem is worth solving. We are a citizen-side helper, not a replacement for any of these portals. |
 
 The product text is always written to be honest about its limits: where we could not read an official source, the app says so and routes the item to an officer review
@@ -440,9 +398,8 @@ A monorepo with one folder per concern. The tree gives the map; the tables below
 ```text
 Red_Tape_Navigator/
 ├── README.md                    this overview
-├── LICENSE                      proprietary licence (Team Onyx)
+├── LICENSE                      proprietary licence
 ├── CODE_OF_CONDUCT.md, CONTRIBUTING.md, SECURITY.md, SUPPORT.md, ACCESSIBILITY.md   community and policy files
-├── submission/                  hackathon pitch deck (PDF and PPTX) and demo video
 ├── requirements.txt             Python dependencies (points to backend/requirements.txt)
 ├── Makefile                     one-word commands: setup, dev, test, lint, eval, e2e, migrate, seed
 ├── docker-compose.yml           local stack: database, cache, API, worker, web
@@ -526,7 +483,7 @@ Red_Tape_Navigator/
 | `lib/api.ts`, `format.ts`, `site.ts`, `types.ts` | API client with token refresh, language-aware dates, site settings, shared types. |
 | `messages/en.json`, `hi.json`, `bn.json` | Every interface string in English, Hindi and Bengali. |
 | `i18n/`, `middleware.ts` | Language routing and detection. |
-| `public/` | The team logo (`logo.png`), installable-app icons and the social-share image. |
+| `public/` | The project logo (`logo.png`), installable-app icons and the social-share image. |
 | `e2e/`, `tests/` | Playwright browser tests (13) and unit tests (10). |
 
 </details>
@@ -752,7 +709,7 @@ We would rather state our limits than hide them.
 ### Future ideas (not built yet)
 
 - **More cities and states**, then district-level coverage (we left Jaipur and Lucknow out because sources conflicted).
-- **Beyond business licences**: residential zoning and building permits, agricultural schemes and grants, ration and welfare applications, which are the other examples in the original problem statement.
+- **Beyond business licences**: residential zoning and building permits, agricultural schemes and grants, ration and welfare applications.
 - **Real UMANG and WhatsApp** adapters, so reminders and status checks arrive where people already are.
 - **Partner portal** for CSC operators and professionals, with delegation and bulk cases.
 - **Per-licence landing pages** and a **support-ticket inbox**.
@@ -837,7 +794,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 
 | Topic | Documents |
 |---|---|
-| **Product and planning** | [Problem statement](docs/Problem_Statement.md) · [Architecture](docs/ARCHITECTURE.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Business model](docs/BUSINESS_MODEL.md) · [Demo script](docs/DEMO_SCRIPT.md) |
+| **Product and planning** | [Architecture](docs/ARCHITECTURE.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Business model](docs/BUSINESS_MODEL.md) · [Demo script](docs/DEMO_SCRIPT.md) |
 | **Rules and integrations** | [Rules verification log](docs/RULES_VERIFICATION.md) · [Reviewer worksheet](docs/RULES_REVIEW_EXPORT.csv) · [Integrations](docs/INTEGRATIONS.md) |
 | **Deploy and operate** | [VPS deployment](docs/DEPLOYMENT.md) · [Runbook](docs/RUNBOOK.md) · [Load test](docs/LOAD_TEST.md) |
 | **Security and compliance** | [Security (OWASP)](docs/SECURITY.md) · [Threat model](docs/THREAT_MODEL.md) · [DPDP compliance](docs/COMPLIANCE.md) |
@@ -848,8 +805,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 
 ## Credits and acknowledgements
 
-- **Team Onyx**: Rajdip Dhar (team leader), Raktim Chakraborty, Anish Goswami and Imon Patra.
-- **HACK&lt;N&gt;PITCH** and **Jadavpur University** for the platform and the problem.
+- **Author and owner**: Rajdip Dhar.
 - **Official sources** we read and cite: the Ministry of MSME (Udyam), FSSAI (FoSCoS), the GST Council and GSTN, state and municipal authorities, state excise and
   drugs-control departments, the Bureau of Indian Standards, MeitY (DigiLocker, UMANG), and the text of the Digital Personal Data Protection Act, 2023. We are not affiliated
   with any of them.
@@ -862,14 +818,14 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 
 ## License
 
-**Proprietary, all rights reserved.** Copyright © 2026 **Team Onyx** (owner: RajdipDhar2007).
+**Proprietary, all rights reserved.** Copyright © 2026 **RajdipDhar2007**.
 
 This repository is **publicly visible for convenience only**; it is **not open-source software**. Visibility grants **no** licence or permission. In short:
 
 | You may | You may not (without written permission) |
 |---|---|
 | View the repository on GitHub, as the GitHub Terms of Service allow. | Copy, fork or download for reuse; modify or translate; distribute, host or sell; train or evaluate any model or product with it; remove this notice. |
-| Use it if you are a member of Team Onyx or approved in writing by the owner. | Compete with the project using any part of the code, rules data, designs, decks or videos. |
+| Use it if you are approved in writing by the owner. | Compete with the project using any part of the code, rules data, designs, decks or videos. |
 
 The regulatory content is informational only and **not legal advice**. Third-party libraries and official government texts keep their own licences and ownership.
 To request permission, contact the repository owner on GitHub: **RajdipDhar2007**.
@@ -879,7 +835,7 @@ To request permission, contact the repository owner on GitHub: **RajdipDhar2007*
 
 ```text
 Red Tape Navigator - Proprietary License
-Copyright (c) 2026 Team Onyx (owner: RajdipDhar2007). All rights reserved.
+Copyright (c) 2026 RajdipDhar2007. All rights reserved.
 
 NOTICE: THIS IS NOT OPEN-SOURCE SOFTWARE.
 
@@ -888,10 +844,10 @@ does NOT grant any license or permission. No rights are granted to anyone except
 Authorized Persons defined below.
 
 1. AUTHORIZED PERSONS
-   "Authorized Persons" means only the members of Team Onyx and any other individual
+   "Authorized Persons" means only individuals
    the copyright owner has approved in writing (email or a GitHub invitation to this
    repository counts as written approval). Authorized Persons may use, copy, modify
-   and run the software solely for the Team Onyx project and only for as long as they
+   and run the software solely for the Red Tape Navigator project and only for as long as they
    remain approved.
 
 2. RESTRICTIONS
@@ -935,6 +891,6 @@ To request permission, contact the repository owner through GitHub: RajdipDhar20
 
 <div align="center">
 
-<img src="docs/assets/footer.svg" alt="Clear rules. Cited sources. The citizen decides. Team Onyx, HACK&lt;N&gt;PITCH, Jadavpur University." width="100%" />
+<img src="docs/assets/footer.svg" alt="Clear rules. Cited sources. The citizen decides." width="100%" />
 
 </div>

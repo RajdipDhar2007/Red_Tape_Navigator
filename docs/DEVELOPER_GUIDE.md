@@ -11,11 +11,11 @@ shows everything for review. **The citizen reviews, signs and submits. The syste
 
 ---
 
-## Hackathon and team
+## Project and author
 
 - **Project:** Red Tape Navigator
-- **Team:** Onyx (HACK&lt;N&gt;PITCH, Jadavpur University). Category: Software / AI and civic tech.
-- **Members:** Rajdip Dhar (team leader), Raktim Chakraborty, Anish Goswami, Imon Patra.
+- **Category:** Software / AI and civic tech.
+- **Author and owner:** Rajdip Dhar.
 
 ---
 
@@ -62,7 +62,7 @@ This guide and the [README](../README.md) are the project's memory. Please follo
 
 ## 1. The problem and the plan
 
-**Problem** (full text in [`docs/Problem_Statement.md`](Problem_Statement.md)): citizens and small businesses lose weeks to scattered departmental sites, outdated PDF
+**Problem:** citizens and small businesses lose weeks to scattered departmental sites, outdated PDF
 forms and contradictory requirements. They need to know *which* licences apply, *in what order*, *with which documents*, *what it costs*,
 and then fill the forms correctly.
 
@@ -232,7 +232,7 @@ The work happened in phases (November 2026). Each phase ended with tests, lint a
 - A rule shows an "Expert-reviewed" badge once a reviewer verifies it in the officer console; there is no label on rules that are still waiting for review (the "Verify with the authority" badge covers low-confidence ones).
 - Every effect is skipped when the visitor's system asks for reduced motion; the strings exist in `en`, `hi` and `bn`.
 
-### Phase 5: hardening, document vault and provider readiness (merged from Anish Goswami's work)
+### Phase 5: hardening, document vault and provider readiness
 
 - **Document Vault** (`backend/app/api/documents.py`, `core/storage.py`, `core/scanner.py`, migration 0009, `/documents` page): private upload of
   PDF/PNG/JPEG up to 5 MB with magic-byte checks, per-owner isolation, optional external malware scan, and local or S3-compatible storage
@@ -413,7 +413,7 @@ without a webhook secret.
 OWASP mapping and controls are in [`docs/SECURITY.md`](SECURITY.md); DPDP Act mapping in [`docs/COMPLIANCE.md`](COMPLIANCE.md). Highlights:
 rotating refresh tokens with reuse detection, account lockout, rate limits, constant-cost login, Fernet encryption of Aadhaar / PAN / bank answers,
 hash-chained audit log, PII-redacting logs, allowlisted outbound fetching (SSRF defence), prompt-injection defences, signed provider webhooks,
-CSP and HSTS headers, non-root containers, dependency and secret scans in CI. The team logo (`frontend/public/logo.png`) shows the State Emblem of India on the robot's cap: the 2005 Act restricts that, so get it cleared or replaced before public launch. Otherwise do not use the emblem; an
+CSP and HSTS headers, non-root containers, dependency and secret scans in CI. The project logo (`frontend/public/logo.png`) shows the State Emblem of India on the robot's cap: the 2005 Act restricts that, so get it cleared or replaced before public launch. Otherwise do not use the emblem; an
 authorised department may supply its own via `NEXT_PUBLIC_EMBLEM_URL`.
 
 ## 14. Lessons learned and gotchas
@@ -458,8 +458,7 @@ docs/             see below                     scripts/ placeholder forms, key 
 Documentation: [Final report](FINAL_REPORT.md) · [Threat model](THREAT_MODEL.md) ·
 [Rules verification log](RULES_VERIFICATION.md) · [Reviewer worksheet](RULES_REVIEW_EXPORT.csv) · [Integrations](INTEGRATIONS.md) ·
 [Deployment (VPS)](DEPLOYMENT.md) · [Architecture](ARCHITECTURE.md) · [DPDP compliance](COMPLIANCE.md) · [Security / OWASP](SECURITY.md) · [Runbook](RUNBOOK.md) ·
-[Pilot plan](PILOT_PLAN.md) · [Demo script](DEMO_SCRIPT.md) · [Load test](LOAD_TEST.md) · [Assumptions](ASSUMPTIONS.md) ·
-[Problem statement](Problem_Statement.md)
+[Pilot plan](PILOT_PLAN.md) · [Demo script](DEMO_SCRIPT.md) · [Load test](LOAD_TEST.md) · [Assumptions](ASSUMPTIONS.md)
 
 ---
 
@@ -469,5 +468,5 @@ Documentation: [Final report](FINAL_REPORT.md) · [Threat model](THREAT_MODEL.md
 
 ## License
 
-**Proprietary, all rights reserved.** Copyright (c) 2026 Team Onyx. This repository is publicly visible but is **not** open source: only Team Onyx
-members (and people the owner approves in writing) may use, copy, modify or distribute it. See [LICENSE](../LICENSE).
+**Proprietary, all rights reserved.** Copyright (c) 2026 RajdipDhar2007. This repository is publicly visible but is **not** open source: only
+the owner (and people the owner approves in writing) may use, copy, modify or distribute it. See [LICENSE](../LICENSE).

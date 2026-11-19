@@ -32,7 +32,7 @@ The project is pre-launch. Only the latest commit on `main` is supported, and fi
 
 In scope: the backend API, the web app, the build and deployment files in this repository, and how personal data is stored and protected.
 
-Out of scope: third-party services we integrate with (report those to the provider), social engineering of team members, denial-of-service testing, and vulnerabilities that need physical access to a user's device.
+Out of scope: third-party services we integrate with (report those to the provider), social engineering of the maintainer, denial-of-service testing, and vulnerabilities that need physical access to a user's device.
 
 ## How the project protects data
 

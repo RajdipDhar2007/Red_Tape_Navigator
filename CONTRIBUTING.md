@@ -4,7 +4,7 @@ Thank you for wanting to help. Please read this page before you open an issue or
 
 ## Who can contribute
 
-This repository is **proprietary** (see [LICENSE](LICENSE)). It is public to view only. Code, data and other materials may be changed only by **Team Onyx** and people the owner has **approved in writing** (a GitHub invitation counts). If you are not one of them, you are still welcome to:
+This repository is **proprietary** (see [LICENSE](LICENSE)). It is public to view only. Code, data and other materials may be changed only by the owner and people the owner has **approved in writing** (a GitHub invitation counts). If you are not one of them, you are still welcome to:
 
 - report a bug, a wrong rule, a broken link or an accessibility barrier (use the issue forms);
 - suggest an improvement;
@@ -26,7 +26,7 @@ These come from the product's promises and are not negotiable:
 - **Never invent legal facts.** Every fee, timeline, authority and document list must come from an official page you actually read, and be recorded in [`docs/RULES_VERIFICATION.md`](docs/RULES_VERIFICATION.md). If you cannot read the source, say so.
 - **Keep personal data safe.** Never commit secrets, `.env` files, databases, keys or real Aadhaar, PAN, bank or contact details. Use obviously fake test values.
 - **Do not bypass protections.** No CAPTCHA solving, firewall evasion, or scraping outside the approved domain list.
-- **Do not use the State Emblem of India** beyond what is already in the team logo and recorded in the launch checklist.
+- **Do not use the State Emblem of India** beyond what is already in the project logo and recorded in the launch checklist.
 - **No billing.** The product is free for everyone; a test guards this.
 - Do not add a dependency bot configuration (`.github/dependabot.yml`); it once opened many unwanted pull requests.
 

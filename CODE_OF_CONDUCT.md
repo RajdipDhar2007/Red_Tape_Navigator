@@ -4,7 +4,7 @@ Red Tape Navigator exists to help ordinary people deal with government paperwork
 
 ## Our pledge
 
-We want everyone who takes part in this project (team members, approved contributors, reviewers, testers and people who report problems) to have a harassment-free experience, whatever their age, body, disability, ethnicity, gender identity or expression, experience, nationality, religion, caste, language, appearance, or sexual orientation.
+We want everyone who takes part in this project (approved contributors, reviewers, testers and people who report problems) to have a harassment-free experience, whatever their age, body, disability, ethnicity, gender identity or expression, experience, nationality, religion, caste, language, appearance, or sexual orientation.
 
 ## What we expect
 
@@ -25,7 +25,7 @@ We want everyone who takes part in this project (team members, approved contribu
 
 ## Where this applies
 
-In this repository (issues, pull requests, discussions, reviews, comments) and in any space where someone represents the project, such as a demo, a hackathon session or a pilot with shop owners.
+In this repository (issues, pull requests, discussions, reviews, comments) and in any space where someone represents the project, such as a demo or a pilot with shop owners.
 
 ## Reporting a problem
 
@@ -33,7 +33,7 @@ If you experience or see behaviour that breaks this code, contact the repository
 
 ## What happens next
 
-The owner and the team will look at each report, hear from the people involved, and decide a proportionate response. This can range from a private reminder, to removing a comment, to ending someone's access to the repository.
+The owner will look at each report, hear from the people involved, and decide a proportionate response. This can range from a private reminder, to removing a comment, to ending someone's access to the repository.
 
 ## Attribution
 
