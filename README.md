@@ -43,7 +43,7 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 
 | Part | # | Section | What you will find |
 |---|---|---|---|
-| **About the project** | 1 | [Project and author](#project-and-author) | Project, track, author |
+| **About the project** | 1 | [Project and team](#project-and-team) | Project, track, team |
 |  | 2 | [The problem, in real life](#the-problem-in-real-life) | Real people, real photos, and the pain point by point with our fixes |
 |  | 3 | [Who we are building this for](#who-we-are-building-this-for) | The people this helps |
 |  | 4 | [How the Indian government context shaped the design](#how-the-indian-government-context-shaped-the-design) | Official systems and laws the product points to |
@@ -68,25 +68,38 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## Project and author
+## Project and team
 
 <table width="100%">
 <tr>
-<td width="58%" valign="top">
+<td width="55%" valign="top">
 
-### Project details
+### Red Tape Navigator
 
-**Project:** Red Tape Navigator<br />
-**Track:** Agentic AI, Software and Civic Tech<br />
+*Type one sentence. Get your whole licence plan, with the forms already filled.*
+
+| | |
+|---|---|
+| **What it is** | An agentic AI assistant for citizens and small businesses in India |
+| **Domain** | Agentic AI, Software and Civic Tech |
+| **Hackathon** | Dev Nexus, Government College of Engineering and Leather Technology |
+| **Track** | Track I: Spooky Starter |
+| **Languages** | English, Hindi, Bengali |
+| **Stack** | FastAPI, Next.js, PostgreSQL, Google Gemini |
 
 </td>
-<td width="42%" valign="top">
+<td width="45%" valign="top">
 
-### Author
+### Team GodsWill
 
-<table>
-<tr><td><b>Rajdip Dhar</b></td><td><b>Owner</b></td></tr>
-</table>
+| Member | Role |
+|---|---|
+| **Rajdip Dhar** | Team Leader |
+| Dipanjan Baidya | Team Member |
+| Ruma Kumari | Team Member |
+| Afraz Ahamed | Team Member |
+
+<sub>Repository owner: Rajdip Dhar</sub>
 
 </td>
 </tr>
