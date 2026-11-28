@@ -26,9 +26,9 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 
 <br />
 
-<img src="docs/media/demo-walkthrough.gif" alt="Animated walkthrough of Red Tape Navigator: goal, plan, interview, review, download, Hindi and Bengali" width="880" />
+<img src="docs/media/demo-walkthrough.gif" alt="Walkthrough of Red Tape Navigator recorded from the running app: sign up, consent, goal, cited plan, interview, review, download, then Hindi and Bengali" width="880" />
 
-<sub>The real app, recorded from a local run: goal, plan, interview, review, download, then the same journey in Hindi and Bengali.</sub>
+<sub>The real app, driven end to end in a browser: sign up, consent, goal, cited plan, interview, review (switching between steps with the progress bar), download, then the same screen in Hindi and Bengali.</sub>
 
 <br />
 
@@ -43,7 +43,7 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 
 | Part | # | Section | What you will find |
 |---|---|---|---|
-| **About the project** | 1 | [Project and team](#project-and-team) | Project, track, team |
+| **About the project** | 1 | [About the project](#about-the-project) | Project and author |
 |  | 2 | [The problem, in real life](#the-problem-in-real-life) | Real people, real photos, and the pain point by point with our fixes |
 |  | 3 | [Who we are building this for](#who-we-are-building-this-for) | The people this helps |
 |  | 4 | [How the Indian government context shaped the design](#how-the-indian-government-context-shaped-the-design) | Official systems and laws the product points to |
@@ -68,11 +68,7 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
-## Project and team
-
-<table width="100%">
-<tr>
-<td width="55%" valign="top">
+## About the project
 
 ### Red Tape Navigator
 
@@ -82,28 +78,9 @@ Free to use, in English, Hindi and Bengali. It never submits anything on your be
 |---|---|
 | **What it is** | An agentic AI assistant for citizens and small businesses in India |
 | **Domain** | Agentic AI, Software and Civic Tech |
-| **Hackathon** | Dev Nexus, Government College of Engineering and Leather Technology |
-| **Track** | Track I: Spooky Starter |
 | **Languages** | English, Hindi, Bengali |
 | **Stack** | FastAPI, Next.js, PostgreSQL, Google Gemini |
-
-</td>
-<td width="45%" valign="top">
-
-### Team GodsWill
-
-| Member | Role |
-|---|---|
-| **Rajdip Dhar** | Team Leader |
-| Dipanjan Baidya | Team Member |
-| Ruma Kumari | Team Member |
-| Afraz Ahamed | Team Member |
-
-<sub>Repository owner: Rajdip Dhar</sub>
-
-</td>
-</tr>
-</table>
+| **Author and owner** | Rajdip Dhar |
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
@@ -661,7 +638,7 @@ and a Terraform skeleton covers Indian cloud regions. Migrations run on start (`
 | 10 | **Local and CI database differences.** A SQLite-only statement failed the PostgreSQL CI job. | Dialect-guarded setup and a dedicated **PostgreSQL plus pgvector CI job** with migration up, down and up again. |
 | 11 | **UI bugs only a real browser shows**: the header and dashboard did not update after sign-in or log-out; download buttons showed raw file names; dates ignored the language; two consent buttons had the same accessible name. | We reviewed the live app in a real browser and fixed each: an `rtn:auth` event keeps the header and dashboard in sync, readable download labels, locale-aware dates, distinct accessible names, and a new end-to-end test. |
 | 12 | **Free hosting limits.** Render's free tier sleeps, has no shell and expires its database in 30 days. | An in-process scheduler and a first officer created from environment variables, so a single free instance is enough to run it. |
-| 13 | **Merging two teammates' diverged work** (core product and the hardening and Document Vault branch). | A careful three-way merge with 12 conflicts resolved by hand, then the full test suite and CI to prove nothing regressed. |
+| 13 | **Merging diverged branches** (core product and the hardening and Document Vault branch). | A careful three-way merge with 12 conflicts resolved by hand, then the full test suite and CI to prove nothing regressed. |
 | 14 | **Dependency bots opening unwanted pull requests.** | We removed the Dependabot config and recorded it as a rule in the contributor notes. |
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
@@ -716,7 +693,7 @@ We would rather state our limits than hide them.
 | 5 | **Official forms** with permission | Owner | Ask FSSAI and departments; add field maps; keep the key-in sheets. |
 | 6 | **Native-speaker review** of Hindi and Bengali | Reviewers | Especially legal and fee wording. |
 | 7 | **Launch hardening** | Owner and counsel | Legal review of privacy and terms; real-phone, screen-reader and slow-network tests; penetration test; secret-rotation plan. |
-| 8 | **Pilot** with 5 to 10 shop owners | Team | See [`docs/PILOT_PLAN.md`](docs/PILOT_PLAN.md). |
+| 8 | **Pilot** with 5 to 10 shop owners | Rajdip | See [`docs/PILOT_PLAN.md`](docs/PILOT_PLAN.md). |
 | 9 | **Rotate any key shared during development** | Owner | Standard hygiene before launch. |
 
 ### Future ideas (not built yet)
@@ -825,7 +802,7 @@ Never commit keys. A walkthrough for presenting the app is in [`docs/DEMO_SCRIPT
 - **Open-source software** this project stands on: FastAPI, SQLAlchemy, Alembic, Pydantic, Next.js, React, next-intl, Tailwind CSS, PyMuPDF, pypdf, reportlab, Playwright, pytest and many more.
 - **Photographs** in [the problem section](#the-problem-in-real-life) are from Wikimedia Commons under Creative Commons licences, credited under each image: Salil Kumar Mukherjee,
   Sunnya343 and Kritzolina (CC BY-SA 4.0) and McKay Savage (CC BY 2.0). They are shown from their original locations and remain the property of their authors.
-- **Screenshots** and the walkthrough animation are original captures of this project.
+- **Screenshots** and the walkthrough GIF are original captures of this project.
 
 <img src="docs/assets/divider.svg" width="100%" alt="" />
 
